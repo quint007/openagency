@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  install:
+    cmds:
+      - echo "staging tasks not implemented"
+  dev:
+    cmds:
+      - echo "staging tasks not implemented"
+  build:
+    cmds:
+      - echo "staging tasks not implemented"
+  lint:
+    cmds:
+      - echo "staging tasks not implemented"
+  test:
+    cmds:
+      - echo "staging tasks not implemented"
+  docker:
+    cmds:
+      - echo "staging tasks not implemented"
+  tofu:
+    cmds:
+      - echo "staging tasks not implemented"

@@ -1,0 +1,14 @@
+version: '3'
+
+includes:
+  dev:
+    taskfile: ci/development.yaml
+  staging:
+    taskfile: ci/staging.yaml
+  production:
+    taskfile: ci/production.yaml
+
+tasks:
+  default:
+    cmds:
+      - task --list

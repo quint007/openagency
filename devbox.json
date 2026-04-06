@@ -1,0 +1,11 @@
+{
+  "name":    "open-agency",
+  "version": "1.0.0",
+  "packages": [
+    "nodejs_20",
+    "pnpm",
+    "opentofu",
+    "docker",
+    "go-task"
+  ]
+}

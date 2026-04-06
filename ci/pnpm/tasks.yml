@@ -1,0 +1,108 @@
+version: '3'
+
+tasks:
+  install:
+    desc: Install all dependencies
+    cmds:
+      - pnpm install --dir frontend
+      - pnpm install --dir backend
+
+  install-frontend:
+    desc: Install frontend dependencies
+    dir: frontend
+    cmds:
+      - pnpm install
+
+  install-backend:
+    desc: Install backend dependencies
+    dir: backend
+    cmds:
+      - pnpm install
+
+  dev:
+    desc: Start development servers
+    cmds:
+      - pnpm --dir frontend dev
+
+  dev-frontend:
+    desc: Start frontend development servers
+    dir: frontend
+    cmds:
+      - pnpm dev
+
+  dev-backend:
+    desc: Start backend development server
+    dir: backend
+    cmds:
+      - pnpm dev
+
+  build:
+    desc: Build all projects
+    cmds:
+      - pnpm --dir frontend build
+      - pnpm --dir backend build
+
+  build-frontend:
+    desc: Build frontend
+    dir: frontend
+    cmds:
+      - pnpm build
+
+  build-backend:
+    desc: Build backend
+    dir: backend
+    cmds:
+      - pnpm build
+
+  lint:
+    desc: Lint all projects
+    cmds:
+      - pnpm --dir frontend lint
+      - pnpm --dir backend lint
+
+  lint-frontend:
+    desc: Lint frontend
+    dir: frontend
+    cmds:
+      - pnpm lint
+
+  lint-backend:
+    desc: Lint backend
+    dir: backend
+    cmds:
+      - pnpm lint
+
+  test:
+    desc: Run tests
+    cmds:
+      - pnpm --dir frontend test
+
+  test-frontend:
+    desc: Run frontend tests
+    dir: frontend
+    cmds:
+      - pnpm test
+
+  clean:
+    desc: Clean all build artifacts
+    cmds:
+      - pnpm --dir frontend clean
+      - pnpm --dir backend clean
+
+  clean-frontend:
+    desc: Clean frontend build artifacts
+    dir: frontend
+    cmds:
+      - pnpm clean
+
+  clean-backend:
+    desc: Clean backend build artifacts
+    dir: backend
+    cmds:
+      - pnpm clean
+
+  check:
+    desc: Run all checks (lint + test)
+    cmds:
+      - pnpm --dir frontend lint
+      - pnpm --dir frontend test

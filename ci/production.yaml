@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  install:
+    cmds:
+      - echo "production tasks not implemented"
+  dev:
+    cmds:
+      - echo "production tasks not implemented"
+  build:
+    cmds:
+      - echo "production tasks not implemented"
+  lint:
+    cmds:
+      - echo "production tasks not implemented"
+  test:
+    cmds:
+      - echo "production tasks not implemented"
+  docker:
+    cmds:
+      - echo "production tasks not implemented"
+  tofu:
+    cmds:
+      - echo "production tasks not implemented"

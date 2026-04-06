@@ -1,0 +1,43 @@
+version: '3'
+
+includes:
+  pnpm:
+    taskfile: pnpm/tasks.yml
+    vars:
+      ENV: development
+
+  docker:
+    taskfile: docker/tasks.yml
+    vars:
+      ENV: development
+
+  tofu:
+    taskfile: tofu/tasks.yml
+    vars:
+      ENV: development
+
+tasks:
+  install: pnpm:install
+  install-frontend: pnpm:install-frontend
+  install-backend: pnpm:install-backend
+
+  dev: pnpm:dev
+  dev-frontend: pnpm:dev-frontend
+  dev-backend: pnpm:dev-backend
+
+  build: pnpm:build
+  build-frontend: pnpm:build-frontend
+  build-backend: pnpm:build-backend
+
+  lint: pnpm:lint
+  lint-frontend: pnpm:lint-frontend
+  lint-backend: pnpm:lint-backend
+
+  test: pnpm:test
+  test-frontend: pnpm:test-frontend
+
+  clean: pnpm:clean
+  clean-frontend: pnpm:clean-frontend
+  clean-backend: pnpm:clean-backend
+
+  check: pnpm:check

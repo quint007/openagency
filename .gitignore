@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.pnpm/
+
+# Build outputs
+frontend/apps/*/dist/
+frontend/apps/*/.next/
+frontend/apps/*/.turbo/
+frontend/packages/*/dist/
+frontend/packages/*/.turbo/
+backend/dist/
+backend/.payload/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.pem
+
+# Terraform/OpenTofu
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.*
+*.tfvars
+*.tfplan
+
+# Go
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.sum
+vendor/
+
+# Test coverage
+coverage/
+
+# Misc
+*.tgz
+.cache/

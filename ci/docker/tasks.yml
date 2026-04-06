@@ -1,0 +1,36 @@
+version: '3'
+
+tasks:
+  pull:
+    desc: Pull Docker images
+    dir: .
+    cmds:
+      - docker pull mongo:7
+      - docker pull node:20
+
+  build-local:
+    desc: Build local Docker images
+    cmds:
+      - docker build -t open-agency-backend:latest ./backend
+      - docker build -t open-agency-frontend:latest ./frontend
+
+  up:
+    desc: Start Docker Compose services
+    cmds:
+      - docker compose up -d
+
+  down:
+    desc: Stop Docker Compose services
+    cmds:
+      - docker compose down
+
+  logs:
+    desc: View Docker Compose logs
+    cmds:
+      - docker compose logs -f
+
+  clean:
+    desc: Clean Docker containers and volumes
+    cmds:
+      - docker compose down -v
+      - docker system prune -f
