@@ -12,3 +12,19 @@ tasks:
   default:
     cmds:
       - task --list
+  setup:
+    desc: Bootstraps the repo for local development
+    cmds:
+      - bash scripts/setup.sh
+  dev:
+    desc: Start the backend and frontend together
+    cmds:
+      - bash scripts/dev.sh
+  dev-frontend:
+    desc: Start the marketing and courses apps
+    cmds:
+      - pnpm --dir frontend dev
+  dev-backend:
+    desc: Start Payload CMS only
+    cmds:
+      - PORT=3002 NEXT_PUBLIC_SERVER_URL=http://localhost:3002 pnpm --dir backend/openagency-backend dev

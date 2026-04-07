@@ -36,3 +36,7 @@ Or use the Taskfile tasks with `devbox run task <task-name>`:
 - `devbox run task run:dev` - Start all development servers
 - `devbox run task build` - Build all projects
 - `devbox run task lint` - Lint all projects
+
+## Taskfile-first policy
+
+Whenever a command needs to be run frequently (setup, dev workflows, migrations, etc.), add a task to `Taskfile.yml` rather than introducing a `Makefile` or ad hoc alias. This keeps the workflow centralized and surfaced through `task <name>` (and `devbox run task <name>`). Do not re-create a Makefile while this policy is in effect.

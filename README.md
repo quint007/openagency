@@ -22,49 +22,43 @@ open-agency/
 
 ## Getting Started
 
+Full local setup (Docker, env files, and `make setup`) is documented in `docs/contributing.md`.
+
 ### Prerequisites
 
 - Node.js 20+
 - pnpm
-- MongoDB (for backend)
+- Docker Desktop (for the PostgreSQL container defined in `docker-compose.yml`)
 
 ### Installation
 
 ```bash
-make install
+task install
 ```
 
 ### Development
 
 ```bash
-make dev
+task dev
 ```
 
-This starts the frontend (Turborepo) with both Next.js apps.
+This starts the Payload backend and the frontend (Turborepo) with both Next.js apps.
 
 ### Build
 
 ```bash
-make build
+task build
 ```
 
 ### Lint
 
 ```bash
-make lint
+task lint
 ```
 
 ## Environment Variables
 
-### Backend
-
-Copy `backend/.env` and update as needed:
-
-```
-PAYLOAD_SECRET=your-secret-key
-MONGODB_URI=mongodb://localhost:27017/open-agency
-PORT=3000
-```
+All runtime settings live in the `.env*` files described in `docs/contributing.md` (backend, marketing, and courses).
 
 ## Tech Stack
 
