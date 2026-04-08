@@ -5,11 +5,25 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
+    "test:e2e": "playwright test apps/marketing/tests/e2e",
+    "test:ui": "vitest run packages/ui apps/marketing",
     "test": "turbo test",
     "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "^2.0.0"
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@playwright/test": "1.58.2",
+    "@testing-library/react": "16.3.0",
+    "@vitejs/plugin-react": "4.5.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "jsdom": "28.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5",
+    "vite-tsconfig-paths": "6.0.5",
+    "vitest": "4.0.18"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
