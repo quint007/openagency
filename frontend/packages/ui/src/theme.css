@@ -1,0 +1,296 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --brand-font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --brand-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --brand-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  --background: #0b1326;
+  --foreground: #e8eaf0;
+  --card: #171f33;
+  --card-foreground: #e8eaf0;
+  --popover: #171f33;
+  --popover-foreground: #e8eaf0;
+  --primary: #00daf3;
+  --primary-foreground: #00363d;
+  --secondary: #009fb2;
+  --secondary-foreground: #e8eaf0;
+  --muted: #222a3d;
+  --muted-foreground: #8d92a3;
+  --accent: #00daf3;
+  --accent-foreground: #00363d;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffffff;
+  --border: rgba(65, 71, 84, 0.15);
+  --input: transparent;
+  --input-background: #060e20;
+  --switch-background: #414754;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #00daf3;
+
+  --brand-primary: #00daf3;
+  --brand-primary-dark: #009fb2;
+  --brand-primary-light: #33e4f6;
+  --brand-accent: #00daf3;
+  --brand-accent-dark: #009fb2;
+  --brand-tertiary: #00ffaa;
+  --brand-success: #00ffaa;
+  --brand-warning: #ffb86c;
+  --brand-danger: #ff6b6b;
+
+  --surface: #0b1326;
+  --surface-container: #171f33;
+  --surface-container-low: #131b2e;
+  --surface-container-lowest: #060e20;
+  --surface-container-high: #222a3d;
+  --surface-container-highest: rgba(34, 42, 61, 0.95);
+  --surface-bright: #2d3548;
+  --surface-variant: #1f2739;
+
+  --on-surface: #e8eaf0;
+  --on-surface-variant: #c1c6d7;
+  --on-primary: #00363d;
+  --on-tertiary: #00363d;
+  --outline-variant: #414754;
+
+  --chart-1: #00daf3;
+  --chart-2: #00ffaa;
+  --chart-3: #ffb86c;
+  --chart-4: #ff6b6b;
+  --chart-5: #bd93f9;
+  --radius: 0px;
+  --sidebar: #171f33;
+  --sidebar-foreground: #e8eaf0;
+  --sidebar-primary: #00daf3;
+  --sidebar-primary-foreground: #00363d;
+  --sidebar-accent: #222a3d;
+  --sidebar-accent-foreground: #e8eaf0;
+  --sidebar-border: rgba(65, 71, 84, 0.15);
+  --sidebar-ring: #00daf3;
+}
+
+.dark {
+  --background: #0b1326;
+  --foreground: #e8eaf0;
+  --card: #171f33;
+  --card-foreground: #e8eaf0;
+  --popover: #171f33;
+  --popover-foreground: #e8eaf0;
+  --primary: #00daf3;
+  --primary-foreground: #00363d;
+  --secondary: #009fb2;
+  --secondary-foreground: #e8eaf0;
+  --muted: #222a3d;
+  --muted-foreground: #8d92a3;
+  --accent: #00daf3;
+  --accent-foreground: #00363d;
+  --destructive: #ff6b6b;
+  --destructive-foreground: #ffffff;
+  --border: rgba(65, 71, 84, 0.15);
+  --input: transparent;
+  --ring: #00daf3;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+
+  --brand-primary: #00daf3;
+  --brand-primary-dark: #009fb2;
+  --brand-primary-light: #33e4f6;
+  --brand-accent: #00daf3;
+  --brand-accent-dark: #009fb2;
+  --brand-tertiary: #00ffaa;
+  --brand-success: #00ffaa;
+  --brand-warning: #ffb86c;
+  --brand-danger: #ff6b6b;
+
+  --surface: #0b1326;
+  --surface-container: #171f33;
+  --surface-container-low: #131b2e;
+  --surface-container-lowest: #060e20;
+  --surface-container-high: #222a3d;
+  --surface-container-highest: rgba(34, 42, 61, 0.95);
+  --surface-bright: #2d3548;
+  --surface-variant: #1f2739;
+
+  --on-surface: #e8eaf0;
+  --on-surface-variant: #c1c6d7;
+  --on-primary: #00363d;
+  --on-tertiary: #00363d;
+  --outline-variant: #414754;
+
+  --chart-1: #00daf3;
+  --chart-2: #00ffaa;
+  --chart-3: #ffb86c;
+  --chart-4: #ff6b6b;
+  --chart-5: #bd93f9;
+  --radius: 0px;
+  --sidebar: #171f33;
+  --sidebar-foreground: #e8eaf0;
+  --sidebar-primary: #00daf3;
+  --sidebar-primary-foreground: #00363d;
+  --sidebar-accent: #222a3d;
+  --sidebar-accent-foreground: #e8eaf0;
+  --sidebar-border: rgba(65, 71, 84, 0.15);
+  --sidebar-ring: #00daf3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-dark: var(--brand-primary-dark);
+  --color-brand-primary-light: var(--brand-primary-light);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-dark: var(--brand-accent-dark);
+  --color-brand-tertiary: var(--brand-tertiary);
+  --color-brand-success: var(--brand-success);
+  --color-brand-warning: var(--brand-warning);
+  --color-brand-danger: var(--brand-danger);
+
+  --color-surface: var(--surface);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-variant: var(--surface-variant);
+
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-on-primary: var(--on-primary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-outline-variant: var(--outline-variant);
+
+  --spacing: 0.25rem;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+  --font-size-6xl: 3.75rem;
+  --font-size-7xl: 4.5rem;
+  --font-size-8xl: 6rem;
+  --font-size-9xl: 8rem;
+
+  --radius-none: 0;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.375rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
+  --radius-4xl: 1.5rem;
+  --radius-5xl: 2rem;
+  --radius-full: 9999px;
+
+  --measure-shell: 88rem;
+  --measure-copy: 46rem;
+  --measure-hero: 72rem;
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--brand-font-body);
+  }
+
+  html {
+    font-size: var(--font-size);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--brand-font-heading);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  label {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
+
+  code,
+  pre,
+  .mono {
+    font-family: var(--brand-font-mono);
+  }
+}

@@ -1,0 +1,85 @@
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@source "./**/*.{ts,tsx}";
+
+:root {
+
+    --bg-color: #000308;
+
+    --light-color: #00e5ff;
+
+    --highlight-color: #ffb86c;
+
+    --glow-color-1: rgba(0, 229, 255, 0.8);
+
+    --glow-color-2: rgba(0, 150, 255, 0.6);
+
+    --highlight-glow: rgba(255, 184, 108, 0.7);
+}
+
+@theme inline {
+
+    --color-bg-color: var(----bg-color);
+
+    --color-light-color: var(----light-color);
+
+    --color-highlight-color: var(----highlight-color);
+
+    --color-glow-color-1: var(----glow-color-1);
+
+    --color-glow-color-2: var(----glow-color-2);
+
+    --color-highlight-glow: var(----highlight-glow);
+  @keyframes rise {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+        }
+  10% {
+    opacity: 1;
+        }
+  100% {
+    transform: translateY(-5%);
+    opacity: 0;
+        }
+    }
+  @keyframes fade {
+  0%, 100% {
+    opacity: 0;
+        }
+  5%, 85% {
+    opacity: 0.8;
+        }
+    }
+  @keyframes floorGlow {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+        }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+        }
+    }
+  @keyframes mainGlow {
+  from {
+    opacity: 0.5;
+    filter: blur(30px);
+        }
+  to {
+    opacity: 0.7;
+    filter: blur(20px);
+        }
+    }
+  @keyframes moveGrid {
+  from {
+    background-position: 0 0;
+        }
+  to {
+    background-position: -100px -50px;
+        }
+    }
+}

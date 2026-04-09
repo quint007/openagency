@@ -65,3 +65,8 @@ coverage/
 # Misc
 *.tgz
 .cache/
+.sisyphus/
+.playwright-mcp/
+frontend/.turbo/
+*/.turbo
+brand/
