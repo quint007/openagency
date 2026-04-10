@@ -26,13 +26,28 @@ export const colors = {
 };
 
 export const spacing = {
-  xs: '0.25rem',
-  sm: '0.5rem',
-  md: '1rem',
-  lg: '1.5rem',
-  xl: '2rem',
-  '2xl': '3rem',
-  '3xl': '4rem',
+  px: '1px',
+  0: '0',
+  '0.5': '0.125rem',
+  1: '0.25rem',
+  '1.5': '0.375rem',
+  2: '0.5rem',
+  '2.5': '0.625rem',
+  3: '0.75rem',
+  4: '1rem',
+  5: '1.25rem',
+  6: '1.5rem',
+  8: '2rem',
+  10: '2.5rem',
+  12: '3rem',
+  16: '4rem',
+  20: '5rem',
+  24: '6rem',
+  32: '8rem',
+  40: '10rem',
+  48: '12rem',
+  56: '14rem',
+  64: '16rem',
 };
 
 export const fontSize = {
@@ -44,6 +59,11 @@ export const fontSize = {
   '2xl': '1.5rem',
   '3xl': '1.875rem',
   '4xl': '2.25rem',
+  '5xl': '3rem',
+  '6xl': '3.75rem',
+  '7xl': '4.5rem',
+  '8xl': '6rem',
+  '9xl': '8rem',
 };
 
 export const borderRadius = {
@@ -54,6 +74,8 @@ export const borderRadius = {
   lg: '0.5rem',
   xl: '0.75rem',
   '2xl': '1rem',
+  '3xl': '1.5rem',
+  '4xl': '2rem',
   full: '9999px',
 };
 
@@ -65,12 +87,21 @@ export const shadows = {
   xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
 };
 
+export const layout = {
+  measure: {
+    shell: '88rem',
+    copy: '46rem',
+    hero: '72rem',
+  },
+} as const;
+
 export const tokens = {
   colors,
   spacing,
   fontSize,
   borderRadius,
   shadows,
+  layout,
 } as const;
 
 export type Tokens = typeof tokens;
