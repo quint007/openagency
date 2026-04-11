@@ -6,8 +6,10 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "test:e2e": "playwright test apps/marketing/tests/e2e",
-    "test:ui": "vitest run packages/ui apps/marketing",
+    "test:ui": "vitest run packages/ui packages/api-client apps/marketing",
     "test": "turbo test",
+    "verify:cms-boundary": "node scripts/verify-cms-client-boundary.mjs",
+    "verify:course-revalidation": "playwright test --config playwright.task8.config.ts apps/courses/tests/e2e/revalidation-latency.spec.ts",
     "clean": "turbo clean && rm -rf node_modules"
   },
   "devDependencies": {

@@ -38,13 +38,24 @@ export default defineConfig({
         find: /^react-dom\/test-utils$/,
         replacement: path.join(frontendRoot, 'node_modules/react-dom/test-utils.js'),
       },
+      {
+        find: /^@open-agency\/cms-client$/,
+        replacement: path.join(frontendRoot, 'packages/cms-client/src/index.ts'),
+      },
+      {
+        find: /^@open-agency\/cms-client\/(.*)$/,
+        replacement: path.join(frontendRoot, 'packages/cms-client/src/$1'),
+      },
     ],
   },
   test: {
     environment: 'jsdom',
     setupFiles: ['frontend/vitest.setup.tsx'],
     include: [
+      'frontend/packages/api-client/tests/**/*.{test,spec}.{ts,tsx}',
+      'frontend/packages/cms-client/tests/**/*.{test,spec}.{ts,tsx}',
       'frontend/packages/ui/tests/**/*.{test,spec}.{ts,tsx}',
+      'frontend/apps/courses/tests/**/*.{test,spec}.{ts,tsx}',
       'frontend/apps/marketing/tests/**/*.{test,spec}.{ts,tsx}',
     ],
     exclude: ['**/tests/e2e/**'],

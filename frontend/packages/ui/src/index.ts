@@ -7,4 +7,5 @@ export * from './components/ui/input';
 export * from './components/ui/navigation-menu';
 export * from './components/ui/separator';
 export * from './components/ui/container-text-flip';
+export * from './content/lexical-renderer';
 export * from './lib/utils';

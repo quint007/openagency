@@ -4,8 +4,13 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { Authors } from './collections/Authors'
+import { BlogPosts } from './collections/BlogPosts'
 import { Categories } from './collections/Categories'
+import { Courses } from './collections/Courses'
+import { Lessons } from './collections/Lessons'
 import { Media } from './collections/Media'
+import { Modules } from './collections/Modules'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
@@ -62,7 +67,18 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [
+    Pages,
+    Posts,
+    BlogPosts,
+    Courses,
+    Modules,
+    Lessons,
+    Authors,
+    Media,
+    Categories,
+    Users,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins,

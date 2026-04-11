@@ -8,6 +8,14 @@ includes:
   production:
     taskfile: ci/production.yaml
 
+vars:
+  BACKEND_DIR: backend/openagency-backend
+  FRONTEND_DIR: frontend
+  DOCKER_COMPOSE_FILE: docker-compose.yml
+  BACKEND_PORT: '3002'
+  MARKETING_PORT: '3000'
+  COURSES_PORT: '3001'
+
 tasks:
   default:
     cmds:
@@ -17,14 +25,128 @@ tasks:
     cmds:
       - bash scripts/setup.sh
   dev:
-    desc: Start the backend and frontend together
+    desc: Start the local database, Payload CMS, and frontend apps together
     cmds:
-      - bash scripts/dev.sh
+      - task dev:prepare
+      - task --parallel dev-backend dev-frontend
   dev-frontend:
     desc: Start the marketing and courses apps
     cmds:
-      - pnpm --dir frontend dev
+      - pnpm --dir {{.FRONTEND_DIR}} dev
   dev-backend:
     desc: Start Payload CMS only
     cmds:
-      - PORT=3002 NEXT_PUBLIC_SERVER_URL=http://localhost:3002 pnpm --dir backend/openagency-backend dev
+      - task dev:backend
+
+  dev:prepare:
+    desc: Run local development preflight tasks
+    cmds:
+      - task dev:ensure-env
+      - task dev:clear-ports
+      - task dev:db:start
+      - task dev:db:wait
+      - task dev:cms:migrate
+
+  dev:ensure-env:
+    desc: Verify local environment files and required backend variables exist
+    preconditions:
+      - sh: test -f {{.BACKEND_DIR}}/.env
+        msg: Missing {{.BACKEND_DIR}}/.env. Run `task setup` first.
+      - sh: test -f {{.FRONTEND_DIR}}/apps/marketing/.env.local
+        msg: Missing {{.FRONTEND_DIR}}/apps/marketing/.env.local. Run `task setup` first.
+      - sh: test -f {{.FRONTEND_DIR}}/apps/courses/.env.local
+        msg: Missing {{.FRONTEND_DIR}}/apps/courses/.env.local. Run `task setup` first.
+      - sh: grep -q '^MARKETING_APP_BASE_URL=' {{.BACKEND_DIR}}/.env
+        msg: Missing MARKETING_APP_BASE_URL in {{.BACKEND_DIR}}/.env.
+      - sh: grep -q '^COURSES_APP_BASE_URL=' {{.BACKEND_DIR}}/.env
+        msg: Missing COURSES_APP_BASE_URL in {{.BACKEND_DIR}}/.env.
+      - sh: grep -q '^REVALIDATE_SECRET=' {{.BACKEND_DIR}}/.env
+        msg: Missing REVALIDATE_SECRET in {{.BACKEND_DIR}}/.env.
+      - sh: test "$(grep '^REVALIDATE_SECRET=' {{.BACKEND_DIR}}/.env | cut -d= -f2-)" = "$(grep '^REVALIDATE_SECRET=' {{.FRONTEND_DIR}}/apps/marketing/.env.local | cut -d= -f2-)"
+        msg: REVALIDATE_SECRET must match between {{.BACKEND_DIR}}/.env and {{.FRONTEND_DIR}}/apps/marketing/.env.local.
+      - sh: test "$(grep '^REVALIDATE_SECRET=' {{.BACKEND_DIR}}/.env | cut -d= -f2-)" = "$(grep '^REVALIDATE_SECRET=' {{.FRONTEND_DIR}}/apps/courses/.env.local | cut -d= -f2-)"
+        msg: REVALIDATE_SECRET must match between {{.BACKEND_DIR}}/.env and {{.FRONTEND_DIR}}/apps/courses/.env.local.
+
+  dev:clear-ports:
+    desc: Clear local app ports before development startup
+    cmds:
+      - task dev:clear-port PORT={{.MARKETING_PORT}}
+      - task dev:clear-port PORT={{.COURSES_PORT}}
+      - task dev:clear-port PORT={{.BACKEND_PORT}}
+
+  dev:clear-port:
+    desc: Clear a single local TCP port
+    requires:
+      vars: [PORT]
+    cmds:
+      - |
+        set -eu
+        pids="$(lsof -ti tcp:{{.PORT}} || true)"
+        if [ -z "$pids" ]; then
+          echo "Port {{.PORT}} is already clear"
+          exit 0
+        fi
+
+        echo "Stopping processes on port {{.PORT}}"
+        printf '%s\n' "$pids" | xargs kill -TERM
+        sleep 1
+
+        remaining="$(lsof -ti tcp:{{.PORT}} || true)"
+        if [ -n "$remaining" ]; then
+          echo "Force stopping remaining processes on port {{.PORT}}"
+          printf '%s\n' "$remaining" | xargs kill -KILL
+        fi
+
+  dev:db:start:
+    desc: Start the local Postgres container
+    cmds:
+      - |
+        set -eu
+        if docker compose version >/dev/null 2>&1; then
+          docker compose -f {{.DOCKER_COMPOSE_FILE}} up -d postgres
+        elif docker-compose version >/dev/null 2>&1; then
+          docker-compose -f {{.DOCKER_COMPOSE_FILE}} up -d postgres
+        else
+          echo "Docker Compose (docker compose or docker-compose) is required" >&2
+          exit 1
+        fi
+
+  dev:db:wait:
+    desc: Wait for the local Postgres container to accept connections
+    cmds:
+      - |
+        set -eu
+        if docker compose version >/dev/null 2>&1; then
+          compose_cmd='docker compose'
+        elif docker-compose version >/dev/null 2>&1; then
+          compose_cmd='docker-compose'
+        else
+          echo "Docker Compose (docker compose or docker-compose) is required" >&2
+          exit 1
+        fi
+
+        postgres_container="$($compose_cmd -f {{.DOCKER_COMPOSE_FILE}} ps -q postgres)"
+        if [ -z "$postgres_container" ]; then
+          echo "Could not determine the postgres container ID" >&2
+          exit 1
+        fi
+
+        echo -n 'Waiting for Postgres to accept connections'
+        until docker exec "$postgres_container" pg_isready -U open_agency >/dev/null 2>&1; do
+          echo -n '.'
+          sleep 1
+        done
+        echo ' done'
+
+  dev:cms:migrate:
+    desc: Verify CMS database connectivity by running Payload migrations
+    cmds:
+      - pnpm --dir {{.BACKEND_DIR}} exec payload migrate --yes
+
+  dev:backend:
+    desc: Start Payload CMS only
+    env:
+      PORT: '{{.BACKEND_PORT}}'
+      NEXT_PUBLIC_SERVER_URL: http://localhost:{{.BACKEND_PORT}}
+    cmds:
+      - pnpm --dir {{.BACKEND_DIR}} dev

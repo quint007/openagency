@@ -1,24 +1,24 @@
 {
-  "name": "@open-agency/api-client",
+  "name": "@open-agency/cms-client",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
-  "types": "./src/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./src/index.ts"
     }
   },
   "scripts": {
-    "lint": "eslint src/",
+    "lint": "eslint src/ tests/",
     "typecheck": "tsc --noEmit",
-    "test": "pnpm --dir ../.. exec vitest run --config vitest.config.mts packages/api-client/tests"
+    "test": "pnpm --dir ../.. exec vitest run --config vitest.config.mts packages/cms-client/tests"
   },
   "devDependencies": {
     "typescript": "^5.9.0"
   },
   "dependencies": {
-    "fetch-retry": "^5.0.6"
+    "server-only": "^0.0.1"
   }
 }

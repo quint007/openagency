@@ -1,13 +1,24 @@
 import type { TextFieldSingleValidation } from 'payload'
 import {
+  BlocksFeature,
   BoldFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  HorizontalRuleFeature,
   ItalicFeature,
   LinkFeature,
   ParagraphFeature,
   lexicalEditor,
+  InlineToolbarFeature,
   UnderlineFeature,
   type LinkFields,
 } from '@payloadcms/richtext-lexical'
+
+import { Banner } from '@/blocks/Banner/config'
+import { Callout } from '@/blocks/Callout/config'
+import { CodeBlock } from '@/blocks/CodeBlock/config'
+import { ImageEmbed } from '@/blocks/ImageEmbed/config'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
 
 export const defaultLexical = lexicalEditor({
   features: [
@@ -15,8 +26,18 @@ export const defaultLexical = lexicalEditor({
     UnderlineFeature(),
     BoldFeature(),
     ItalicFeature(),
+    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+    HorizontalRuleFeature(),
     LinkFeature({
-      enabledCollections: ['pages', 'posts'],
+      enabledCollections: [
+        'pages',
+        'posts',
+        'authors',
+        'blog-posts',
+        'courses',
+        'lessons',
+        'modules',
+      ],
       fields: ({ defaultFields }) => {
         const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
           if ('name' in field && field.name === 'url') return false
@@ -43,5 +64,10 @@ export const defaultLexical = lexicalEditor({
         ]
       },
     }),
+    BlocksFeature({
+      blocks: [Banner, Callout, CodeBlock, MediaBlock, ImageEmbed],
+    }),
+    FixedToolbarFeature(),
+    InlineToolbarFeature(),
   ],
 })
