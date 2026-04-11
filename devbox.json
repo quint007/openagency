@@ -6,6 +6,7 @@
     "pnpm",
     "opentofu",
     "docker",
-    "go-task"
+    "go-task",
+    "gh"
   ]
 }
