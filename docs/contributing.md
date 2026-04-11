@@ -35,13 +35,13 @@ If you need to re-run the script after editing env values, delete the generated 
 
 ## Running the apps
 
-- `task dev` starts the backend (Payload CMS) and the frontend apps together via `scripts/dev.sh`.
+- `task dev` now runs the local dev preflight inside the root `Taskfile.yml`: it verifies the env files exist, clears ports `3000`, `3001`, and `3002`, starts PostgreSQL via Docker Compose, waits for the database to accept connections, runs Payload migrations, and then launches the backend plus the frontend apps together.
 - `task dev-frontend` launches only the marketing/courses stack; `task dev-backend` runs Payload CMS alone.
 
 ### Taskfile commands
 
 - `task setup` – run the bootstrapper discussed above.
-- `task dev` – bring up Payload plus the marketing/courses apps.
+- `task dev` – run the reusable dev preflight tasks, then bring up Payload plus the marketing/courses apps.
 - `task dev-frontend` – just run the marketing/courses apps.
 - `task dev-backend` – just run Payload CMS.
 - Visit the services after `task dev`:
@@ -54,7 +54,7 @@ If you need to re-run the script after editing env values, delete the generated 
 
 - Always run `pnpm --dir backend/openagency-backend exec payload migrate --yes` after changing collections or config.
 - Credentials flow through `backend/openagency-backend/.env`; avoid checking unencrypted secrets into git.
-- The `scripts/setup.sh` template already seeds the required Postgres database, so new contributors can rely on that automator.
+- The `scripts/setup.sh` template still prepares dependencies and env files, while `task dev` now owns ongoing runtime orchestration for the local database and CMS.
 
 ## Frontend-specific workflow
 

@@ -25,7 +25,7 @@ openagency/
 | Task | Location | Notes |
 |------|----------|-------|
 | Local setup | `Taskfile.yml`, `docs/contributing.md`, `scripts/setup.sh` | Root workflow; prefer task commands |
-| Start full stack | `Taskfile.yml`, `scripts/dev.sh` | Backend on `3002`, frontend workspace drives apps |
+| Start full stack | `Taskfile.yml` | Root dev task clears app ports, verifies Postgres, starts backend on `3002`, then runs the frontend workspace |
 | Frontend app work | `frontend/AGENTS.md` | Workspace-level build/test/package rules |
 | Shared design system | `frontend/packages/ui/AGENTS.md` | Tokens, theme CSS, exported primitives |
 | Shared frontend API client | `frontend/packages/api-client/AGENTS.md` | Payload-facing fetch and mapping boundary |
@@ -74,5 +74,5 @@ devbox run pnpm --dir backend/openagency-backend lint
 
 ## NOTES
 - `scripts/setup.sh` installs frontend and backend separately, copies env examples, starts Postgres, then runs Payload migrations.
-- `scripts/dev.sh` backgrounds the backend and then starts the frontend workspace dev server.
+- Root `task dev` now performs runtime preflight in `Taskfile.yml`, then starts the backend and frontend workspace together.
 - Several repo artifacts (`session-ses_2930.md`, screenshots, task files) are session output, not product code.

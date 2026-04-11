@@ -66,6 +66,7 @@ coverage/
 *.tgz
 .cache/
 .sisyphus/
+*/boulder.json
 .playwright-mcp/
 frontend/.turbo/
 */.turbo
