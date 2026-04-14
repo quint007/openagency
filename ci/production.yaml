@@ -2,23 +2,262 @@ version: '3'
 
 tasks:
   install:
+    desc: Install all dependencies
     cmds:
-      - echo "production tasks not implemented"
+      - pnpm --dir ../frontend install
+      - pnpm --dir ../backend/openagency-backend install
+
   dev:
+    desc: Start development servers
     cmds:
-      - echo "production tasks not implemented"
+      - pnpm --dir ../frontend dev
+
   build:
+    desc: Build all projects
     cmds:
-      - echo "production tasks not implemented"
+      - pnpm --dir ../frontend build
+      - pnpm --dir ../backend/openagency-backend build
+
   lint:
+    desc: Lint all projects
     cmds:
-      - echo "production tasks not implemented"
+      - pnpm --dir ../frontend lint
+
   test:
+    desc: Run tests
     cmds:
-      - echo "production tasks not implemented"
-  docker:
-    cmds:
-      - echo "production tasks not implemented"
+      - pnpm --dir ../frontend test
+
   tofu:
+    desc: OpenTofu validation for production environment
     cmds:
-      - echo "production tasks not implemented"
+      - devbox run tofu -chdir=infra/environments/production init
+      - devbox run tofu -chdir=infra/environments/production validate
+
+  tofu:plan:
+    desc: Plan production infrastructure changes
+    cmds:
+      - devbox run tofu -chdir=infra/environments/production plan
+
+  tofu:apply:
+    desc: Apply production infrastructure changes
+    cmds:
+      - devbox run tofu -chdir=infra/environments/production apply
+
+  tofu:destroy:
+    desc: Destroy production infrastructure
+    cmds:
+      - devbox run tofu -chdir=infra/environments/production destroy
+
+  deploy:init:
+    desc: Initialize production OpenTofu with local env-loaded secrets
+    cmds:
+      - devbox run tofu -chdir=infra/environments/production init
+
+  deploy:validate:
+    desc: Validate production OpenTofu configuration
+    cmds:
+      - devbox run tofu -chdir=infra/environments/production validate
+
+  deploy:plan:
+    desc: Plan production infrastructure with local env config
+    dotenv: [.env]
+    cmds:
+      - |
+        set -eu
+        # Build variable args conditionally - only pass when values are provided
+        VARS=""
+        
+        # Provider tokens (only pass if set - otherwise let defaults apply)
+        if [ -n "${RAILWAY_ENABLED:-}" ]; then
+          VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
+        fi
+        if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
+        fi
+        if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
+          VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
+        fi
+        if [ -n "${POSTGRES_USER:-}" ]; then
+          VARS="$VARS -var=postgres_user=$POSTGRES_USER"
+        fi
+        if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+          VARS="$VARS -var=postgres_password=$POSTGRES_PASSWORD"
+        fi
+        if [ -n "${RAILWAY_TOKEN:-}" ]; then
+          VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
+          VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
+        fi
+        if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_account_id=$CLOUDFLARE_ACCOUNT_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_NAME:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_name=$CLOUDFLARE_ZONE_NAME"
+        fi
+        if [ -n "${R2_ENABLED:-}" ]; then
+          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
+        fi
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+        fi
+        
+        # Non-secret app URLs
+        VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
+        VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
+        
+        # Backend secrets (only pass if all required are set)
+        if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
+        fi
+        
+        devbox run tofu -chdir=infra/environments/production plan $VARS
+
+  deploy:apply:
+    desc: Apply production infrastructure with local env config
+    dotenv: [.env]
+    prompt: true
+    cmds:
+      - |
+        set -eu
+        VARS=""
+        
+        if [ -n "${RAILWAY_ENABLED:-}" ]; then
+          VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
+        fi
+        if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
+        fi
+        if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
+          VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
+        fi
+        if [ -n "${POSTGRES_USER:-}" ]; then
+          VARS="$VARS -var=postgres_user=$POSTGRES_USER"
+        fi
+        if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+          VARS="$VARS -var=postgres_password=$POSTGRES_PASSWORD"
+        fi
+        if [ -n "${RAILWAY_TOKEN:-}" ]; then
+          VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
+          VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
+        fi
+        if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_account_id=$CLOUDFLARE_ACCOUNT_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_NAME:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_name=$CLOUDFLARE_ZONE_NAME"
+        fi
+        if [ -n "${R2_ENABLED:-}" ]; then
+          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
+        fi
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+        fi
+        
+        VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
+        VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
+        
+        if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
+        fi
+        
+        devbox run tofu -chdir=infra/environments/production apply $VARS
+
+  deploy:destroy:
+    desc: Destroy production infrastructure with local env config
+    dotenv: [.env]
+    prompt: true
+    cmds:
+      - |
+        set -eu
+        VARS=""
+        
+        if [ -n "${RAILWAY_ENABLED:-}" ]; then
+          VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
+        fi
+        if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
+        fi
+        if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
+          VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
+        fi
+        if [ -n "${POSTGRES_USER:-}" ]; then
+          VARS="$VARS -var=postgres_user=$POSTGRES_USER"
+        fi
+        if [ -n "${POSTGRES_PASSWORD:-}" ]; then
+          VARS="$VARS -var=postgres_password=$POSTGRES_PASSWORD"
+        fi
+        if [ -n "${RAILWAY_TOKEN:-}" ]; then
+          VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
+          VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
+        fi
+        if [ -n "${CLOUDFLARE_ACCOUNT_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_account_id=$CLOUDFLARE_ACCOUNT_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_ID:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_id=$CLOUDFLARE_ZONE_ID"
+        fi
+        if [ -n "${CLOUDFLARE_ZONE_NAME:-}" ]; then
+          VARS="$VARS -var=cloudflare_zone_name=$CLOUDFLARE_ZONE_NAME"
+        fi
+        if [ -n "${R2_ENABLED:-}" ]; then
+          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
+        fi
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+        fi
+        
+        VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
+        VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
+        
+        if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
+        fi
+        
+        devbox run tofu -chdir=infra/environments/production destroy $VARS
+
+  cutover:plan:
+    desc: Print the production cutover order and commands
+    dotenv: [.env]
+    cmds:
+      - bash scripts/production/cutover.sh --dry-run
+
+  deploy:migrate:
+    desc: Run production Payload migrations using root .env secrets
+    dotenv: [.env]
+    cmds:
+      - |
+        set -eu
+        DATABASE_URL="${BACKEND_DATABASE_URL:?BACKEND_DATABASE_URL is required}" \
+        PAYLOAD_SECRET="${BACKEND_PAYLOAD_SECRET:?BACKEND_PAYLOAD_SECRET is required}" \
+        CRON_SECRET="${BACKEND_CRON_SECRET:?BACKEND_CRON_SECRET is required}" \
+        PREVIEW_SECRET="${BACKEND_PREVIEW_SECRET:?BACKEND_PREVIEW_SECRET is required}" \
+        REVALIDATE_SECRET="${BACKEND_REVALIDATE_SECRET:?BACKEND_REVALIDATE_SECRET is required}" \
+        NEXT_PUBLIC_SERVER_URL="${NEXT_PUBLIC_SERVER_URL:-https://admin.open-agency.io}" \
+        MARKETING_APP_BASE_URL="${MARKETING_APP_BASE_URL:-https://open-agency.io}" \
+        COURSES_APP_BASE_URL="${COURSES_APP_BASE_URL:-https://courses.open-agency.io}" \
+        REVALIDATE_TIMEOUT_MS="${REVALIDATE_TIMEOUT_MS:-5000}" \
+        pnpm --dir backend/openagency-backend exec payload migrate --yes
+
+  deploy:verify:
+    desc: Run production smoke checks against backend and frontend URLs
+    dotenv: [.env]
+    cmds:
+      - bash scripts/production/smoke-check.sh
+
+  restore:drill:plan:
+    desc: Print the isolated restore drill steps and smoke checks
+    dotenv: [.env]
+    cmds:
+      - bash scripts/production/isolated-restore-drill.sh --dry-run

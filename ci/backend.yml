@@ -19,7 +19,5 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
-      - run: pnpm install
-        working-directory: backend
-      - run: pnpm build
-        working-directory: backend
+      - run: pnpm --dir backend/openagency-backend install
+      - run: pnpm --dir backend/openagency-backend build

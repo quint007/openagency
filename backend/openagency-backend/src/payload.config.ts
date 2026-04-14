@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -19,9 +20,12 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { isR2StorageConfigured, getR2StorageEndpoint } from './utilities/mediaStorage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const r2StorageEnabled = isR2StorageConfigured()
+const r2StorageEndpoint = getR2StorageEndpoint()
 
 export default buildConfig({
   admin: {
@@ -81,7 +85,28 @@ export default buildConfig({
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  plugins,
+  plugins: [
+    ...plugins,
+    ...(r2StorageEnabled && r2StorageEndpoint
+      ? [
+          s3Storage({
+            acl: 'public-read',
+            bucket: process.env.R2_BUCKET || '',
+            collections: {
+              [Media.slug]: true,
+            },
+            config: {
+              credentials: {
+                accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+              },
+              endpoint: r2StorageEndpoint,
+              region: process.env.R2_REGION || 'auto',
+            },
+          }),
+        ]
+      : []),
+  ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {

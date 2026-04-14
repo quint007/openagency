@@ -1,57 +1,28 @@
 version: '3'
 
 tasks:
-  init-staging:
-    desc: Initialize OpenTofu for staging
-    dir: infra/environments/staging
-    cmds:
-      - tofu init
-
   init-production:
     desc: Initialize OpenTofu for production
-    dir: infra/environments/production
     cmds:
-      - tofu init
+      - devbox run tofu -chdir=infra/environments/production init -backend-config=backend.hcl
 
   validate:
     desc: Validate OpenTofu configurations
     cmds:
-      - tofu validate
-      - tofu validate infra/environments/staging
-      - tofu validate infra/environments/production
-
-  plan-staging:
-    desc: Plan staging infrastructure changes
-    dir: infra/environments/staging
-    cmds:
-      - tofu plan
+      - devbox run tofu validate
+      - devbox run tofu -chdir=infra/environments/production validate -backend-config=backend.hcl
 
   plan-production:
     desc: Plan production infrastructure changes
-    dir: infra/environments/production
     cmds:
-      - tofu plan
-
-  apply-staging:
-    desc: Apply staging infrastructure changes
-    dir: infra/environments/staging
-    cmds:
-      - tofu apply
+      - devbox run tofu -chdir=infra/environments/production plan -backend-config=backend.hcl
 
   apply-production:
     desc: Apply production infrastructure changes
-    dir: infra/environments/production
     cmds:
-      - tofu apply
-
-  destroy-staging:
-    desc: Destroy staging infrastructure
-    dir: infra/environments/staging
-    cmds:
-      - tofu destroy
+      - devbox run tofu -chdir=infra/environments/production apply -backend-config=backend.hcl
 
   destroy-production:
     desc: Destroy production infrastructure
-    dir: infra/environments/production
     cmds:
-      - tofu destroy
+      - devbox run tofu -chdir=infra/environments/production destroy

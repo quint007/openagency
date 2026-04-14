@@ -1,7 +1,7 @@
 [submodule "frontend/apps/marketing"]
 	path = frontend/apps/marketing
-	url = https://github.com/quint007/openagency-marketing
+	url = git@github.com:quint007/openagency-marketing.git
 
 [submodule "frontend/apps/courses"]
 	path = frontend/apps/courses
-	url = https://github.com/quint007/openagency-courses
+	url = git@github.com:quint007/openagency-courses.git

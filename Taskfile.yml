@@ -3,10 +3,10 @@ version: '3'
 includes:
   dev:
     taskfile: ci/development.yaml
-  staging:
-    taskfile: ci/staging.yaml
   production:
     taskfile: ci/production.yaml
+  tofu:
+    taskfile: ci/tofu/tasks.yml
 
 vars:
   BACKEND_DIR: backend/openagency-backend
@@ -142,6 +142,41 @@ tasks:
     desc: Verify CMS database connectivity by running Payload migrations
     cmds:
       - pnpm --dir {{.BACKEND_DIR}} exec payload migrate --yes
+
+  deploy:plan:
+    desc: Plan production infrastructure with local env configuration
+    cmds:
+      - task production:deploy:plan
+
+  deploy:apply:
+    desc: Apply production infrastructure with local env configuration
+    cmds:
+      - task production:deploy:apply
+
+  deploy:destroy:
+    desc: Destroy production infrastructure with local env configuration
+    cmds:
+      - task production:deploy:destroy
+
+  cutover:plan:
+    desc: Print the production cutover order and commands
+    cmds:
+      - task production:cutover:plan
+
+  deploy:migrate:
+    desc: Run production Payload migrations using the repo-root .env
+    cmds:
+      - task production:deploy:migrate
+
+  deploy:verify:
+    desc: Run production smoke checks
+    cmds:
+      - task production:deploy:verify
+
+  restore:drill:plan:
+    desc: Print the isolated restore drill steps and smoke checks
+    cmds:
+      - task production:restore:drill:plan
 
   dev:backend:
     desc: Start Payload CMS only

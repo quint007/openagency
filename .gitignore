@@ -12,6 +12,8 @@ frontend/packages/*/.turbo/
 backend/dist/
 backend/.payload/
 
+*/backend.hcl
+backend.hcl
 # Logs
 *.log
 npm-debug.log*
@@ -25,6 +27,7 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 backend/.env
 
 # IDE
