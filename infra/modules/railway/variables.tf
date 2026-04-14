@@ -190,7 +190,7 @@ variable "postgres_volume_mount_path" {
   description = "Mount path used by the managed Railway Postgres service volume."
   type        = string
   nullable    = false
-  default     = "/var/lib/postgresql"
+  default     = "/var/lib/postgresql/data"
 }
 
 variable "postgres_data_directory" {

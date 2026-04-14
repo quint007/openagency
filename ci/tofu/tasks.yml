@@ -4,23 +4,23 @@ tasks:
   init-production:
     desc: Initialize OpenTofu for production
     cmds:
-      - devbox run tofu -chdir=infra/environments/production init
+      - devbox run tofu -chdir=infra/environments/production init -backend-config=backend.hcl
 
   validate:
     desc: Validate OpenTofu configurations
     cmds:
       - devbox run tofu validate
-      - devbox run tofu -chdir=infra/environments/production validate
+      - devbox run tofu -chdir=infra/environments/production validate -backend-config=backend.hcl
 
   plan-production:
     desc: Plan production infrastructure changes
     cmds:
-      - devbox run tofu -chdir=infra/environments/production plan
+      - devbox run tofu -chdir=infra/environments/production plan -backend-config=backend.hcl
 
   apply-production:
     desc: Apply production infrastructure changes
     cmds:
-      - devbox run tofu -chdir=infra/environments/production apply
+      - devbox run tofu -chdir=infra/environments/production apply -backend-config=backend.hcl
 
   destroy-production:
     desc: Destroy production infrastructure

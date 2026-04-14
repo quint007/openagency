@@ -12,6 +12,8 @@ frontend/packages/*/.turbo/
 backend/dist/
 backend/.payload/
 
+*/backend.hcl
+backend.hcl
 # Logs
 *.log
 npm-debug.log*
