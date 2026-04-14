@@ -32,11 +32,11 @@ COPY . .
 
 RUN \
   if [ -f yarn.lock ]; then \
-    yarn --frozen-lockfile && yarn next build --experimental-build-mode=compile; \
+    yarn --frozen-lockfile && yarn next build --experimental-build-mode=compile && yarn global add payload; \
   elif [ -f package-lock.json ]; then \
-    npm ci && npm run next build -- --experimental-build-mode=compile; \
+    npm ci && npm run next build -- --experimental-build-mode=compile && npm install -g payload; \
   elif [ -f pnpm-lock.yaml ]; then \
-    corepack enable pnpm && pnpm install --frozen-lockfile && pnpm next build --experimental-build-mode=compile; \
+    corepack enable pnpm && pnpm install --frozen-lockfile && pnpm next build --experimental-build-mode=compile && pnpm add -g payload; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
