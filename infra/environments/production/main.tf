@@ -224,3 +224,9 @@ output "environment_contract" {
     railway    = local.railway_contract
   }
 }
+
+output "database_url" {
+  description = "Production database connection URL for backend runtime. Null if Railway resources are disabled."
+  value       = var.railway_enabled ? module.railway[0].database_url : null
+  sensitive   = true
+}
