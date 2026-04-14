@@ -7,6 +7,7 @@
     "opentofu",
     "docker",
     "go-task",
-    "gh"
+    "gh",
+    "railway@latest"
   ]
 }

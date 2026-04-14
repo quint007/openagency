@@ -178,6 +178,12 @@ tasks:
     cmds:
       - task production:restore:drill:plan
 
+  prd:db-forward:
+    desc: Connect to production PostgreSQL via railway connect
+    cmds:
+      - echo "Connecting to production PostgreSQL..."
+      - railway connect postgres --environment production
+
   dev:backend:
     desc: Start Payload CMS only
     env:

@@ -29,6 +29,54 @@
     "pnpm": {
       "resolved": "github:NixOS/nixpkgs/5e11f7acce6c3469bef9df154d78534fa7ae8b6c?narHash=sha256-cGyKiTspHEUx3QwAnV3RfyT%2BVOXhHLs%2BNEr17HU34Wo%3D#pnpm",
       "source": "nixpkg"
+    },
+    "railway@latest": {
+      "last_modified": "2026-04-07T16:32:49Z",
+      "resolved": "github:NixOS/nixpkgs/dfd9566f82a6e1d55c30f861879186440614696e#railway",
+      "source": "devbox-search",
+      "version": "4.36.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/gpk4m0mny9k8q6525n28yxydji78canh-railway-4.36.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/gpk4m0mny9k8q6525n28yxydji78canh-railway-4.36.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lmfl3y5grjiyds0an4kr1z2c4y3al3v1-railway-4.36.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/lmfl3y5grjiyds0an4kr1z2c4y3al3v1-railway-4.36.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/gklz4rszrd5nxyknqb00k43h8g0wwjp1-railway-4.36.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/gklz4rszrd5nxyknqb00k43h8g0wwjp1-railway-4.36.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ma7xnlfyrqjr87qs653h6q6m8i61lx7i-railway-4.36.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ma7xnlfyrqjr87qs653h6q6m8i61lx7i-railway-4.36.1"
+        }
+      }
     }
   }
 }
