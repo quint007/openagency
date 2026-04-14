@@ -11,10 +11,10 @@ on:
       - 'infra/**'
 
 jobs:
-  plan:
+  plan-production:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: opentofu/setup-opentofu@v1
-      - run: tofu init infra/environments/staging
-      - run: tofu plan infra/environments/staging
+      - run: tofu -chdir=infra/environments/production init
+      - run: tofu -chdir=infra/environments/production plan

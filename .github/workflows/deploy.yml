@@ -1,0 +1,112 @@
+name: deploy
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  deploy-production:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: '1.11.2'
+
+      - name: Write backend secret environment file
+        run: |
+          cat > infra/environments/production/backend_secrets.auto.tfvars.json << EOF
+          {
+            "backend_secret_environment": {
+              "PAYLOAD_SECRET": "${{ secrets.BACKEND_PAYLOAD_SECRET }}",
+              "CRON_SECRET": "${{ secrets.BACKEND_CRON_SECRET }}",
+              "PREVIEW_SECRET": "${{ secrets.BACKEND_PREVIEW_SECRET }}",
+              "REVALIDATE_SECRET": "${{ secrets.BACKEND_REVALIDATE_SECRET }}"
+            }
+          }
+          EOF
+        env:
+          BACKEND_PAYLOAD_SECRET: ${{ secrets.BACKEND_PAYLOAD_SECRET }}
+          BACKEND_CRON_SECRET: ${{ secrets.BACKEND_CRON_SECRET }}
+          BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
+          BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
+
+      - name: Write provider environment variables
+        run: |
+          # Railway token (if enabled)
+          if [ "${{ vars.RAILWAY_ENABLED }}" = "true" ]; then
+            export RAILWAY_TOKEN="${{ secrets.RAILWAY_TOKEN }}"
+          fi
+
+          # Cloudflare credentials (if DNS enabled)
+          if [ "${{ vars.CLOUDFLARE_DNS_ENABLED }}" = "true" ]; then
+            export CLOUDFLARE_API_TOKEN="${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          fi
+
+          # R2 credentials (if enabled)
+          if [ "${{ vars.R2_ENABLED }}" = "true" ]; then
+            export AWS_ACCESS_KEY_ID="${{ secrets.R2_ACCESS_KEY_ID }}"
+            export AWS_SECRET_ACCESS_KEY="${{ secrets.R2_SECRET_ACCESS_KEY }}"
+          fi
+
+      - name: Init production environment
+        run: tofu -chdir=infra/environments/production init
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Plan production environment
+        run: |
+          tofu -chdir=infra/environments/production plan \
+            -var="railway_enabled=${{ vars.RAILWAY_ENABLED }}" \
+            -var="railway_token=${{ secrets.RAILWAY_TOKEN }}" \
+            -var="postgres_database_name=${{ vars.POSTGRES_DATABASE_NAME }}" \
+            -var="postgres_user=${{ vars.POSTGRES_USER }}" \
+            -var="postgres_password=${{ secrets.POSTGRES_PASSWORD }}" \
+            -var="cloudflare_dns_enabled=${{ vars.CLOUDFLARE_DNS_ENABLED }}" \
+            -var="cloudflare_zone_id=${{ vars.CLOUDFLARE_ZONE_ID }}" \
+            -var="cloudflare_zone_name=${{ vars.CLOUDFLARE_ZONE_NAME }}" \
+            -var="cloudflare_account_id=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" \
+            -var="marketing_app_base_url=${{ vars.MARKETING_APP_BASE_URL }}" \
+            -var="courses_app_base_url=${{ vars.COURSES_APP_BASE_URL }}" \
+            -var="r2_enabled=${{ vars.R2_ENABLED }}" \
+            -var="r2_public_hostname=${{ vars.R2_PUBLIC_HOSTNAME }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+      - name: Apply production environment
+        run: |
+          tofu -chdir=infra/environments/production apply -auto-approve \
+            -var="railway_enabled=${{ vars.RAILWAY_ENABLED }}" \
+            -var="railway_token=${{ secrets.RAILWAY_TOKEN }}" \
+            -var="postgres_database_name=${{ vars.POSTGRES_DATABASE_NAME }}" \
+            -var="postgres_user=${{ vars.POSTGRES_USER }}" \
+            -var="postgres_password=${{ secrets.POSTGRES_PASSWORD }}" \
+            -var="cloudflare_dns_enabled=${{ vars.CLOUDFLARE_DNS_ENABLED }}" \
+            -var="cloudflare_zone_id=${{ vars.CLOUDFLARE_ZONE_ID }}" \
+            -var="cloudflare_zone_name=${{ vars.CLOUDFLARE_ZONE_NAME }}" \
+            -var="cloudflare_account_id=${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" \
+            -var="marketing_app_base_url=${{ vars.MARKETING_APP_BASE_URL }}" \
+            -var="courses_app_base_url=${{ vars.COURSES_APP_BASE_URL }}" \
+            -var="r2_enabled=${{ vars.R2_ENABLED }}" \
+            -var="r2_public_hostname=${{ vars.R2_PUBLIC_HOSTNAME }}"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}

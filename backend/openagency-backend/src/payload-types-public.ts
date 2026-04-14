@@ -49,6 +49,9 @@ export interface BlogPost {
   category?: number | Category | null;
   tags?: Array<{ id?: string | null; tag: string }> | null;
   relatedBlogPosts?: Array<number | BlogPost> | null;
+   seoTitle?: string | null;
+   seoDescription?: string | null;
+   ogImage?: number | Media | null;
   meta?: {
     description?: string | null;
     image?: number | Media | null;

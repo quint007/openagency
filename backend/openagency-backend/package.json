@@ -14,6 +14,7 @@
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
+    "media:migrate": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" tsx ./src/scripts/mediaMigration.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.81.0",
+    "@payloadcms/db-postgres": "3.81.0",
     "@payloadcms/live-preview-react": "3.81.0",
     "@payloadcms/next": "3.81.0",
     "@payloadcms/plugin-form-builder": "3.81.0",
@@ -31,6 +33,7 @@
     "@payloadcms/plugin-search": "3.81.0",
     "@payloadcms/plugin-seo": "3.81.0",
     "@payloadcms/richtext-lexical": "3.81.0",
+    "@payloadcms/storage-s3": "3.81.0",
     "@payloadcms/ui": "3.81.0",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
@@ -51,8 +54,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "7.71.1",
     "sharp": "0.34.2",
-    "tailwind-merge": "^3.4.0",
-    "@payloadcms/db-postgres": "3.81.0"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

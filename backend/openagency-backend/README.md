@@ -44,6 +44,8 @@ pnpx create-payload-app my-project -t website
 1. `pnpm install && pnpm dev` to install dependencies and start the dev server
 1. open `http://localhost:3000` to open the app in your browser
 
+If you need a temporary alpha-stage gate, set both `ALPHA_BASIC_AUTH_USERNAME` and `ALPHA_BASIC_AUTH_PASSWORD` in the backend environment to require HTTP Basic Auth for non-static requests.
+
 That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
 
 ## How it works

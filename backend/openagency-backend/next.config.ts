@@ -2,14 +2,19 @@ import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { getMediaRemoteHostUrls } from './src/utilities/mediaStorage'
 
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
+const imageHostUrls = [
+  ...(process.env.__NEXT_PRIVATE_ORIGIN ? [process.env.__NEXT_PRIVATE_ORIGIN] : []),
+  ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+    : []),
+  ...getMediaRemoteHostUrls(),
+]
 
 const nextConfig: NextConfig = {
   images: {
@@ -19,16 +24,14 @@ const nextConfig: NextConfig = {
       },
     ],
     qualities: [100],
-    remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+    remotePatterns: imageHostUrls.map((item) => {
         const url = new URL(item)
 
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
-        }
-      }),
-    ],
+      return {
+        hostname: url.hostname,
+        protocol: url.protocol.replace(':', '') as 'http' | 'https',
+      }
+    }),
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

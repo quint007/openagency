@@ -106,6 +106,11 @@ export type CmsServerEnv = Readonly<{
   revalidateSecret: string;
 }>;
 
+type CmsReadEnv = Readonly<{
+  apiKey: string;
+  apiUrl: string;
+}>;
+
 export function getBlogListTag(): 'blog:list' {
   return 'blog:list';
 }
@@ -147,6 +152,13 @@ export function getCmsServerEnv(): CmsServerEnv {
     apiKey: getPayloadApiKey(),
     apiUrl: getPayloadApiUrl(),
     revalidateSecret: getRevalidateSecret(),
+  };
+}
+
+function getCmsReadEnv(): CmsReadEnv {
+  return {
+    apiKey: getPayloadApiKey(),
+    apiUrl: getPayloadApiUrl(),
   };
 }
 
@@ -387,8 +399,9 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     sort?: string;
   },
 ): Promise<Array<CollectionDocument<TSlug>>> {
-  const { apiKey } = getCmsServerEnv();
+  const { apiKey } = getCmsReadEnv();
   const requestOptions: CmsFetchOptions = {
+    cache: 'force-cache',
     method: 'GET',
     headers: {
       Accept: 'application/json',

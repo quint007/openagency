@@ -1,0 +1,12 @@
+{
+  "publicBaseUrl": "http://127.0.0.1:40117",
+  "media": [
+    {
+      "id": "media-1",
+      "filename": "hero.webp",
+      "mimeType": "image/webp",
+      "url": "http://127.0.0.1:40117/hero.webp",
+      "filesize": 19
+    }
+  ]
+}

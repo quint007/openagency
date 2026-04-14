@@ -4,20 +4,18 @@ tasks:
   install:
     desc: Install all dependencies
     cmds:
-      - pnpm install --dir frontend
-      - pnpm install --dir backend
+      - pnpm --dir frontend install
+      - pnpm --dir backend/openagency-backend install
 
   install-frontend:
     desc: Install frontend dependencies
-    dir: frontend
     cmds:
-      - pnpm install
+      - pnpm --dir frontend install
 
   install-backend:
     desc: Install backend dependencies
-    dir: backend
     cmds:
-      - pnpm install
+      - pnpm --dir backend/openagency-backend install
 
   dev:
     desc: Start development servers
@@ -26,33 +24,29 @@ tasks:
 
   dev-frontend:
     desc: Start frontend development servers
-    dir: frontend
     cmds:
-      - pnpm dev
+      - pnpm --dir frontend dev
 
   dev-backend:
     desc: Start backend development server
-    dir: backend
     cmds:
-      - pnpm dev
+      - PORT=3002 NEXT_PUBLIC_SERVER_URL=http://localhost:3002 pnpm --dir backend/openagency-backend dev
 
   build:
     desc: Build all projects
     cmds:
       - pnpm --dir frontend build
-      - pnpm --dir backend build
+      - pnpm --dir backend/openagency-backend build
 
   build-frontend:
     desc: Build frontend
-    dir: frontend
     cmds:
-      - pnpm build
+      - pnpm --dir frontend build
 
   build-backend:
     desc: Build backend
-    dir: backend
     cmds:
-      - pnpm build
+      - pnpm --dir backend/openagency-backend build
 
   lint:
     desc: Lint all projects
@@ -61,15 +55,13 @@ tasks:
 
   lint-frontend:
     desc: Lint frontend
-    dir: frontend
     cmds:
-      - pnpm lint
+      - pnpm --dir frontend lint
 
   lint-backend:
     desc: Lint backend
-    dir: backend
     cmds:
-      - pnpm lint
+      - pnpm --dir backend/openagency-backend lint
 
   test:
     desc: Run tests
@@ -78,27 +70,24 @@ tasks:
 
   test-frontend:
     desc: Run frontend tests
-    dir: frontend
     cmds:
-      - pnpm test
+      - pnpm --dir frontend test
 
   clean:
     desc: Clean all build artifacts
     cmds:
       - pnpm --dir frontend clean
-      - pnpm --dir backend clean
+      - pnpm --dir backend/openagency-backend clean
 
   clean-frontend:
     desc: Clean frontend build artifacts
-    dir: frontend
     cmds:
-      - pnpm clean
+      - pnpm --dir frontend clean
 
   clean-backend:
     desc: Clean backend build artifacts
-    dir: backend
     cmds:
-      - pnpm clean
+      - pnpm --dir backend/openagency-backend clean
 
   check:
     desc: Run all checks (lint + test)

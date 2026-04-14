@@ -111,6 +111,7 @@ describe('cms-client typed Payload fetchers', () => {
     expect(url.searchParams.get('where[_status][equals]')).toBe('published');
     expect(url.searchParams.get('where[slug][equals]')).toBe('launch-week');
     expect(init.method).toBe('GET');
+    expect(init.cache).toBe('force-cache');
     expect(init.headers).toEqual({
       Accept: 'application/json',
       Authorization: 'users API-Key server-secret',
@@ -154,6 +155,7 @@ describe('cms-client typed Payload fetchers', () => {
     expect(request.url.searchParams.get('sort')).toBe('title');
     expect(request.url.searchParams.get('where[_status][equals]')).toBe('published');
     expect(request.url.searchParams.get('where[status][equals]')).toBe('published');
+    expect(request.init.cache).toBe('force-cache');
     expect(request.init.next).toEqual({
       tags: [getCourseListTag()],
     });
@@ -194,6 +196,7 @@ describe('cms-client typed Payload fetchers', () => {
     expect(request.url.searchParams.get('sort')).toBe('name');
     expect(request.url.searchParams.get('where[slug][equals]')).toBe('jane-doe');
     expect(request.url.searchParams.has('where[status][equals]')).toBe(false);
+    expect(request.init.cache).toBe('force-cache');
     expect(request.init.next).toEqual({
       tags: [getAuthorSlugTag('jane-doe')],
     });

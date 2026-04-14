@@ -63,3 +63,77 @@ If you need to re-run the script after editing env values, delete the generated 
 - Turbo (`pnpm --dir frontend dev`) watches both apps and automatically rebuilds shared packages.
 
 Whenever you document a new step or tool, keep this file in sync so onboarding stays under ten minutes from a clean clone.
+
+## Manual Production Deploy (local operator)
+
+For local operators who need to run production infrastructure changes without CI:
+
+### Prerequisites
+
+1. **Create a local `.env` file** in the repo root from the top-level deployment template (this file is gitignored — do not commit real credentials):
+   ```bash
+    # Copy the example template
+    cp .env.example .env
+    
+    # Edit .env with real values
+    ```
+    
+    Required variables in `.env`:
+    - `BACKEND_PAYLOAD_SECRET` — Payload JWT encryption secret
+    - `BACKEND_CRON_SECRET` — Cron job authentication secret
+    - `BACKEND_PREVIEW_SECRET` — Preview requests authentication secret
+    - `BACKEND_REVALIDATE_SECRET` — On-demand revalidation shared secret
+    - `POSTGRES_PASSWORD` — Managed Railway Postgres password
+   
+    Optional variables (only needed when enabling provider features or ops verification):
+    - `RAILWAY_ENABLED`, `RAILWAY_PROJECT_NAME`, `RAILWAY_TOKEN`, `POSTGRES_DATABASE_NAME`, `POSTGRES_USER`
+    - `CLOUDFLARE_DNS_ENABLED`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_ZONE_NAME`
+    - `R2_ENABLED`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_PUBLIC_HOSTNAME`
+    - `BACKEND_DATABASE_URL` (only if you need a direct external connection string for local migration or restore tooling)
+    - `ALPHA_BASIC_AUTH_USERNAME`, `ALPHA_BASIC_AUTH_PASSWORD`
+
+### Deploy Commands
+
+```bash
+# Print the ordered production runbook for the current env file
+task cutover:plan
+
+# Plan infrastructure changes (non-destructive)
+task deploy:plan
+
+# Apply infrastructure changes (requires confirmation)
+task deploy:apply
+
+# Deploy the tagged release through GitHub Actions
+git tag <release-tag>
+git push origin <release-tag>
+
+# Run the explicit post-deploy migration step
+task deploy:migrate
+
+# Run production smoke checks
+task deploy:verify
+
+# Destroy production infrastructure (requires confirmation)
+task deploy:destroy
+```
+
+Alternatively, use the production namespace directly:
+```bash
+task production:deploy:plan
+task production:deploy:apply
+task production:deploy:migrate
+task production:deploy:verify
+task production:deploy:destroy
+```
+
+### Command Details
+
+- The deploy tasks automatically load the repo-root `.env` via Taskfile's `dotenv` feature.
+- Use the repo-root `.env.example` as the single deployment contract for local runs and CI variable setup.
+- Secrets are passed to OpenTofu via `-var` flags only when the corresponding environment variables are set in `.env`.
+- The deploy works in fallback mode without provider credentials (uses variable defaults).
+- Production cutover stays production-only and follows this exact order: **apply infra -> push release tag / deploy -> run migrations -> run smoke verification**.
+- The backend runtime `DATABASE_URL` is generated inside Terraform from the managed Railway Postgres service credentials.
+- `BACKEND_DATABASE_URL` is now optional and only needed for operator workflows that connect directly from outside Railway.
+- `task restore:drill:plan` prints an isolated restore-drill path that restores into a disposable target database instead of staging, then follows with app smoke checks.

@@ -6,7 +6,6 @@
 ## STRUCTURE
 ```text
 infra/
-├── environments/staging/
 ├── environments/production/
 └── modules/
 ```
@@ -15,7 +14,6 @@ infra/
 | Task | Location | Notes |
 |------|----------|-------|
 | Domain overview | `infra/README.md` | Currently minimal |
-| Staging env | `infra/environments/staging/` | Placeholder README today |
 | Production env | `infra/environments/production/` | Placeholder README today |
 | Shared modules | `infra/modules/` | Placeholder README today |
 
