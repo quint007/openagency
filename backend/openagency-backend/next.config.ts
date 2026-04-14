@@ -17,6 +17,7 @@ const imageHostUrls = [
 ]
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     localPatterns: [
       {

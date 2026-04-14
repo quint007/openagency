@@ -215,4 +215,4 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy backend to Railway
-        run: railway up ./backend/openagency-backend --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
+        run: railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
