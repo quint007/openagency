@@ -202,3 +202,9 @@ output "backend_service_contract" {
     variable_collection_id = try(railway_variable_collection.backend[0].id, null)
   }
 }
+
+output "database_url" {
+  description = "Production database connection URL for backend runtime."
+  value       = local.managed_database_url
+  sensitive   = true
+}
