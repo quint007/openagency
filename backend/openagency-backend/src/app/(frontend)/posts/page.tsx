@@ -8,8 +8,9 @@ import { getPayload } from 'payload'
 import React from 'react'
 import PageClient from './page.client'
 
-export const dynamic = 'force-static'
-export const revalidate = 600
+// force-dynamic prevents Next.js from pre-rendering this page at build time,
+// which would fail because the database is only available at runtime.
+export const dynamic = 'force-dynamic'
 
 export default async function Page() {
   const payload = await getPayload({ config: configPromise })
