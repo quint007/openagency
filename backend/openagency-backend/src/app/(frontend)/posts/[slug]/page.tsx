@@ -16,11 +16,10 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
-  // DATABASE_URL is only available at runtime (injected by Railway). Skip the
-  // DB call entirely during `next build` so the Docker image can be built
-  // without a database. Pages are served on-demand at runtime via dynamicParams
-  // (enabled by default in Next.js).
-  if (!process.env.DATABASE_URL) {
+  // NEXT_BUILD_SKIP_DB is set in the Dockerfile builder stage so the Docker
+  // image can be built without a live database. The variable is absent from the
+  // runner stage, so generateStaticParams will use the DB normally at runtime.
+  if (process.env.NEXT_BUILD_SKIP_DB === 'true') {
     return []
   }
   try {
