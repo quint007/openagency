@@ -216,25 +216,3 @@ jobs:
 
       - name: Deploy backend to Railway
         run: railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
-
-  migrate-backend:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-    needs: deploy-backend
-    runs-on: ubuntu-latest
-    container: ghcr.io/railwayapp/cli:latest
-    environment: production
-    permissions:
-      contents: read
-    env:
-      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
-      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Run Payload migrations on Railway
-        run: |
-          railway ssh --service open-agency-backend-production --environment production -- \
-            "payload migrate --yes"
