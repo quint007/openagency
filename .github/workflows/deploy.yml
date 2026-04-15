@@ -102,7 +102,11 @@ jobs:
         run: devbox run task production:deploy:plan
 
   apply-production:
+<<<<<<< HEAD
     if: (github.event_name == 'pull_request') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+=======
+    if: github.event_name == 'pull_request'
+>>>>>>> c0ec1ff (fix: migration trigger)
     needs: plan-production
     runs-on: ubuntu-latest
     environment: production
@@ -148,6 +152,8 @@ jobs:
           RAW_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RAW_RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAW_RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
         run: |
           normalize_bool() {
             value="$(printf '%s' "$1" | tr -d '\r' | xargs 2>/dev/null || true)"
@@ -189,6 +195,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID=${RAW_CLOUDFLARE_ACCOUNT_ID}
           R2_ACCESS_KEY_ID=${RAW_R2_ACCESS_KEY_ID}
           R2_SECRET_ACCESS_KEY=${RAW_R2_SECRET_ACCESS_KEY}
+          RAILWAY_API_TOKEN=${RAW_RAILWAY_API_TOKEN}
+          RAILWAY_PROJECT_ID=${RAW_RAILWAY_PROJECT_ID}
           EOF
 
       - name: Init production environment
