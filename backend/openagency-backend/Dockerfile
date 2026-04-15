@@ -37,6 +37,12 @@ COPY . .
 ARG PAYLOAD_SECRET=build_secret_placeholder_not_used_at_runtime
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 
+# Signal to generateStaticParams that we are in a build environment without a
+# database. The variable is set only in this builder stage; the runner stage
+# starts fresh so it will NOT be present at runtime.
+ARG NEXT_BUILD_SKIP_DB=true
+ENV NEXT_BUILD_SKIP_DB=$NEXT_BUILD_SKIP_DB
+
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \

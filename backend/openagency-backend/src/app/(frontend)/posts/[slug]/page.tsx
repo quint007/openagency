@@ -16,6 +16,12 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
+  // NEXT_BUILD_SKIP_DB is set in the Dockerfile builder stage so the Docker
+  // image can be built without a live database. The variable is absent from the
+  // runner stage, so generateStaticParams will use the DB normally at runtime.
+  if (process.env.NEXT_BUILD_SKIP_DB === 'true') {
+    return []
+  }
   try {
     const payload = await getPayload({ config: configPromise })
     const posts = await payload.find({
