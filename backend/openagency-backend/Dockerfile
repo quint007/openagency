@@ -30,13 +30,17 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+# Payload requires a secret key at initialisation time, including during static
+# page-data collection in `next build`. Provide a placeholder here so the build
+# succeeds; the real PAYLOAD_SECRET is injected by Railway at runtime and takes
+# precedence over this build-time value.
+ARG PAYLOAD_SECRET=build_secret_placeholder_not_used_at_runtime
+ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+
 RUN \
-  if [ -f yarn.lock ]; then \
-    yarn --frozen-lockfile && yarn next build --experimental-build-mode=compile && yarn global add payload; \
-  elif [ -f package-lock.json ]; then \
-    npm ci && npm run next build -- --experimental-build-mode=compile && npm install -g payload; \
-  elif [ -f pnpm-lock.yaml ]; then \
-    corepack enable pnpm && pnpm install --frozen-lockfile && pnpm next build --experimental-build-mode=compile && pnpm add -g payload; \
+  if [ -f yarn.lock ]; then yarn run build; \
+  elif [ -f package-lock.json ]; then npm run build; \
+  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
@@ -62,6 +66,12 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Wire up a `payload` shim so `railway ssh … "payload migrate --yes"` works.
+# The payload package is present in the standalone node_modules because the
+# server imports it; this shim makes the CLI entry-point accessible in PATH.
+RUN printf '#!/bin/sh\ncd /app && exec node ./node_modules/payload/dist/bin.js "$@"\n' \
+    > /usr/local/bin/payload && chmod +x /usr/local/bin/payload
 
 USER nextjs
 
