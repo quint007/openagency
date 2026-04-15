@@ -16,6 +16,13 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
+  // DATABASE_URL is only available at runtime (injected by Railway). Skip the
+  // DB call entirely during `next build` so the Docker image can be built
+  // without a database. Pages are served on-demand at runtime via dynamicParams
+  // (enabled by default in Next.js).
+  if (!process.env.DATABASE_URL) {
+    return []
+  }
   try {
     const payload = await getPayload({ config: configPromise })
     const posts = await payload.find({
@@ -35,9 +42,6 @@ export async function generateStaticParams() {
 
     return params
   } catch {
-    // Database is not available at build time (e.g. Docker build without DB).
-    // Return an empty array so the build succeeds; pages are rendered on-demand
-    // at runtime via dynamicParams (enabled by default).
     return []
   }
 }
