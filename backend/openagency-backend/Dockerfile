@@ -50,6 +50,31 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+# Run database migrations as part of the build so the schema is ready
+# before the new container starts serving traffic.
+#
+# Railway builds Docker images on its own infrastructure, which means the
+# builder has network access to postgres.railway.internal. Railway also
+# automatically passes any ARG-declared variable from the service's
+# environment as a Docker build argument, so DATABASE_URL here resolves to
+# the real Postgres URL at build time.
+#
+# If DATABASE_URL is absent (local or CI builds without a DB) the step is
+# skipped gracefully; the outer `if` check guarantees no failure.
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+RUN if [ -n "$DATABASE_URL" ]; then \
+      echo "==> Generating initial migration (if none exist)..." && \
+      if ! find src/migrations -name "*.sql" -maxdepth 1 2>/dev/null | grep -q .; then \
+        NODE_OPTIONS=--no-deprecation pnpm exec payload migrate:create --name init; \
+      fi && \
+      echo "==> Applying pending migrations..." && \
+      NODE_OPTIONS=--no-deprecation pnpm exec payload migrate --yes; \
+    else \
+      echo "==> DATABASE_URL not set — skipping build-time migrations"; \
+    fi
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
