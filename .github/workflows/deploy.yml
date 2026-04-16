@@ -102,7 +102,7 @@ jobs:
         run: devbox run task production:deploy:plan
 
   apply-production:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    if: (github.event_name == 'pull_request') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
     needs: plan-production
     runs-on: ubuntu-latest
     environment: production
@@ -198,7 +198,7 @@ jobs:
         run: devbox run task --yes production:deploy:apply
 
   deploy-backend:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    if: (github.event_name == 'pull_request') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
     needs: apply-production
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest

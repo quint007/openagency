@@ -70,11 +70,6 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
-    // Push the current schema to the database on startup so tables are
-    // created/updated automatically without requiring a separate migration
-    // step. This is safe because the Payload CLI cannot load payload.config.ts
-    // inside the Next.js standalone Docker image (no source files present).
-    push: true,
   }),
   collections: [
     Pages,
