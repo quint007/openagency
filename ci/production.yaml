@@ -104,9 +104,40 @@ tasks:
         if [ -n "${R2_ENABLED:-}" ]; then
           VARS="$VARS -var=r2_enabled=$R2_ENABLED"
         fi
-        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
-          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
-        fi
+         if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+           VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+         fi
+         OPTIONAL_BACKEND_ENV=""
+         if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_USERNAME=\"$ALPHA_BASIC_AUTH_USERNAME\""
+         fi
+         if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
+         fi
+         if [ -n "${R2_ENDPOINT:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
+         fi
+         if [ -n "${R2_BUCKET:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
+         fi
+         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+         fi
+         if [ -n "${R2_REGION:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
+         fi
+         if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
+         fi
+         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+         fi
+         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+         fi
+         if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
+           VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
+         fi
         
         # Non-secret app URLs
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
@@ -163,9 +194,40 @@ tasks:
         if [ -n "${R2_ENABLED:-}" ]; then
           VARS="$VARS -var=r2_enabled=$R2_ENABLED"
         fi
-        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
-          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
-        fi
+         if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+           VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+         fi
+         OPTIONAL_BACKEND_ENV=""
+         if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_USERNAME=\"$ALPHA_BASIC_AUTH_USERNAME\""
+         fi
+         if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
+         fi
+         if [ -n "${R2_ENDPOINT:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
+         fi
+         if [ -n "${R2_BUCKET:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
+         fi
+         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+         fi
+         if [ -n "${R2_REGION:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
+         fi
+         if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
+         fi
+         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+         fi
+         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+         fi
+         if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
+           VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
+         fi
         
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
@@ -218,9 +280,40 @@ tasks:
         if [ -n "${R2_ENABLED:-}" ]; then
           VARS="$VARS -var=r2_enabled=$R2_ENABLED"
         fi
-        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
-          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
-        fi
+         if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+           VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+         fi
+         OPTIONAL_BACKEND_ENV=""
+         if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_USERNAME=\"$ALPHA_BASIC_AUTH_USERNAME\""
+         fi
+         if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
+         fi
+         if [ -n "${R2_ENDPOINT:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
+         fi
+         if [ -n "${R2_BUCKET:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
+         fi
+         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+         fi
+         if [ -n "${R2_REGION:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
+         fi
+         if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
+         fi
+         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+         fi
+         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+         fi
+         if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
+           VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
+         fi
         
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"

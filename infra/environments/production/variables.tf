@@ -112,7 +112,15 @@ variable "postgres_password" {
 variable "backend_optional_environment" {
   description = "Optional backend runtime environment values for production."
   type = object({
-    REVALIDATE_TIMEOUT_MS = optional(string)
+    ALPHA_BASIC_AUTH_PASSWORD = optional(string)
+    ALPHA_BASIC_AUTH_USERNAME = optional(string)
+    R2_ACCESS_KEY_ID          = optional(string)
+    R2_BUCKET                 = optional(string)
+    R2_ENDPOINT               = optional(string)
+    R2_PUBLIC_BASE_URL        = optional(string)
+    R2_REGION                 = optional(string)
+    R2_SECRET_ACCESS_KEY      = optional(string)
+    REVALIDATE_TIMEOUT_MS     = optional(string)
   })
   default = {}
 }

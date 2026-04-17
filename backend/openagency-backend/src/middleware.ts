@@ -19,6 +19,31 @@ const isStaticAssetRequest = (pathname: string): boolean => {
   return /\.[^/]+$/.test(pathname)
 }
 
+const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, '')
+
+const getHostname = (value: string | undefined): string | null => {
+  const trimmed = value?.trim()
+
+  if (!trimmed) return null
+
+  try {
+    return new URL(trimTrailingSlash(trimmed)).host
+  } catch {
+    return null
+  }
+}
+
+const isAllowedAdminRoute = (pathname: string): boolean => {
+  return (
+    pathname === '/admin' ||
+    pathname.startsWith('/admin/') ||
+    pathname === '/api' ||
+    pathname.startsWith('/api/') ||
+    pathname === '/next/preview' ||
+    pathname.startsWith('/next/preview/')
+  )
+}
+
 const unauthorizedResponse = (): NextResponse =>
   new NextResponse('Authentication required', {
     status: 401,
@@ -30,8 +55,29 @@ const unauthorizedResponse = (): NextResponse =>
 export const middleware = (request: NextRequest): NextResponse => {
   const username = process.env.ALPHA_BASIC_AUTH_USERNAME
   const password = process.env.ALPHA_BASIC_AUTH_PASSWORD
+  const adminHostname = getHostname(process.env.NEXT_PUBLIC_SERVER_URL)
+  const publicHostname = getHostname(process.env.MARKETING_APP_BASE_URL)
+  const requestHostname = request.nextUrl.host
+  const isAdminHostRequest = Boolean(adminHostname && requestHostname === adminHostname)
+  const hideNonAdminRoutes = Boolean(
+    isAdminHostRequest &&
+    adminHostname &&
+    publicHostname &&
+    adminHostname !== publicHostname &&
+    !isStaticAssetRequest(request.nextUrl.pathname) &&
+    !isAllowedAdminRoute(request.nextUrl.pathname),
+  )
 
-  if (!username || !password || isStaticAssetRequest(request.nextUrl.pathname)) {
+  if (hideNonAdminRoutes) {
+    return new NextResponse(null, { status: 404 })
+  }
+
+  if (
+    !isAdminHostRequest ||
+    !username ||
+    !password ||
+    isStaticAssetRequest(request.nextUrl.pathname)
+  ) {
     return NextResponse.next()
   }
 

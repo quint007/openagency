@@ -1,28 +1,29 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Post, Config } from '../payload-types'
+import type { Config, Page, Post } from '../payload-types'
+import type { CollectionSlug } from 'payload'
+import type { Media } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
-import { getServerSideURL } from './getURL'
+import { getPublicCollectionUrl, toAbsoluteUrl } from './getURL'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
-  const serverUrl = getServerSideURL()
-
-  let url = serverUrl + '/website-template-OG.webp'
+  let url = toAbsoluteUrl('/website-template-OG.webp')
 
   if (image && typeof image === 'object' && 'url' in image) {
     const ogUrl = image.sizes?.og?.url
 
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+    url = toAbsoluteUrl(ogUrl || image.url)
   }
 
   return url
 }
 
 export const generateMeta = async (args: {
+  collectionSlug: Extract<CollectionSlug, 'pages' | 'posts'>
   doc: Partial<Page> | Partial<Post> | null
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { collectionSlug, doc } = args
 
   const ogImage = getImageURL(doc?.meta?.image)
 
@@ -42,7 +43,10 @@ export const generateMeta = async (args: {
           ]
         : undefined,
       title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      url: getPublicCollectionUrl({
+        collectionSlug,
+        slug: Array.isArray(doc?.slug) ? doc.slug.join('/') : doc?.slug,
+      }),
     }),
     title,
   }
