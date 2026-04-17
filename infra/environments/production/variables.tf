@@ -18,6 +18,69 @@ variable "railway_token" {
   default     = "replace-with-production-railway-token"
 }
 
+variable "vercel_enabled" {
+  description = "Whether production should manage the marketing Vercel project directly. Defaults to fallback mode until provider credentials are available."
+  type        = bool
+  default     = false
+}
+
+variable "vercel_api_token" {
+  description = "Vercel API token placeholder for production plan-time provider configuration. Replace externally when vercel_enabled is true."
+  type        = string
+  sensitive   = true
+  default     = "replace-with-production-vercel-token"
+}
+
+variable "vercel_team" {
+  description = "Optional Vercel team slug or ID used by the production environment root."
+  type        = string
+  default     = null
+}
+
+variable "marketing_vercel_project_name" {
+  description = "Vercel project name used for the production marketing site."
+  type        = string
+  nullable    = false
+  default     = "open-agency-marketing"
+}
+
+variable "marketing_vercel_git_repository" {
+  description = "GitHub repository connected to the production marketing Vercel project."
+  type        = string
+  nullable    = false
+  default     = "quint007/openagency"
+}
+
+variable "marketing_vercel_domain" {
+  description = "Production domain attached to the marketing Vercel project."
+  type        = string
+  default     = "open-agency.io"
+}
+
+variable "marketing_payload_api_key" {
+  description = "Sensitive Payload API key used by the production marketing site for server-side CMS reads."
+  type        = string
+  sensitive   = true
+  nullable    = false
+  default     = "replace-with-production-marketing-payload-api-key"
+}
+
+variable "marketing_preview_payload_api_key" {
+  description = "Sensitive test Payload API key used by preview marketing deployments."
+  type        = string
+  sensitive   = true
+  nullable    = false
+  default     = "replace-with-preview-marketing-payload-api-key"
+}
+
+variable "marketing_preview_revalidate_secret" {
+  description = "Sensitive revalidation secret used by preview marketing deployments."
+  type        = string
+  sensitive   = true
+  nullable    = false
+  default     = "replace-with-preview-marketing-revalidate-secret"
+}
+
 variable "cloudflare_dns_enabled" {
   description = "Whether production should manage Cloudflare DNS records directly. Defaults to fallback mode until provider credentials are available."
   type        = bool

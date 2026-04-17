@@ -1,0 +1,168 @@
+terraform {
+  required_providers {
+    vercel = {
+      source = "vercel/vercel"
+    }
+  }
+}
+
+locals {
+  production_environment = {
+    for key, value in var.production_environment : key => trimspace(value)
+    if length(trimspace(value)) > 0
+  }
+
+  preview_environment = {
+    for key, value in var.preview_environment : key => trimspace(value)
+    if length(trimspace(value)) > 0
+  }
+
+  production_secret_environment = {
+    for key, value in var.production_secret_environment : key => trimspace(value)
+    if length(trimspace(value)) > 0
+  }
+
+  preview_secret_environment = {
+    for key, value in var.preview_secret_environment : key => trimspace(value)
+    if length(trimspace(value)) > 0
+  }
+
+  environment_variables = merge(
+    {
+      for key, value in local.production_environment : "production:${key}" => {
+        comment   = "Managed by OpenTofu for the marketing Vercel project."
+        key       = key
+        sensitive = false
+        target    = ["production"]
+        value     = value
+      }
+    },
+    {
+      for key, value in local.preview_environment : "preview:${key}" => {
+        comment   = "Managed by OpenTofu for preview marketing deployments."
+        key       = key
+        sensitive = false
+        target    = ["preview"]
+        value     = value
+      }
+    },
+    {
+      for key, value in local.production_secret_environment : "production-secret:${key}" => {
+        comment   = "Managed by OpenTofu for the marketing Vercel project."
+        key       = key
+        sensitive = true
+        target    = ["production"]
+        value     = value
+      }
+    },
+    {
+      for key, value in local.preview_secret_environment : "preview-secret:${key}" => {
+        comment   = "Managed by OpenTofu for preview marketing deployments."
+        key       = key
+        sensitive = true
+        target    = ["preview"]
+        value     = value
+      }
+    },
+  )
+
+  required_environment_variable_names = sort(distinct(concat(
+    keys(local.production_environment),
+    keys(local.preview_environment),
+    keys(local.production_secret_environment),
+    keys(local.preview_secret_environment),
+  )))
+
+  fallback_markers = {
+    provider_auth = {
+      status = var.enabled ? "configured" : "fallback_mode"
+      reason = var.enabled ? "Vercel project management is enabled for this environment." : "Vercel resources are disabled until Vercel credentials and project settings are supplied."
+      procedure = var.enabled ? [] : [
+        "Set vercel_enabled = true in the production environment when Vercel credentials are available.",
+        "Provide VERCEL_API_TOKEN and optionally VERCEL_TEAM before running plan/apply for managed Vercel resources.",
+      ]
+    }
+    dns = {
+      status = var.domain == null ? "not_configured" : "manual_verification_required"
+      reason = var.domain == null ? "No production marketing domain is attached in this module." : "The marketing domain is attached in Vercel, but external DNS still needs to point at Vercel for certificate issuance and traffic cutover."
+      procedure = var.domain == null ? [] : [
+        "Point the external DNS record for the marketing hostname to Vercel's required target before expecting certificate issuance.",
+        "Verify the attached domain inside the Vercel dashboard after apply because DNS ownership and propagation are external dependencies.",
+      ]
+    }
+  }
+}
+
+resource "vercel_project" "marketing" {
+  count = var.enabled ? 1 : 0
+
+  name                                              = var.project_name
+  framework                                         = var.framework
+  auto_assign_custom_domains                        = true
+  automatically_expose_system_environment_variables = true
+  build_command                                     = var.build_command
+  install_command                                   = var.install_command
+  root_directory                                    = var.root_directory
+  team_id                                           = var.team_id
+
+  git_repository = {
+    repo              = var.git_repository
+    type              = "github"
+    production_branch = var.production_branch
+  }
+}
+
+resource "vercel_project_environment_variable" "marketing" {
+  for_each = var.enabled ? local.environment_variables : {}
+
+  project_id = vercel_project.marketing[0].id
+  key        = each.value.key
+  value      = each.value.value
+  target     = each.value.target
+  sensitive  = each.value.sensitive
+  comment    = each.value.comment
+  team_id    = var.team_id
+}
+
+resource "vercel_project_domain" "marketing" {
+  count = var.enabled && var.domain != null ? 1 : 0
+
+  project_id = vercel_project.marketing[0].id
+  domain     = var.domain
+  team_id    = var.team_id
+}
+
+output "project_contract" {
+  description = "Concrete Vercel marketing project composition plus explicit fallback markers."
+  value = {
+    managed      = var.enabled
+    team_id      = var.team_id
+    project_id   = try(vercel_project.marketing[0].id, null)
+    project_name = var.project_name
+    framework    = var.framework
+    git_repository = {
+      production_branch = var.production_branch
+      provider          = "github"
+      repo              = var.git_repository
+    }
+    build = {
+      build_command   = var.build_command
+      install_command = var.install_command
+      root_directory  = var.root_directory
+    }
+    domain = {
+      configured = var.domain != null
+      hostname   = var.domain
+      id         = try(vercel_project_domain.marketing[0].id, null)
+    }
+    environment_variables = {
+      production_public_names = sort(keys(local.production_environment))
+      production_secret_names = sort(keys(local.production_secret_environment))
+      preview_public_names    = sort(keys(local.preview_environment))
+      preview_secret_names    = sort(keys(local.preview_secret_environment))
+      required_names          = local.required_environment_variable_names
+      managed_count           = length(local.environment_variables)
+    }
+    fallback_markers = local.fallback_markers
+  }
+}

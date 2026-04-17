@@ -14,6 +14,7 @@ jobs:
       contents: read
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
       RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -132,7 +133,27 @@ jobs:
         run: tofu -chdir=infra/environments/production init
 
       - name: Plan production environment
-        run: tofu -chdir=infra/environments/production plan -var=railway_token="$RAILWAY_TOKEN"
+        env:
+          VERCEL_ENABLED: ${{ secrets.VERCEL_ENABLED != '' && secrets.VERCEL_ENABLED || vars.VERCEL_ENABLED }}
+          VERCEL_TEAM: ${{ secrets.VERCEL_TEAM != '' && secrets.VERCEL_TEAM || vars.VERCEL_TEAM }}
+          MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
+          MARKETING_VERCEL_GIT_REPOSITORY: ${{ secrets.MARKETING_VERCEL_GIT_REPOSITORY != '' && secrets.MARKETING_VERCEL_GIT_REPOSITORY || vars.MARKETING_VERCEL_GIT_REPOSITORY }}
+          MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
+          MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
+          MARKETING_PREVIEW_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PREVIEW_PAYLOAD_API_KEY }}
+          MARKETING_PREVIEW_REVALIDATE_SECRET: ${{ secrets.MARKETING_PREVIEW_REVALIDATE_SECRET }}
+        run: |
+          tofu -chdir=infra/environments/production plan \
+            -var=railway_token="$RAILWAY_TOKEN" \
+            -var=vercel_api_token="$VERCEL_API_TOKEN" \
+            -var=vercel_enabled="$VERCEL_ENABLED" \
+            -var=vercel_team="$VERCEL_TEAM" \
+            -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
+            -var=marketing_vercel_git_repository="$MARKETING_VERCEL_GIT_REPOSITORY" \
+            -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
+            -var=marketing_payload_api_key="$MARKETING_PAYLOAD_API_KEY" \
+            -var=marketing_preview_payload_api_key="$MARKETING_PREVIEW_PAYLOAD_API_KEY" \
+            -var=marketing_preview_revalidate_secret="$MARKETING_PREVIEW_REVALIDATE_SECRET"
 
   apply-production:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -143,6 +164,7 @@ jobs:
       contents: read
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      VERCEL_API_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
       RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -273,7 +295,28 @@ jobs:
         run: tofu -chdir=infra/environments/production init
 
       - name: Apply production environment
-        run: tofu -chdir=infra/environments/production apply -var=railway_token="$RAILWAY_TOKEN" -auto-approve
+        env:
+          VERCEL_ENABLED: ${{ secrets.VERCEL_ENABLED != '' && secrets.VERCEL_ENABLED || vars.VERCEL_ENABLED }}
+          VERCEL_TEAM: ${{ secrets.VERCEL_TEAM != '' && secrets.VERCEL_TEAM || vars.VERCEL_TEAM }}
+          MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
+          MARKETING_VERCEL_GIT_REPOSITORY: ${{ secrets.MARKETING_VERCEL_GIT_REPOSITORY != '' && secrets.MARKETING_VERCEL_GIT_REPOSITORY || vars.MARKETING_VERCEL_GIT_REPOSITORY }}
+          MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
+          MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
+          MARKETING_PREVIEW_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PREVIEW_PAYLOAD_API_KEY }}
+          MARKETING_PREVIEW_REVALIDATE_SECRET: ${{ secrets.MARKETING_PREVIEW_REVALIDATE_SECRET }}
+        run: |
+          tofu -chdir=infra/environments/production apply \
+            -var=railway_token="$RAILWAY_TOKEN" \
+            -var=vercel_api_token="$VERCEL_API_TOKEN" \
+            -var=vercel_enabled="$VERCEL_ENABLED" \
+            -var=vercel_team="$VERCEL_TEAM" \
+            -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
+            -var=marketing_vercel_git_repository="$MARKETING_VERCEL_GIT_REPOSITORY" \
+            -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
+            -var=marketing_payload_api_key="$MARKETING_PAYLOAD_API_KEY" \
+            -var=marketing_preview_payload_api_key="$MARKETING_PREVIEW_PAYLOAD_API_KEY" \
+            -var=marketing_preview_revalidate_secret="$MARKETING_PREVIEW_REVALIDATE_SECRET" \
+            -auto-approve
 
   deploy-backend:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')

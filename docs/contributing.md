@@ -43,6 +43,7 @@ If you need to re-run the script after editing env values, delete the generated 
 - `task setup` – run the bootstrapper discussed above.
 - `task dev` – run the reusable dev preflight tasks, then bring up Payload plus the marketing/courses apps.
 - `task dev-frontend` – just run the marketing/courses apps.
+- `task dev:marketing:prod-api` – run only the marketing app locally while pointing both public and server-side CMS reads at `https://admin.open-agency.io/api` for pre-deploy verification.
 - `task dev-backend` – just run Payload CMS.
 - Visit the services after `task dev`:
   - Payload admin: `http://localhost:3002/admin`
@@ -61,6 +62,12 @@ If you need to re-run the script after editing env values, delete the generated 
 - The marketing and courses apps read `NEXT_PUBLIC_API_URL` at build time to reach Payload's REST endpoints.
 - The marketing and courses apps run on separate ports (3000 and 3001) so they can both be up in dev without conflicts.
 - Turbo (`pnpm --dir frontend dev`) watches both apps and automatically rebuilds shared packages.
+
+### Running marketing against the production CMS API
+
+- Use `task dev:marketing:prod-api` when you need to verify the local marketing app against the live Payload REST API at `https://admin.open-agency.io/api` before a deploy.
+- The task keeps the site itself on `http://localhost:3000`, but overrides both `NEXT_PUBLIC_API_URL` and `PAYLOAD_API_URL` so client-side and server-side reads hit production content.
+- Keep `frontend/apps/marketing/.env.local` in place because the app still loads local server-only values such as `PAYLOAD_API_KEY` and `REVALIDATE_SECRET` from that file.
 
 Whenever you document a new step or tool, keep this file in sync so onboarding stays under ten minutes from a clean clone.
 

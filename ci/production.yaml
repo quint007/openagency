@@ -77,6 +77,21 @@ tasks:
         if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
           VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
         fi
+        if [ -n "${VERCEL_ENABLED:-}" ]; then
+          VARS="$VARS -var=vercel_enabled=$VERCEL_ENABLED"
+        fi
+        if [ -n "${VERCEL_TEAM:-}" ]; then
+          VARS="$VARS -var=vercel_team=$VERCEL_TEAM"
+        fi
+        if [ -n "${MARKETING_VERCEL_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_project_name=$MARKETING_VERCEL_PROJECT_NAME"
+        fi
+        if [ -n "${MARKETING_VERCEL_GIT_REPOSITORY:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_git_repository=$MARKETING_VERCEL_GIT_REPOSITORY"
+        fi
+        if [ -n "${MARKETING_VERCEL_DOMAIN:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_domain=$MARKETING_VERCEL_DOMAIN"
+        fi
         if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
           VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
         fi
@@ -88,6 +103,9 @@ tasks:
         fi
         if [ -n "${RAILWAY_TOKEN:-}" ]; then
           VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${VERCEL_API_TOKEN:-}" ]; then
+          VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -146,6 +164,16 @@ tasks:
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
 
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_preview_payload_api_key=$MARKETING_PREVIEW_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_preview_revalidate_secret=$MARKETING_PREVIEW_REVALIDATE_SECRET"
+        fi
+        
         # Non-secret app URLs
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
@@ -174,6 +202,21 @@ tasks:
         if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
           VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
         fi
+        if [ -n "${VERCEL_ENABLED:-}" ]; then
+          VARS="$VARS -var=vercel_enabled=$VERCEL_ENABLED"
+        fi
+        if [ -n "${VERCEL_TEAM:-}" ]; then
+          VARS="$VARS -var=vercel_team=$VERCEL_TEAM"
+        fi
+        if [ -n "${MARKETING_VERCEL_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_project_name=$MARKETING_VERCEL_PROJECT_NAME"
+        fi
+        if [ -n "${MARKETING_VERCEL_GIT_REPOSITORY:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_git_repository=$MARKETING_VERCEL_GIT_REPOSITORY"
+        fi
+        if [ -n "${MARKETING_VERCEL_DOMAIN:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_domain=$MARKETING_VERCEL_DOMAIN"
+        fi
         if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
           VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
         fi
@@ -185,6 +228,9 @@ tasks:
         fi
         if [ -n "${RAILWAY_TOKEN:-}" ]; then
           VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${VERCEL_API_TOKEN:-}" ]; then
+          VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -243,6 +289,22 @@ tasks:
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
 
+        if [ -n "${R2_ENABLED:-}" ]; then
+          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
+        fi
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+        fi
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_preview_payload_api_key=$MARKETING_PREVIEW_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_preview_revalidate_secret=$MARKETING_PREVIEW_REVALIDATE_SECRET"
+        fi
+        
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
 
@@ -267,6 +329,21 @@ tasks:
         if [ -n "${RAILWAY_PROJECT_NAME:-}" ]; then
           VARS="$VARS -var=railway_project_name=$RAILWAY_PROJECT_NAME"
         fi
+        if [ -n "${VERCEL_ENABLED:-}" ]; then
+          VARS="$VARS -var=vercel_enabled=$VERCEL_ENABLED"
+        fi
+        if [ -n "${VERCEL_TEAM:-}" ]; then
+          VARS="$VARS -var=vercel_team=$VERCEL_TEAM"
+        fi
+        if [ -n "${MARKETING_VERCEL_PROJECT_NAME:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_project_name=$MARKETING_VERCEL_PROJECT_NAME"
+        fi
+        if [ -n "${MARKETING_VERCEL_GIT_REPOSITORY:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_git_repository=$MARKETING_VERCEL_GIT_REPOSITORY"
+        fi
+        if [ -n "${MARKETING_VERCEL_DOMAIN:-}" ]; then
+          VARS="$VARS -var=marketing_vercel_domain=$MARKETING_VERCEL_DOMAIN"
+        fi
         if [ -n "${POSTGRES_DATABASE_NAME:-}" ]; then
           VARS="$VARS -var=postgres_database_name=$POSTGRES_DATABASE_NAME"
         fi
@@ -278,6 +355,9 @@ tasks:
         fi
         if [ -n "${RAILWAY_TOKEN:-}" ]; then
           VARS="$VARS -var=railway_token=$RAILWAY_TOKEN"
+        fi
+        if [ -n "${VERCEL_API_TOKEN:-}" ]; then
+          VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -338,6 +418,19 @@ tasks:
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
 
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
+        fi
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_preview_payload_api_key=$MARKETING_PREVIEW_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${MARKETING_PREVIEW_REVALIDATE_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_preview_revalidate_secret=$MARKETING_PREVIEW_REVALIDATE_SECRET"
+        fi
+        
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
 

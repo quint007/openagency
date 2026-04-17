@@ -6,6 +6,10 @@ terraform {
       source  = "terraform-community-providers/railway"
       version = "~> 0.6"
     }
+    vercel = {
+      source  = "vercel/vercel"
+      version = "~> 2.0"
+    }
   }
   backend "s3" {
     bucket = "terraform-state"
@@ -27,4 +31,9 @@ terraform {
 
 provider "railway" {
   token = var.railway_token
+}
+
+provider "vercel" {
+  api_token = var.vercel_api_token
+  team      = var.vercel_team
 }

@@ -33,6 +33,16 @@ tasks:
     desc: Start the marketing and courses apps
     cmds:
       - pnpm --dir {{.FRONTEND_DIR}} dev
+
+  dev:marketing:prod-api:
+    desc: Start marketing locally against the production CMS API
+    env:
+      PORT: '{{.MARKETING_PORT}}'
+      NEXT_PUBLIC_SERVER_URL: http://localhost:{{.MARKETING_PORT}}
+      NEXT_PUBLIC_API_URL: https://admin.open-agency.io/api
+      PAYLOAD_API_URL: https://admin.open-agency.io/api
+    cmds:
+      - pnpm --dir {{.FRONTEND_DIR}} --filter marketing dev
   dev-backend:
     desc: Start Payload CMS only
     cmds:
