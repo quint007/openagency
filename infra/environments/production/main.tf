@@ -58,7 +58,17 @@ locals {
     }
     required_public_environment_names = ["NEXT_PUBLIC_SERVER_URL", "MARKETING_APP_BASE_URL", "COURSES_APP_BASE_URL"]
     required_secret_environment_names = ["PAYLOAD_SECRET", "CRON_SECRET", "PREVIEW_SECRET", "REVALIDATE_SECRET"]
-    optional_environment_names        = ["REVALIDATE_TIMEOUT_MS"]
+    optional_environment_names = [
+      "ALPHA_BASIC_AUTH_PASSWORD",
+      "ALPHA_BASIC_AUTH_USERNAME",
+      "R2_ACCESS_KEY_ID",
+      "R2_BUCKET",
+      "R2_ENDPOINT",
+      "R2_PUBLIC_BASE_URL",
+      "R2_REGION",
+      "R2_SECRET_ACCESS_KEY",
+      "REVALIDATE_TIMEOUT_MS",
+    ]
     secret_values_supplied_externally = true
     service_domain_subdomain          = local.backend_service_domain_subdomain
     service_domains = {
@@ -142,6 +152,16 @@ locals {
     secret_values_supplied_externally = true
     required_secret_variable_names    = ["R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]
   }
+
+  backend_optional_environment = merge(
+    var.backend_optional_environment,
+    {
+      R2_BUCKET          = local.r2_contract.bucket_name
+      R2_ENDPOINT        = local.r2_contract.s3_compatible_endpoint
+      R2_PUBLIC_BASE_URL = local.r2_contract.public_custom_domain == null ? null : "https://${local.r2_contract.public_custom_domain}"
+      R2_REGION          = local.r2_contract.aws_region
+    },
+  )
 }
 
 module "railway" {
@@ -150,7 +170,7 @@ module "railway" {
 
   admin_hostname               = local.admin_hostname
   api_hostname                 = local.api_hostname
-  backend_optional_environment = var.backend_optional_environment
+  backend_optional_environment = local.backend_optional_environment
   backend_public_environment = {
     NEXT_PUBLIC_SERVER_URL = local.canonical_server_url
     MARKETING_APP_BASE_URL = var.marketing_app_base_url

@@ -40,6 +40,14 @@ locals {
   ]
 
   optional_environment_variable_names = [
+    "ALPHA_BASIC_AUTH_PASSWORD",
+    "ALPHA_BASIC_AUTH_USERNAME",
+    "R2_ACCESS_KEY_ID",
+    "R2_BUCKET",
+    "R2_ENDPOINT",
+    "R2_PUBLIC_BASE_URL",
+    "R2_REGION",
+    "R2_SECRET_ACCESS_KEY",
     "REVALIDATE_TIMEOUT_MS",
   ]
 
@@ -157,17 +165,17 @@ resource "railway_custom_domain" "admin" {
 output "backend_service_contract" {
   description = "Concrete Railway backend service composition plus explicit provider-gap fallbacks."
   value = {
-    admin_hostname                    = var.admin_hostname
-    api_hostname                      = var.api_hostname
-    backend_service_domain            = null
-    backend_service_domain_suffix     = null
-    backend_service_name              = var.backend_service_name
-    environment_id                    = try(railway_project.backend[0].default_environment.id, null)
-    environment_name                  = var.environment_name
-    fallback_markers                  = local.fallback_markers
-    managed                           = var.enabled
-    project_id                        = try(railway_project.backend[0].id, null)
-    project_name                      = var.project_name
+    admin_hostname                = var.admin_hostname
+    api_hostname                  = var.api_hostname
+    backend_service_domain        = null
+    backend_service_domain_suffix = null
+    backend_service_name          = var.backend_service_name
+    environment_id                = try(railway_project.backend[0].default_environment.id, null)
+    environment_name              = var.environment_name
+    fallback_markers              = local.fallback_markers
+    managed                       = var.enabled
+    project_id                    = try(railway_project.backend[0].id, null)
+    project_name                  = var.project_name
     postgres = {
       database_name          = var.postgres_database_name
       data_directory         = var.postgres_data_directory

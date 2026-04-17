@@ -19,7 +19,7 @@ import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
-import { getServerSideURL } from './utilities/getURL'
+import { getAdminURL, getPublicSiteURL } from './utilities/getURL'
 import { isR2StorageConfigured, getR2StorageEndpoint } from './utilities/mediaStorage'
 
 const filename = fileURLToPath(import.meta.url)
@@ -83,8 +83,9 @@ export default buildConfig({
     Categories,
     Users,
   ],
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: [getAdminURL(), getPublicSiteURL()].filter(Boolean),
   globals: [Header, Footer],
+  serverURL: getAdminURL(),
   plugins: [
     ...plugins,
     ...(r2StorageEnabled && r2StorageEndpoint

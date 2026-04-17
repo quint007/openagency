@@ -18,7 +18,7 @@ declare global {
       R2_PUBLIC_BASE_URL?: string
       R2_REGION?: string
       R2_SECRET_ACCESS_KEY?: string
-      VERCEL_PROJECT_PRODUCTION_URL: string
+      VERCEL_PROJECT_PRODUCTION_URL?: string
     }
   }
 }
