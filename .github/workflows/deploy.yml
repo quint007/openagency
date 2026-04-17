@@ -12,94 +12,30 @@ jobs:
     environment: production
     permissions:
       contents: read
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_EC2_METADATA_DISABLED: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Devbox
-        uses: jetify-com/devbox-install-action@v0.12.0
-
-      - name: Write backend state config
-        run: |
-          cat > infra/environments/production/backend.hcl <<'EOF'
-          ${{ secrets.BACKEND_STATE }}
-          EOF
-
-      - name: Write production env file
-        env:
-          RAW_NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL != '' && secrets.NEXT_PUBLIC_SERVER_URL || vars.NEXT_PUBLIC_SERVER_URL }}
-          RAW_MARKETING_APP_BASE_URL: ${{ secrets.MARKETING_APP_BASE_URL != '' && secrets.MARKETING_APP_BASE_URL || vars.MARKETING_APP_BASE_URL }}
-          RAW_COURSES_APP_BASE_URL: ${{ secrets.COURSES_APP_BASE_URL != '' && secrets.COURSES_APP_BASE_URL || vars.COURSES_APP_BASE_URL }}
-          RAW_REVALIDATE_TIMEOUT_MS: ${{ secrets.REVALIDATE_TIMEOUT_MS != '' && secrets.REVALIDATE_TIMEOUT_MS || vars.REVALIDATE_TIMEOUT_MS }}
-          RAW_RAILWAY_ENABLED: ${{ secrets.RAILWAY_ENABLED != '' && secrets.RAILWAY_ENABLED || vars.RAILWAY_ENABLED }}
-          RAW_RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME != '' && secrets.RAILWAY_PROJECT_NAME || vars.RAILWAY_PROJECT_NAME }}
-          RAW_POSTGRES_DATABASE_NAME: ${{ secrets.POSTGRES_DATABASE_NAME != '' && secrets.POSTGRES_DATABASE_NAME || vars.POSTGRES_DATABASE_NAME }}
-          RAW_POSTGRES_USER: ${{ secrets.POSTGRES_USER != '' && secrets.POSTGRES_USER || vars.POSTGRES_USER }}
-          RAW_R2_ENABLED: ${{ secrets.R2_ENABLED != '' && secrets.R2_ENABLED || vars.R2_ENABLED }}
-          RAW_CLOUDFLARE_DNS_ENABLED: ${{ secrets.CLOUDFLARE_DNS_ENABLED != '' && secrets.CLOUDFLARE_DNS_ENABLED || vars.CLOUDFLARE_DNS_ENABLED }}
-          RAW_CLOUDFLARE_ZONE_NAME: ${{ secrets.CLOUDFLARE_ZONE_NAME != '' && secrets.CLOUDFLARE_ZONE_NAME || vars.CLOUDFLARE_ZONE_NAME }}
-          RAW_CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID != '' && secrets.CLOUDFLARE_ZONE_ID || vars.CLOUDFLARE_ZONE_ID }}
-          RAW_R2_PUBLIC_HOSTNAME: ${{ secrets.R2_PUBLIC_HOSTNAME != '' && secrets.R2_PUBLIC_HOSTNAME || vars.R2_PUBLIC_HOSTNAME }}
-          RAW_BACKEND_PAYLOAD_SECRET: ${{ secrets.BACKEND_PAYLOAD_SECRET }}
-          RAW_BACKEND_CRON_SECRET: ${{ secrets.BACKEND_CRON_SECRET }}
-          RAW_BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
-          RAW_BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
-          RAW_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          RAW_RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAW_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          RAW_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: |
-          normalize_bool() {
-            value="$(printf '%s' "$1" | tr -d '\r' | xargs 2>/dev/null || true)"
-            value="${value#\"}"
-            value="${value%\"}"
-            value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
-
-            case "$value" in
-              true|false)
-                printf '%s' "$value"
-                ;;
-              *)
-                printf '%s' "$value"
-                ;;
-            esac
-          }
-
-          cat > .env <<EOF
-          BACKEND_PAYLOAD_SECRET=${RAW_BACKEND_PAYLOAD_SECRET}
-          BACKEND_CRON_SECRET=${RAW_BACKEND_CRON_SECRET}
-          BACKEND_PREVIEW_SECRET=${RAW_BACKEND_PREVIEW_SECRET}
-          BACKEND_REVALIDATE_SECRET=${RAW_BACKEND_REVALIDATE_SECRET}
-          NEXT_PUBLIC_SERVER_URL=${RAW_NEXT_PUBLIC_SERVER_URL:-https://admin.open-agency.io}
-          MARKETING_APP_BASE_URL=${RAW_MARKETING_APP_BASE_URL:-https://open-agency.io}
-          COURSES_APP_BASE_URL=${RAW_COURSES_APP_BASE_URL:-https://courses.open-agency.io}
-          REVALIDATE_TIMEOUT_MS=${RAW_REVALIDATE_TIMEOUT_MS:-5000}
-          RAILWAY_ENABLED=$(normalize_bool "$RAW_RAILWAY_ENABLED")
-          RAILWAY_PROJECT_NAME=${RAW_RAILWAY_PROJECT_NAME:-open-agency-production}
-          POSTGRES_DATABASE_NAME=${RAW_POSTGRES_DATABASE_NAME:-open_agency}
-          POSTGRES_USER=${RAW_POSTGRES_USER:-open_agency}
-          POSTGRES_PASSWORD=${RAW_POSTGRES_PASSWORD}
-          R2_ENABLED=$(normalize_bool "$RAW_R2_ENABLED")
-          CLOUDFLARE_DNS_ENABLED=$(normalize_bool "$RAW_CLOUDFLARE_DNS_ENABLED")
-          CLOUDFLARE_ZONE_NAME=${RAW_CLOUDFLARE_ZONE_NAME:-open-agency.io}
-          CLOUDFLARE_ZONE_ID=${RAW_CLOUDFLARE_ZONE_ID}
-          R2_PUBLIC_HOSTNAME=${RAW_R2_PUBLIC_HOSTNAME:-media.open-agency.io}
-          RAILWAY_TOKEN=${RAW_RAILWAY_TOKEN}
-          CLOUDFLARE_API_TOKEN=${RAW_CLOUDFLARE_API_TOKEN}
-          CLOUDFLARE_ACCOUNT_ID=${RAW_CLOUDFLARE_ACCOUNT_ID}
-          R2_ACCESS_KEY_ID=${RAW_R2_ACCESS_KEY_ID}
-          R2_SECRET_ACCESS_KEY=${RAW_R2_SECRET_ACCESS_KEY}
-          EOF
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "latest"
 
       - name: Init production environment
-        run: devbox run task tofu:init-production
+        run: tofu -chdir=infra/environments/production init
 
       - name: Plan production environment
-        run: devbox run task production:deploy:plan
+        run: tofu -chdir=infra/environments/production plan -var=railway_token="$RAILWAY_TOKEN"
 
   apply-production:
     if: (github.event_name == 'pull_request') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
@@ -108,20 +44,24 @@ jobs:
     environment: production
     permissions:
       contents: read
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_EC2_METADATA_DISABLED: "true"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Devbox
-        uses: jetify-com/devbox-install-action@v0.12.0
-
-      - name: Write backend state config
-        run: |
-          cat > infra/environments/production/backend.hcl <<'EOF'
-          ${{ secrets.BACKEND_STATE }}
-          EOF
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "latest"
 
       - name: Write production env file
         env:
@@ -148,6 +88,8 @@ jobs:
           RAW_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          RAW_RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          RAW_RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
         run: |
           normalize_bool() {
             value="$(printf '%s' "$1" | tr -d '\r' | xargs 2>/dev/null || true)"
@@ -189,13 +131,20 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID=${RAW_CLOUDFLARE_ACCOUNT_ID}
           R2_ACCESS_KEY_ID=${RAW_R2_ACCESS_KEY_ID}
           R2_SECRET_ACCESS_KEY=${RAW_R2_SECRET_ACCESS_KEY}
+          RAILWAY_API_TOKEN=${RAW_RAILWAY_API_TOKEN}
+          RAILWAY_PROJECT_ID=${RAW_RAILWAY_PROJECT_ID}
           EOF
 
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "latest"
+
       - name: Init production environment
-        run: devbox run task tofu:init-production
+        run: tofu -chdir=infra/environments/production init
 
       - name: Apply production environment
-        run: devbox run task --yes production:deploy:apply
+        run: tofu -chdir=infra/environments/production apply -var=railway_token="$RAILWAY_TOKEN" -auto-approve
 
   deploy-backend:
     if: (github.event_name == 'pull_request') || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
@@ -206,8 +155,8 @@ jobs:
     permissions:
       contents: read
     env:
-      RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
-      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -215,4 +164,21 @@ jobs:
           fetch-depth: 0
 
       - name: Deploy backend to Railway
-        run: railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
+        run: |
+          # Debug: Print Railway variables
+          echo "=== Railway Variables ==="
+          railway variables --service open-agency-backend-production
+
+          # Debug: Print service status before deploy
+          echo "=== Service Status Before ==="
+          railway service open-agency-backend-production || true
+
+          # Deploy with verbose output
+          railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
+
+          # Debug: Print deployment status
+          echo "=== Waiting for deployment ==="
+          # Give the deployed container time to start and run its startup migration.
+          sleep 45
+          railway status open-agency-backend-production || true
+          railway logs open-agency-backend-production --tail 100 || true

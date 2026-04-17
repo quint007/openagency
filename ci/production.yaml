@@ -62,6 +62,8 @@ tasks:
   deploy:plan:
     desc: Plan production infrastructure with local env config
     dotenv: [.env]
+    env:
+      TF_LOG: DEBUG
     cmds:
       - |
         set -eu
@@ -120,6 +122,8 @@ tasks:
   deploy:apply:
     desc: Apply production infrastructure with local env config
     dotenv: [.env]
+    env:
+      TF_LOG: DEBUG
     prompt: true
     cmds:
       - |
@@ -170,7 +174,7 @@ tasks:
           VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
         fi
         
-        devbox run tofu -chdir=infra/environments/production apply -auto-approve $VARS
+        devbox run tofu -chdir=infra/environments/production apply -auto-approve $VARS -verbose
 
   deploy:destroy:
     desc: Destroy production infrastructure with local env config

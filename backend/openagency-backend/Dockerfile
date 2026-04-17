@@ -9,12 +9,13 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
+# Install dependencies based on the preferred package manager.
+# Prefer pnpm when its lockfile is present; this repo is pnpm-managed.
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f yarn.lock ]; then yarn --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
@@ -44,35 +45,16 @@ ARG NEXT_BUILD_SKIP_DB=true
 ENV NEXT_BUILD_SKIP_DB=$NEXT_BUILD_SKIP_DB
 
 RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
+  elif [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-# Run database migrations as part of the build so the schema is ready
-# before the new container starts serving traffic.
-#
-# Railway builds Docker images on its own infrastructure, which means the
-# builder has network access to postgres.railway.internal. Railway also
-# automatically passes any ARG-declared variable from the service's
-# environment as a Docker build argument, so DATABASE_URL here resolves to
-# the real Postgres URL at build time.
-#
-# If DATABASE_URL is absent (local or CI builds without a DB) the step is
-# skipped gracefully; the outer `if` check guarantees no failure.
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-
-RUN if [ -n "$DATABASE_URL" ]; then \
-      echo "==> Generating initial migration (if none exist)..." && \
-      if ! find src/migrations -name "*.sql" -maxdepth 1 2>/dev/null | grep -q .; then \
-        NODE_OPTIONS=--no-deprecation pnpm exec payload migrate:create --name init; \
-      fi && \
-      echo "==> Applying pending migrations..." && \
-      NODE_OPTIONS=--no-deprecation pnpm exec payload migrate --yes; \
-    else \
-      echo "==> DATABASE_URL not set — skipping build-time migrations"; \
+# If the repo doesn't already contain migrations, generate an initial one at
+# build time so the runtime container can apply it on Railway's private network.
+RUN if ! find src/migrations -type f -name "*.ts" 2>/dev/null | grep -q .; then \
+      NODE_OPTIONS=--no-deprecation pnpm exec payload migrate:create --name init; \
     fi
 
 # Production image, copy all the files and run next
@@ -97,11 +79,13 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+COPY --from=builder --chown=nextjs:nodejs /app/tsconfig.json ./tsconfig.json
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Wire up a `payload` shim so `railway ssh … "payload migrate --yes"` works.
-# The payload package is present in the standalone node_modules because the
-# server imports it; this shim makes the CLI entry-point accessible in PATH.
-RUN printf '#!/bin/sh\ncd /app && exec node ./node_modules/payload/dist/bin.js "$@"\n' \
+# The CLI entry-point is payload/bin.js in this package version.
+RUN printf '#!/bin/sh\ncd /app && exec node ./node_modules/payload/bin.js "$@"\n' \
     > /usr/local/bin/payload && chmod +x /usr/local/bin/payload
 
 USER nextjs
@@ -110,6 +94,8 @@ EXPOSE 8080
 
 ENV PORT=8080
 
-# server.js is created by next build from the standalone output
+# server.js is created by next build from the standalone output.
+# Run Payload migrations at container startup so they execute inside Railway's
+# runtime private network instead of during the build.
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]
