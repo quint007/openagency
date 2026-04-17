@@ -14,21 +14,15 @@ tasks:
 
   plan-production:
     desc: Plan production infrastructure changes
-    env:
-      TF_LOG: DEBUG
     cmds:
       - devbox run tofu -chdir=infra/environments/production plan -backend-config=backend.hcl
 
   apply-production:
     desc: Apply production infrastructure changes
-    env:
-      TF_LOG: DEBUG
     cmds:
-      - devbox run tofu -chdir=infra/environments/production apply -backend-config=backend.hcl -auto-approve
+      - devbox run tofu -chdir=infra/environments/production apply -backend-config=backend.hcl
 
   destroy-production:
     desc: Destroy production infrastructure
-    env:
-      TF_LOG: DEBUG
     cmds:
-      - devbox run tofu -chdir=infra/environments/production destroy -auto-approve
+      - devbox run tofu -chdir=infra/environments/production destroy
