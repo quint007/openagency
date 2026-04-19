@@ -69,7 +69,7 @@ tasks:
         set -eu
         # Build variable args conditionally - only pass when values are provided
         VARS=""
-        
+
         # Provider tokens (only pass if set - otherwise let defaults apply)
         if [ -n "${RAILWAY_ENABLED:-}" ]; then
           VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
@@ -101,19 +101,17 @@ tasks:
         if [ -n "${CLOUDFLARE_ZONE_NAME:-}" ]; then
           VARS="$VARS -var=cloudflare_zone_name=$CLOUDFLARE_ZONE_NAME"
         fi
-        if [ -n "${R2_ENABLED:-}" ]; then
-          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
+        VARS="$VARS -var=r2_enabled=true"
+        if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
+          VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
         fi
-         if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
-           VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
-         fi
-         OPTIONAL_BACKEND_ENV=""
-         if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_USERNAME=\"$ALPHA_BASIC_AUTH_USERNAME\""
-         fi
-         if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
-         fi
+        OPTIONAL_BACKEND_ENV=""
+        if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ]; then
+          OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_USERNAME=\"$ALPHA_BASIC_AUTH_USERNAME\""
+        fi
+          if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
+          fi
          if [ -n "${R2_ENDPOINT:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
          fi
@@ -129,25 +127,28 @@ tasks:
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
-         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
-         fi
-         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
-         fi
+          if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+          fi
+          if [ -n "${RESEND_API_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+          fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
-        
+
         # Non-secret app URLs
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
-        
+
         # Backend secrets (only pass if all required are set)
         if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
           VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
         fi
-        
+
         devbox run tofu -chdir=infra/environments/production plan $VARS
 
   deploy:apply:
@@ -160,7 +161,7 @@ tasks:
       - |
         set -eu
         VARS=""
-        
+
         if [ -n "${RAILWAY_ENABLED:-}" ]; then
           VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
         fi
@@ -191,9 +192,7 @@ tasks:
         if [ -n "${CLOUDFLARE_ZONE_NAME:-}" ]; then
           VARS="$VARS -var=cloudflare_zone_name=$CLOUDFLARE_ZONE_NAME"
         fi
-        if [ -n "${R2_ENABLED:-}" ]; then
-          VARS="$VARS -var=r2_enabled=$R2_ENABLED"
-        fi
+        VARS="$VARS -var=r2_enabled=true"
          if [ -n "${R2_PUBLIC_HOSTNAME:-}" ]; then
            VARS="$VARS -var=r2_public_hostname=$R2_PUBLIC_HOSTNAME"
          fi
@@ -219,23 +218,26 @@ tasks:
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
-         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
-         fi
-         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
-         fi
+          if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+          fi
+          if [ -n "${RESEND_API_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+          fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
-        
+
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
-        
+
         if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
           VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
         fi
-        
+
         devbox run tofu -chdir=infra/environments/production apply -auto-approve $VARS -verbose
 
   deploy:destroy:
@@ -246,7 +248,7 @@ tasks:
       - |
         set -eu
         VARS=""
-        
+
         if [ -n "${RAILWAY_ENABLED:-}" ]; then
           VARS="$VARS -var=railway_enabled=$RAILWAY_ENABLED"
         fi
@@ -305,23 +307,26 @@ tasks:
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
-         if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
-         fi
-         if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
-         fi
+          if [ -n "${R2_SECRET_ACCESS_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_SECRET_ACCESS_KEY=\"$R2_SECRET_ACCESS_KEY\""
+          fi
+          if [ -n "${RESEND_API_KEY:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+          fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
-        
+
         VARS="$VARS -var=marketing_app_base_url=${MARKETING_APP_BASE_URL:-https://open-agency.io}"
         VARS="$VARS -var=courses_app_base_url=${COURSES_APP_BASE_URL:-https://courses.open-agency.io}"
-        
+
         if [ -n "${BACKEND_PAYLOAD_SECRET:-}" ] && [ -n "${BACKEND_CRON_SECRET:-}" ] && [ -n "${BACKEND_PREVIEW_SECRET:-}" ] && [ -n "${BACKEND_REVALIDATE_SECRET:-}" ]; then
           VARS="$VARS -var=backend_secret_environment={PAYLOAD_SECRET=\"$BACKEND_PAYLOAD_SECRET\",CRON_SECRET=\"$BACKEND_CRON_SECRET\",PREVIEW_SECRET=\"$BACKEND_PREVIEW_SECRET\",REVALIDATE_SECRET=\"$BACKEND_REVALIDATE_SECRET\"}"
         fi
-        
+
         devbox run tofu -chdir=infra/environments/production destroy $VARS
 
   cutover:plan:
@@ -329,6 +334,47 @@ tasks:
     dotenv: [.env]
     cmds:
       - bash scripts/production/cutover.sh --dry-run
+
+  deploy:backend:
+    desc: Deploy the backend Payload instance to Railway production
+    dotenv: [.env]
+    preconditions:
+      - sh: test -n "${RAILWAY_TOKEN:-}"
+        msg: Missing RAILWAY_TOKEN in repo-root .env.
+      - sh: test -n "${RAILWAY_PROJECT_ID:-}"
+        msg: Missing RAILWAY_PROJECT_ID in repo-root .env.
+      - sh: test -n "${R2_ACCESS_KEY_ID:-}"
+        msg: Missing R2_ACCESS_KEY_ID in repo-root .env.
+      - sh: test -n "${R2_BUCKET:-}"
+        msg: Missing R2_BUCKET in repo-root .env.
+      - sh: test -n "${R2_ENDPOINT:-}"
+        msg: Missing R2_ENDPOINT in repo-root .env.
+      - sh: test -n "${R2_PUBLIC_BASE_URL:-}"
+        msg: Missing R2_PUBLIC_BASE_URL in repo-root .env.
+      - sh: test -n "${R2_SECRET_ACCESS_KEY:-}"
+        msg: Missing R2_SECRET_ACCESS_KEY in repo-root .env.
+      - sh: test -n "${RESEND_API_KEY:-}"
+        msg: Missing RESEND_API_KEY in repo-root .env.
+    cmds:
+      - |
+        set -eu
+        devbox run railway variable set \
+          R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
+          R2_BUCKET="$R2_BUCKET" \
+          R2_ENDPOINT="$R2_ENDPOINT" \
+          R2_PUBLIC_BASE_URL="$R2_PUBLIC_BASE_URL" \
+          R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
+          RESEND_API_KEY="$RESEND_API_KEY" \
+          --service open-agency-backend-production \
+          --environment production \
+          --skip-deploys
+
+        devbox run railway variables --service open-agency-backend-production
+        devbox run railway service open-agency-backend-production || true
+        devbox run railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
+        sleep 45
+        devbox run railway status open-agency-backend-production || true
+        devbox run railway logs open-agency-backend-production --tail 100 || true
 
   deploy:migrate:
     desc: Run production Payload migrations using root .env secrets

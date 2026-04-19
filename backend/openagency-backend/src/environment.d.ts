@@ -9,6 +9,7 @@ declare global {
       MARKETING_APP_BASE_URL: string
       NEXT_PUBLIC_SERVER_URL: string
       PAYLOAD_SECRET: string
+      RESEND_API_KEY?: string
       PREVIEW_SECRET: string
       REVALIDATE_SECRET: string
       REVALIDATE_TIMEOUT_MS?: string

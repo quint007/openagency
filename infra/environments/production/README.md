@@ -75,6 +75,7 @@ Important caveats:
 - The current provider surface does **not** expose first-class spending caps or explicit free-tier sizing controls.
 - This repo keeps the footprint minimal by using one Railway custom domain, one Postgres service, one volume, and no backup automation surface.
 - The backend runtime `DATABASE_URL` is generated internally from `POSTGRES_DATABASE_NAME`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` and injected into the backend Railway variable collection.
+- The backend runtime now requires R2 media storage variables in the Railway variable collection: `R2_ACCESS_KEY_ID`, `R2_BUCKET`, `R2_ENDPOINT`, `R2_PUBLIC_BASE_URL`, and `R2_SECRET_ACCESS_KEY`.
 - The Postgres volume mounts at `/var/lib/postgresql`, while `PGDATA=/var/lib/postgresql/data/pgdata` keeps initdb off the mount root and avoids the Railway `lost+found` failure.
 - If you need to run migrations or restore tooling from outside Railway, provide an operator-only `BACKEND_DATABASE_URL` in the repo-root `.env`.
 

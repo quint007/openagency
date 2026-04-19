@@ -39,6 +39,7 @@ jobs:
       RAW_BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
       RAW_BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
       RAW_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
       RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       RAW_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT != '' && secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
@@ -73,27 +74,28 @@ jobs:
               value = get(name)
               return value or None
 
-          payload = {
-              'railway_project_name': get('RAILWAY_PROJECT_NAME') or 'open-agency-production',
-              'railway_enabled': get_bool('RAW_RAILWAY_ENABLED', False),
-              'cloudflare_dns_enabled': get_bool('RAW_CLOUDFLARE_DNS_ENABLED', False),
-              'r2_enabled': get_bool('RAW_R2_ENABLED', False),
-              'cloudflare_zone_name': get('RAW_CLOUDFLARE_ZONE_NAME') or 'open-agency.io',
-              'cloudflare_zone_id': optional('RAW_CLOUDFLARE_ZONE_ID'),
-              'cloudflare_account_id': get('CLOUDFLARE_ACCOUNT_ID') or 'replace-with-production-cloudflare-account-id',
+           payload = {
+               'railway_project_name': get('RAILWAY_PROJECT_NAME') or 'open-agency-production',
+               'railway_enabled': get_bool('RAW_RAILWAY_ENABLED', False),
+               'cloudflare_dns_enabled': get_bool('RAW_CLOUDFLARE_DNS_ENABLED', False),
+               'r2_enabled': True,
+               'cloudflare_zone_name': get('RAW_CLOUDFLARE_ZONE_NAME') or 'open-agency.io',
+               'cloudflare_zone_id': optional('RAW_CLOUDFLARE_ZONE_ID'),
+               'cloudflare_account_id': get('CLOUDFLARE_ACCOUNT_ID') or 'replace-with-production-cloudflare-account-id',
               'marketing_app_base_url': get('RAW_MARKETING_APP_BASE_URL') or 'https://open-agency.io',
               'courses_app_base_url': get('RAW_COURSES_APP_BASE_URL') or 'https://courses.open-agency.io',
               'r2_public_hostname': get('RAW_R2_PUBLIC_HOSTNAME') or 'media.open-agency.io',
               'postgres_database_name': get('RAW_POSTGRES_DATABASE_NAME') or 'open_agency',
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
-              'backend_secret_environment': {
-                  'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
-                  'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
-                  'PREVIEW_SECRET': get('RAW_BACKEND_PREVIEW_SECRET') or 'replace-with-production-preview-secret',
-                  'REVALIDATE_SECRET': get('RAW_BACKEND_REVALIDATE_SECRET') or 'replace-with-production-revalidate-secret',
-              },
-          }
+               'backend_secret_environment': {
+                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
+                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
+                   'PREVIEW_SECRET': get('RAW_BACKEND_PREVIEW_SECRET') or 'replace-with-production-preview-secret',
+                   'REVALIDATE_SECRET': get('RAW_BACKEND_REVALIDATE_SECRET') or 'replace-with-production-revalidate-secret',
+                   'RESEND_API_KEY': get('RAW_RESEND_API_KEY') or 'replace-with-production-resend-api-key',
+               },
+           }
 
           optional_backend_environment = {
               key: value
@@ -130,7 +132,7 @@ jobs:
         run: tofu -chdir=infra/environments/production plan -var=railway_token="$RAILWAY_TOKEN"
 
   apply-production:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: plan-production
     runs-on: ubuntu-latest
     environment: production
@@ -164,6 +166,7 @@ jobs:
       RAW_BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
       RAW_BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
       RAW_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
       RAW_RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       RAW_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RAW_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -212,7 +215,7 @@ jobs:
               'railway_project_name': get('RAW_RAILWAY_PROJECT_NAME') or 'open-agency-production',
               'railway_enabled': get_bool('RAW_RAILWAY_ENABLED', False),
               'cloudflare_dns_enabled': get_bool('RAW_CLOUDFLARE_DNS_ENABLED', False),
-              'r2_enabled': get_bool('RAW_R2_ENABLED', False),
+              'r2_enabled': True,
               'cloudflare_zone_name': get('RAW_CLOUDFLARE_ZONE_NAME') or 'open-agency.io',
               'cloudflare_zone_id': optional('RAW_CLOUDFLARE_ZONE_ID'),
               'cloudflare_account_id': get('RAW_CLOUDFLARE_ACCOUNT_ID') or 'replace-with-production-cloudflare-account-id',
@@ -241,8 +244,9 @@ jobs:
                   'R2_BUCKET': optional('RAW_R2_BUCKET'),
                   'R2_PUBLIC_BASE_URL': optional('RAW_R2_PUBLIC_BASE_URL'),
                   'R2_REGION': optional('RAW_R2_REGION'),
+                  'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
-              }.items()
+               }.items()
               if value is not None
           }
 
@@ -265,7 +269,7 @@ jobs:
         run: tofu -chdir=infra/environments/production apply -var=railway_token="$RAILWAY_TOKEN" -auto-approve
 
   deploy-backend:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: apply-production
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest
@@ -283,6 +287,26 @@ jobs:
 
       - name: Deploy backend to Railway
         run: |
+          set -eu
+
+          : "${R2_BUCKET:?Missing required R2_BUCKET secret or variable.}"
+          : "${R2_ENDPOINT:?Missing required R2_ENDPOINT secret or variable.}"
+          : "${R2_PUBLIC_BASE_URL:?Missing required R2_PUBLIC_BASE_URL secret or variable.}"
+          : "${R2_ACCESS_KEY_ID:?Missing required R2_ACCESS_KEY_ID secret or variable.}"
+          : "${R2_SECRET_ACCESS_KEY:?Missing required R2_SECRET_ACCESS_KEY secret or variable.}"
+          : "${RESEND_API_KEY:?Missing required RESEND_API_KEY secret or variable.}"
+
+          railway variables set \
+            R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
+            R2_BUCKET="$R2_BUCKET" \
+            R2_ENDPOINT="$R2_ENDPOINT" \
+            R2_PUBLIC_BASE_URL="$R2_PUBLIC_BASE_URL" \
+            R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
+            RESEND_API_KEY="$RESEND_API_KEY" \
+            --service open-agency-backend-production \
+            --environment production \
+            --skip-deploys
+
           # Debug: Print Railway variables
           echo "=== Railway Variables ==="
           railway variables --service open-agency-backend-production

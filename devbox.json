@@ -8,6 +8,7 @@
     "docker",
     "go-task",
     "gh",
-    "railway@latest"
+    "railway@latest",
+    "git@latest"
   ]
 }
