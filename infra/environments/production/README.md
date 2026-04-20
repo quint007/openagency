@@ -68,6 +68,8 @@ task deploy:verify
 - `MARKETING_APP_BASE_URL/`
 - `COURSES_APP_BASE_URL/`
 
+When `MARKETING_REVALIDATE_URL` or `COURSES_REVALIDATE_URL` are set, the smoke check also probes their `/api/revalidate` endpoints directly. This is the intended production escape hatch whenever public frontend hostnames are proxied through Cloudflare but backend-triggered revalidation should hit a direct origin.
+
 If the alpha HTTP Basic Auth gate is enabled, set `ALPHA_BASIC_AUTH_USERNAME` and `ALPHA_BASIC_AUTH_PASSWORD` in `.env` before running the smoke check.
 
 ## Managed Railway Postgres
