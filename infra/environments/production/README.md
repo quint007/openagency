@@ -2,6 +2,8 @@
 
 This root module encodes production defaults for `admin.open-agency.io` as the canonical backend/admin URL, with API traffic served from the same hostname under `/api`, while composing the reusable contracts in `infra/modules/`.
 
+The admin/backend hostname is expected to stay **DNS-only** in Cloudflare so the Railway custom domain terminates TLS directly. If `admin.open-agency.io` returns a Cloudflare 525, verify the record is not proxied before debugging the app runtime.
+
 ## Operator inputs
 
 Local production operations use the repo-root `.env`. Start from:
@@ -131,7 +133,7 @@ task deploy:verify
 ### DNS or domain failure
 
 1. Re-apply the last known-good DNS target values in Cloudflare.
-2. Confirm `admin.open-agency.io` resolves to the expected Railway-managed target and that `/api/*` requests succeed through the same hostname.
+2. Confirm `admin.open-agency.io` resolves to the expected Railway-managed target, remains DNS-only in Cloudflare, and that `/api/*` requests succeed through the same hostname.
 3. Re-run smoke checks once DNS propagates.
 
 Concrete commands:

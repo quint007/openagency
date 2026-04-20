@@ -55,6 +55,8 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 
 Create a `production` environment in GitHub and assign the secrets/variables to it.
 
+For `admin.open-agency.io`, keep the Cloudflare DNS record DNS-only. The backend/admin origin is expected to terminate TLS at Railway rather than through Cloudflare proxying.
+
 ## Local Production Ops Tasks
 
 The repo also exposes local production-only operator tasks through the repo-root `.env`:
