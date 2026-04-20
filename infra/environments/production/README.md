@@ -4,6 +4,8 @@ This root module encodes production defaults for `admin.open-agency.io` as the c
 
 The admin/backend hostname is expected to stay **DNS-only** in Cloudflare so the Railway custom domain terminates TLS directly. If `admin.open-agency.io` returns a Cloudflare 525, verify the record is not proxied before debugging the app runtime.
 
+`task deploy:verify` now treats `server: cloudflare` on `https://admin.open-agency.io/admin` as a deployment failure because that header means the admin hostname is still proxied through Cloudflare instead of terminating TLS at Railway.
+
 ## Operator inputs
 
 Local production operations use the repo-root `.env`. Start from:

@@ -67,8 +67,36 @@ check_url() {
   esac
 }
 
+check_backend_dns_mode() {
+  url="$1"
+
+  if [ "$dry_run" -eq 1 ]; then
+    echo "[dry-run] validate backend origin headers for ${url%/}/admin"
+    return 0
+  fi
+
+  headers_file="$(mktemp)"
+  trap 'rm -f "$headers_file"' EXIT
+
+  if [ -n "${ALPHA_BASIC_AUTH_USERNAME:-}" ] && [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
+    curl -sS -I -u "${ALPHA_BASIC_AUTH_USERNAME}:${ALPHA_BASIC_AUTH_PASSWORD}" "${url%/}/admin" >"$headers_file"
+  else
+    curl -sS -I "${url%/}/admin" >"$headers_file"
+  fi
+
+  if grep -Eiq '^server:\s*cloudflare\s*$' "$headers_file"; then
+    echo "FAIL backend-origin-proxy admin backend is responding through Cloudflare. Production expects admin.open-agency.io to stay DNS-only so Railway terminates TLS directly; proxied mode can surface 525 publish failures." >&2
+    exit 1
+  fi
+
+  rm -f "$headers_file"
+  trap - EXIT
+  echo "PASS backend-origin-proxy direct backend origin detected for ${url%/}/admin"
+}
+
 check_url "backend-admin" "${backend_url%/}/admin"
 check_url "backend-api" "${api_url%/}/api/globals/header?depth=0"
+check_backend_dns_mode "$backend_url"
 
 if [ "$check_frontends" -eq 1 ]; then
   check_url "marketing-home" "${marketing_url%/}/"
