@@ -23,6 +23,8 @@ jobs:
       RAW_NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL != '' && secrets.NEXT_PUBLIC_SERVER_URL || vars.NEXT_PUBLIC_SERVER_URL }}
       RAW_MARKETING_APP_BASE_URL: ${{ secrets.MARKETING_APP_BASE_URL != '' && secrets.MARKETING_APP_BASE_URL || vars.MARKETING_APP_BASE_URL }}
       RAW_COURSES_APP_BASE_URL: ${{ secrets.COURSES_APP_BASE_URL != '' && secrets.COURSES_APP_BASE_URL || vars.COURSES_APP_BASE_URL }}
+      RAW_MARKETING_REVALIDATE_URL: ${{ secrets.MARKETING_REVALIDATE_URL != '' && secrets.MARKETING_REVALIDATE_URL || vars.MARKETING_REVALIDATE_URL }}
+      RAW_COURSES_REVALIDATE_URL: ${{ secrets.COURSES_REVALIDATE_URL != '' && secrets.COURSES_REVALIDATE_URL || vars.COURSES_REVALIDATE_URL }}
       RAW_REVALIDATE_TIMEOUT_MS: ${{ secrets.REVALIDATE_TIMEOUT_MS != '' && secrets.REVALIDATE_TIMEOUT_MS || vars.REVALIDATE_TIMEOUT_MS }}
       RAW_RAILWAY_ENABLED: ${{ secrets.RAILWAY_ENABLED != '' && secrets.RAILWAY_ENABLED || vars.RAILWAY_ENABLED }}
       RAW_POSTGRES_DATABASE_NAME: ${{ secrets.POSTGRES_DATABASE_NAME != '' && secrets.POSTGRES_DATABASE_NAME || vars.POSTGRES_DATABASE_NAME }}
@@ -74,28 +76,27 @@ jobs:
               value = get(name)
               return value or None
 
-           payload = {
-               'railway_project_name': get('RAILWAY_PROJECT_NAME') or 'open-agency-production',
-               'railway_enabled': get_bool('RAW_RAILWAY_ENABLED', False),
-               'cloudflare_dns_enabled': get_bool('RAW_CLOUDFLARE_DNS_ENABLED', False),
-               'r2_enabled': True,
-               'cloudflare_zone_name': get('RAW_CLOUDFLARE_ZONE_NAME') or 'open-agency.io',
-               'cloudflare_zone_id': optional('RAW_CLOUDFLARE_ZONE_ID'),
-               'cloudflare_account_id': get('CLOUDFLARE_ACCOUNT_ID') or 'replace-with-production-cloudflare-account-id',
+          payload = {
+              'railway_project_name': get('RAILWAY_PROJECT_NAME') or 'open-agency-production',
+              'railway_enabled': get_bool('RAW_RAILWAY_ENABLED', False),
+              'cloudflare_dns_enabled': get_bool('RAW_CLOUDFLARE_DNS_ENABLED', False),
+              'r2_enabled': True,
+              'cloudflare_zone_name': get('RAW_CLOUDFLARE_ZONE_NAME') or 'open-agency.io',
+              'cloudflare_zone_id': optional('RAW_CLOUDFLARE_ZONE_ID'),
+              'cloudflare_account_id': get('CLOUDFLARE_ACCOUNT_ID') or 'replace-with-production-cloudflare-account-id',
               'marketing_app_base_url': get('RAW_MARKETING_APP_BASE_URL') or 'https://open-agency.io',
               'courses_app_base_url': get('RAW_COURSES_APP_BASE_URL') or 'https://courses.open-agency.io',
               'r2_public_hostname': get('RAW_R2_PUBLIC_HOSTNAME') or 'media.open-agency.io',
               'postgres_database_name': get('RAW_POSTGRES_DATABASE_NAME') or 'open_agency',
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
-               'backend_secret_environment': {
-                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
-                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
-                   'PREVIEW_SECRET': get('RAW_BACKEND_PREVIEW_SECRET') or 'replace-with-production-preview-secret',
-                   'REVALIDATE_SECRET': get('RAW_BACKEND_REVALIDATE_SECRET') or 'replace-with-production-revalidate-secret',
-                   'RESEND_API_KEY': get('RAW_RESEND_API_KEY') or 'replace-with-production-resend-api-key',
-               },
-           }
+              'backend_secret_environment': {
+                  'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
+                  'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
+                  'PREVIEW_SECRET': get('RAW_BACKEND_PREVIEW_SECRET') or 'replace-with-production-preview-secret',
+                  'REVALIDATE_SECRET': get('RAW_BACKEND_REVALIDATE_SECRET') or 'replace-with-production-revalidate-secret',
+              },
+          }
 
           optional_backend_environment = {
               key: value
@@ -108,6 +109,8 @@ jobs:
                   'R2_BUCKET': optional('RAW_R2_BUCKET'),
                   'R2_PUBLIC_BASE_URL': optional('RAW_R2_PUBLIC_BASE_URL'),
                   'R2_REGION': optional('RAW_R2_REGION'),
+                  'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
+                  'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
               }.items()
               if value is not None
@@ -149,6 +152,8 @@ jobs:
       RAW_NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL != '' && secrets.NEXT_PUBLIC_SERVER_URL || vars.NEXT_PUBLIC_SERVER_URL }}
       RAW_MARKETING_APP_BASE_URL: ${{ secrets.MARKETING_APP_BASE_URL != '' && secrets.MARKETING_APP_BASE_URL || vars.MARKETING_APP_BASE_URL }}
       RAW_COURSES_APP_BASE_URL: ${{ secrets.COURSES_APP_BASE_URL != '' && secrets.COURSES_APP_BASE_URL || vars.COURSES_APP_BASE_URL }}
+      RAW_MARKETING_REVALIDATE_URL: ${{ secrets.MARKETING_REVALIDATE_URL != '' && secrets.MARKETING_REVALIDATE_URL || vars.MARKETING_REVALIDATE_URL }}
+      RAW_COURSES_REVALIDATE_URL: ${{ secrets.COURSES_REVALIDATE_URL != '' && secrets.COURSES_REVALIDATE_URL || vars.COURSES_REVALIDATE_URL }}
       RAW_REVALIDATE_TIMEOUT_MS: ${{ secrets.REVALIDATE_TIMEOUT_MS != '' && secrets.REVALIDATE_TIMEOUT_MS || vars.REVALIDATE_TIMEOUT_MS }}
       RAW_RAILWAY_ENABLED: ${{ secrets.RAILWAY_ENABLED != '' && secrets.RAILWAY_ENABLED || vars.RAILWAY_ENABLED }}
       RAW_RAILWAY_PROJECT_NAME: ${{ secrets.RAILWAY_PROJECT_NAME != '' && secrets.RAILWAY_PROJECT_NAME || vars.RAILWAY_PROJECT_NAME }}
@@ -244,9 +249,11 @@ jobs:
                   'R2_BUCKET': optional('RAW_R2_BUCKET'),
                   'R2_PUBLIC_BASE_URL': optional('RAW_R2_PUBLIC_BASE_URL'),
                   'R2_REGION': optional('RAW_R2_REGION'),
+                  'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
+                  'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
-               }.items()
+              }.items()
               if value is not None
           }
 
@@ -279,6 +286,13 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET != '' && secrets.R2_BUCKET || vars.R2_BUCKET }}
+      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT != '' && secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
+      R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
+      R2_REGION: ${{ secrets.R2_REGION != '' && secrets.R2_REGION || vars.R2_REGION }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

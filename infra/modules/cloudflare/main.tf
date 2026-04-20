@@ -30,10 +30,10 @@ resource "cloudflare_dns_record" "admin" {
   name    = var.managed_hostnames.admin
   type    = "CNAME"
   content = try(var.dns_targets.admin, null)
-  proxied = true
+  proxied = false
   ttl     = 1
 
-  comment = "Managed by OpenTofu for the Railway-backed admin hostname."
+  comment = "Managed by OpenTofu for the Railway-backed admin hostname. Keep DNS-only so Railway terminates TLS directly."
 }
 
 output "dns_contract" {
