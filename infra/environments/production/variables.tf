@@ -50,14 +50,6 @@ variable "marketing_vercel_domain" {
   default     = "open-agency.io"
 }
 
-variable "marketing_payload_api_key" {
-  description = "Sensitive Payload API key used by the production marketing site for server-side CMS reads."
-  type        = string
-  sensitive   = true
-  nullable    = false
-  default     = "replace-with-production-marketing-payload-api-key"
-}
-
 variable "cloudflare_dns_enabled" {
   description = "Whether production should manage Cloudflare DNS records directly. Defaults to fallback mode until provider credentials are available."
   type        = bool

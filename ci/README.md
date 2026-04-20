@@ -31,7 +31,6 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `R2_ACCESS_KEY_ID`                    | R2 access key ID (required for production media)               |
 | `R2_SECRET_ACCESS_KEY`                | R2 secret access key (required for production media)           |
 | `RESEND_API_KEY`                      | Resend API key for backend email delivery                      |
-| `MARKETING_PAYLOAD_API_KEY`           | Production server-side Payload API key for the marketing app   |
 
 ### Required Variables
 
@@ -40,7 +39,9 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `RAILWAY_ENABLED`                 | `true` or `false`                                                         |
 | `VERCEL_ENABLED`                  | `true` or `false`                                                         |
 | `VERCEL_TEAM`                     | Optional Vercel team slug or team ID                                      |
+| `VERCEL_ORG_ID`                   | Vercel org/team ID used by the CLI deploy job                             |
 | `MARKETING_VERCEL_PROJECT_NAME`   | Marketing Vercel project name (e.g. `open-agency-marketing`)              |
+| `MARKETING_VERCEL_PROJECT_ID`     | Vercel project ID for the marketing app CLI deploy job                    |
 | `MARKETING_VERCEL_DOMAIN`         | Production marketing domain (e.g. `open-agency.io`)                       |
 | `POSTGRES_DATABASE_NAME`          | Managed Postgres database name (e.g. `open_agency`)                       |
 | `POSTGRES_USER`                   | Managed Postgres username (e.g. `open_agency`)                            |

@@ -4,9 +4,7 @@ import type { Config } from '../../../../backend/openagency-backend/src/public-c
 
 const PACKAGE_NAME = '@open-agency/cms-client';
 const PAYLOAD_API_URL_ENV = 'PAYLOAD_API_URL';
-const PAYLOAD_API_KEY_ENV = 'PAYLOAD_API_KEY';
 const REVALIDATE_SECRET_ENV = 'REVALIDATE_SECRET';
-const PAYLOAD_USERS_COLLECTION_SLUG = 'users';
 const DEFAULT_PAYLOAD_DEPTH = '2';
 const BLOG_REVALIDATE_SECONDS = 3600;
 
@@ -83,7 +81,7 @@ function assertServerOnlyContext(): void {
 }
 
 function readRequiredEnv(
-  name: typeof PAYLOAD_API_URL_ENV | typeof PAYLOAD_API_KEY_ENV | typeof REVALIDATE_SECRET_ENV,
+  name: typeof PAYLOAD_API_URL_ENV | typeof REVALIDATE_SECRET_ENV,
 ): string {
   const value = process.env[name]?.trim();
 
@@ -101,14 +99,8 @@ function normalizeApiUrl(value: string): string {
 assertServerOnlyContext();
 
 export type CmsServerEnv = Readonly<{
-  apiKey: string;
   apiUrl: string;
   revalidateSecret: string;
-}>;
-
-type CmsReadEnv = Readonly<{
-  apiKey: string;
-  apiUrl: string;
 }>;
 
 export function getBlogListTag(): 'blog:list' {
@@ -139,26 +131,14 @@ export function getPayloadApiUrl(): string {
   return normalizeApiUrl(readRequiredEnv(PAYLOAD_API_URL_ENV));
 }
 
-export function getPayloadApiKey(): string {
-  return readRequiredEnv(PAYLOAD_API_KEY_ENV);
-}
-
 export function getRevalidateSecret(): string {
   return readRequiredEnv(REVALIDATE_SECRET_ENV);
 }
 
 export function getCmsServerEnv(): CmsServerEnv {
   return {
-    apiKey: getPayloadApiKey(),
     apiUrl: getPayloadApiUrl(),
     revalidateSecret: getRevalidateSecret(),
-  };
-}
-
-function getCmsReadEnv(): CmsReadEnv {
-  return {
-    apiKey: getPayloadApiKey(),
-    apiUrl: getPayloadApiUrl(),
   };
 }
 
@@ -399,13 +379,11 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     sort?: string;
   },
 ): Promise<Array<CollectionDocument<TSlug>>> {
-  const { apiKey } = getCmsReadEnv();
   const requestOptions: CmsFetchOptions = {
     cache: 'force-cache',
     method: 'GET',
     headers: {
       Accept: 'application/json',
-      Authorization: `${PAYLOAD_USERS_COLLECTION_SLUG} API-Key ${apiKey}`,
     },
     next: options.next,
   };

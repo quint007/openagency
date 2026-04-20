@@ -187,11 +187,10 @@ locals {
     }
     environment_variables = {
       production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL"]
-      production_secret_names = ["PAYLOAD_API_KEY", "REVALIDATE_SECRET"]
+      production_secret_names = ["REVALIDATE_SECRET"]
       required_names = [
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_SERVER_URL",
-        "PAYLOAD_API_KEY",
         "PAYLOAD_API_URL",
         "REVALIDATE_SECRET",
       ]
@@ -292,7 +291,6 @@ module "vercel" {
   }
 
   production_secret_environment = {
-    PAYLOAD_API_KEY   = var.marketing_payload_api_key
     REVALIDATE_SECRET = var.backend_secret_environment.REVALIDATE_SECRET
   }
 }
