@@ -44,13 +44,6 @@ variable "marketing_vercel_project_name" {
   default     = "open-agency-marketing"
 }
 
-variable "marketing_vercel_git_repository" {
-  description = "GitHub repository connected to the production marketing Vercel project."
-  type        = string
-  nullable    = false
-  default     = "quint007/openagency"
-}
-
 variable "marketing_vercel_domain" {
   description = "Production domain attached to the marketing Vercel project."
   type        = string
@@ -63,22 +56,6 @@ variable "marketing_payload_api_key" {
   sensitive   = true
   nullable    = false
   default     = "replace-with-production-marketing-payload-api-key"
-}
-
-variable "marketing_preview_payload_api_key" {
-  description = "Sensitive test Payload API key used by preview marketing deployments."
-  type        = string
-  sensitive   = true
-  nullable    = false
-  default     = "replace-with-preview-marketing-payload-api-key"
-}
-
-variable "marketing_preview_revalidate_secret" {
-  description = "Sensitive revalidation secret used by preview marketing deployments."
-  type        = string
-  sensitive   = true
-  nullable    = false
-  default     = "replace-with-preview-marketing-revalidate-secret"
 }
 
 variable "cloudflare_dns_enabled" {

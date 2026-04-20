@@ -86,21 +86,8 @@ variable "production_environment" {
   default     = {}
 }
 
-variable "preview_environment" {
-  description = "Non-sensitive preview environment variables for the marketing project."
-  type        = map(string)
-  default     = {}
-}
-
 variable "production_secret_environment" {
   description = "Sensitive production environment variables for the marketing project."
-  type        = map(string)
-  default     = {}
-  sensitive   = true
-}
-
-variable "preview_secret_environment" {
-  description = "Sensitive preview environment variables for the marketing project."
   type        = map(string)
   default     = {}
   sensitive   = true

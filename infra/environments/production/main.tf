@@ -173,7 +173,7 @@ locals {
     git_repository = {
       production_branch = "main"
       provider          = "github"
-      repo              = var.marketing_vercel_git_repository
+      repo              = "quint007/openagency"
     }
     build = {
       build_command   = "pnpm turbo build --filter=marketing"
@@ -188,8 +188,6 @@ locals {
     environment_variables = {
       production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL"]
       production_secret_names = ["PAYLOAD_API_KEY", "REVALIDATE_SECRET"]
-      preview_public_names    = ["NEXT_PUBLIC_API_URL", "PAYLOAD_API_URL"]
-      preview_secret_names    = ["PAYLOAD_API_KEY", "REVALIDATE_SECRET"]
       required_names = [
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_SERVER_URL",
@@ -280,7 +278,7 @@ module "vercel" {
   team_id           = var.vercel_team
   project_name      = var.marketing_vercel_project_name
   framework         = "nextjs"
-  git_repository    = var.marketing_vercel_git_repository
+  git_repository    = "quint007/openagency"
   production_branch = "main"
   build_command     = "pnpm turbo build --filter=marketing"
   install_command   = "pnpm install --frozen-lockfile"
@@ -293,19 +291,9 @@ module "vercel" {
     PAYLOAD_API_URL        = local.marketing_api_url
   }
 
-  preview_environment = {
-    NEXT_PUBLIC_API_URL = local.marketing_api_url
-    PAYLOAD_API_URL     = local.marketing_api_url
-  }
-
   production_secret_environment = {
     PAYLOAD_API_KEY   = var.marketing_payload_api_key
     REVALIDATE_SECRET = var.backend_secret_environment.REVALIDATE_SECRET
-  }
-
-  preview_secret_environment = {
-    PAYLOAD_API_KEY   = var.marketing_preview_payload_api_key
-    REVALIDATE_SECRET = var.marketing_preview_revalidate_secret
   }
 }
 

@@ -140,8 +140,6 @@ jobs:
           MARKETING_VERCEL_GIT_REPOSITORY: ${{ secrets.MARKETING_VERCEL_GIT_REPOSITORY != '' && secrets.MARKETING_VERCEL_GIT_REPOSITORY || vars.MARKETING_VERCEL_GIT_REPOSITORY }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
           MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
-          MARKETING_PREVIEW_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PREVIEW_PAYLOAD_API_KEY }}
-          MARKETING_PREVIEW_REVALIDATE_SECRET: ${{ secrets.MARKETING_PREVIEW_REVALIDATE_SECRET }}
         run: |
           tofu -chdir=infra/environments/production plan \
             -var=railway_token="$RAILWAY_TOKEN" \
@@ -151,9 +149,7 @@ jobs:
             -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
             -var=marketing_vercel_git_repository="$MARKETING_VERCEL_GIT_REPOSITORY" \
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
-            -var=marketing_payload_api_key="$MARKETING_PAYLOAD_API_KEY" \
-            -var=marketing_preview_payload_api_key="$MARKETING_PREVIEW_PAYLOAD_API_KEY" \
-            -var=marketing_preview_revalidate_secret="$MARKETING_PREVIEW_REVALIDATE_SECRET"
+            -var=marketing_payload_api_key="$MARKETING_PAYLOAD_API_KEY"
 
   apply-production:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -302,8 +298,6 @@ jobs:
           MARKETING_VERCEL_GIT_REPOSITORY: ${{ secrets.MARKETING_VERCEL_GIT_REPOSITORY != '' && secrets.MARKETING_VERCEL_GIT_REPOSITORY || vars.MARKETING_VERCEL_GIT_REPOSITORY }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
           MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
-          MARKETING_PREVIEW_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PREVIEW_PAYLOAD_API_KEY }}
-          MARKETING_PREVIEW_REVALIDATE_SECRET: ${{ secrets.MARKETING_PREVIEW_REVALIDATE_SECRET }}
         run: |
           tofu -chdir=infra/environments/production apply \
             -var=railway_token="$RAILWAY_TOKEN" \
@@ -314,8 +308,6 @@ jobs:
             -var=marketing_vercel_git_repository="$MARKETING_VERCEL_GIT_REPOSITORY" \
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
             -var=marketing_payload_api_key="$MARKETING_PAYLOAD_API_KEY" \
-            -var=marketing_preview_payload_api_key="$MARKETING_PREVIEW_PAYLOAD_API_KEY" \
-            -var=marketing_preview_revalidate_secret="$MARKETING_PREVIEW_REVALIDATE_SECRET" \
             -auto-approve
 
   deploy-backend:

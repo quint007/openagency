@@ -12,18 +12,8 @@ locals {
     if length(trimspace(value)) > 0
   }
 
-  preview_environment = {
-    for key, value in var.preview_environment : key => trimspace(value)
-    if length(trimspace(value)) > 0
-  }
-
   production_secret_environment = {
     for key, value in var.production_secret_environment : key => trimspace(value)
-    if length(trimspace(value)) > 0
-  }
-
-  preview_secret_environment = {
-    for key, value in var.preview_secret_environment : key => trimspace(value)
     if length(trimspace(value)) > 0
   }
 
@@ -38,15 +28,6 @@ locals {
       }
     },
     {
-      for key, value in local.preview_environment : "preview:${key}" => {
-        comment   = "Managed by OpenTofu for preview marketing deployments."
-        key       = key
-        sensitive = false
-        target    = ["preview"]
-        value     = value
-      }
-    },
-    {
       for key, value in local.production_secret_environment : "production-secret:${key}" => {
         comment   = "Managed by OpenTofu for the marketing Vercel project."
         key       = key
@@ -55,22 +36,11 @@ locals {
         value     = value
       }
     },
-    {
-      for key, value in local.preview_secret_environment : "preview-secret:${key}" => {
-        comment   = "Managed by OpenTofu for preview marketing deployments."
-        key       = key
-        sensitive = true
-        target    = ["preview"]
-        value     = value
-      }
-    },
   )
 
   required_environment_variable_names = sort(distinct(concat(
     keys(local.production_environment),
-    keys(local.preview_environment),
     keys(local.production_secret_environment),
-    keys(local.preview_secret_environment),
   )))
 
   fallback_markers = {
@@ -101,6 +71,7 @@ resource "vercel_project" "marketing" {
   auto_assign_custom_domains                        = true
   automatically_expose_system_environment_variables = true
   build_command                                     = var.build_command
+  ignore_command                                    = "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"${var.production_branch}\" ]; then exit 1; else exit 0; fi"
   install_command                                   = var.install_command
   root_directory                                    = var.root_directory
   team_id                                           = var.team_id
@@ -158,8 +129,6 @@ output "project_contract" {
     environment_variables = {
       production_public_names = sort(keys(local.production_environment))
       production_secret_names = sort(keys(local.production_secret_environment))
-      preview_public_names    = sort(keys(local.preview_environment))
-      preview_secret_names    = sort(keys(local.preview_secret_environment))
       required_names          = local.required_environment_variable_names
       managed_count           = length(local.environment_variables)
     }
