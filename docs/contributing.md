@@ -85,12 +85,13 @@ For local operators who need to run production infrastructure changes without CI
     - `BACKEND_REVALIDATE_SECRET` — On-demand revalidation shared secret
     - `POSTGRES_PASSWORD` — Managed Railway Postgres password
    
-    Optional variables (only needed when enabling provider features or ops verification):
-    - `RAILWAY_ENABLED`, `RAILWAY_PROJECT_NAME`, `RAILWAY_TOKEN`, `POSTGRES_DATABASE_NAME`, `POSTGRES_USER`
-    - `CLOUDFLARE_DNS_ENABLED`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_ZONE_NAME`
-    - `R2_ENABLED`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ENDPOINT`, `R2_PUBLIC_BASE_URL`, `R2_PUBLIC_HOSTNAME`
-    - `BACKEND_DATABASE_URL` (only if you need a direct external connection string for local migration or restore tooling)
-    - `ALPHA_BASIC_AUTH_USERNAME`, `ALPHA_BASIC_AUTH_PASSWORD`
+     Optional variables (only needed when enabling provider features or ops verification):
+     - `RAILWAY_ENABLED`, `RAILWAY_PROJECT_NAME`, `RAILWAY_TOKEN`, `POSTGRES_DATABASE_NAME`, `POSTGRES_USER`
+     - `CLOUDFLARE_DNS_ENABLED`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`, `CLOUDFLARE_ZONE_NAME`
+     - `R2_ENABLED`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_ENDPOINT`, `R2_PUBLIC_BASE_URL`, `R2_PUBLIC_HOSTNAME`
+     - `MARKETING_REVALIDATE_URL`, `COURSES_REVALIDATE_URL` when backend-triggered revalidation should bypass the public hostname and hit a direct origin
+     - `BACKEND_DATABASE_URL` (only if you need a direct external connection string for local migration or restore tooling)
+     - `ALPHA_BASIC_AUTH_USERNAME`, `ALPHA_BASIC_AUTH_PASSWORD`
 
 ### Deploy Commands
 

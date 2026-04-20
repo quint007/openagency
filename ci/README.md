@@ -48,6 +48,8 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `R2_PUBLIC_HOSTNAME` | Public media hostname (e.g., `media.open-agency.io`) |
 | `MARKETING_APP_BASE_URL` | Marketing app URL (e.g., `https://open-agency.io`) |
 | `COURSES_APP_BASE_URL` | Courses app URL (e.g., `https://courses.open-agency.io`) |
+| `MARKETING_REVALIDATE_URL` | Optional direct marketing revalidation origin for the backend |
+| `COURSES_REVALIDATE_URL` | Optional direct courses revalidation origin for the backend |
 
 ### Environment
 
@@ -70,3 +72,5 @@ Additional optional `.env` values used by those tasks/scripts:
 | `NEXT_PUBLIC_SERVER_URL` | Override for backend smoke checks; defaults to `https://admin.open-agency.io` |
 | `ALPHA_BASIC_AUTH_USERNAME` | Optional smoke-check username when the alpha gate is enabled |
 | `ALPHA_BASIC_AUTH_PASSWORD` | Optional smoke-check password when the alpha gate is enabled |
+| `MARKETING_REVALIDATE_URL` | Optional direct marketing revalidation origin when the public site hostname should be bypassed |
+| `COURSES_REVALIDATE_URL` | Optional direct courses revalidation origin when the public site hostname should be bypassed |

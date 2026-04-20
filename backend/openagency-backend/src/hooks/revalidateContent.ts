@@ -3,6 +3,14 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'paylo
 const REVALIDATE_SECRET_HEADER = 'x-revalidate-secret'
 const REVALIDATE_PATH = '/api/revalidate'
 const DEFAULT_REVALIDATE_TIMEOUT_MS = 5000
+const REVALIDATE_ENDPOINT_ENV_BY_APP = {
+  courses: 'COURSES_REVALIDATE_URL',
+  marketing: 'MARKETING_REVALIDATE_URL',
+} as const
+const PUBLIC_BASE_URL_ENV_BY_APP = {
+  courses: 'COURSES_APP_BASE_URL',
+  marketing: 'MARKETING_APP_BASE_URL',
+} as const
 
 type RevalidateCollectionSlug = 'authors' | 'blog-posts' | 'courses' | 'lessons'
 type RevalidateApp = 'courses' | 'marketing'
@@ -222,10 +230,13 @@ function createUnexpectedDeliveryError(args: {
 }
 
 function getRevalidateEndpoint(app: RevalidateApp): string {
-  const baseUrl =
-    app === 'marketing'
-      ? readRequiredEnv('MARKETING_APP_BASE_URL')
-      : readRequiredEnv('COURSES_APP_BASE_URL')
+  const revalidateUrl = readOptionalEnv(REVALIDATE_ENDPOINT_ENV_BY_APP[app])
+
+  if (revalidateUrl) {
+    return new URL(REVALIDATE_PATH, `${normalizeBaseUrl(revalidateUrl)}/`).toString()
+  }
+
+  const baseUrl = readRequiredEnv(PUBLIC_BASE_URL_ENV_BY_APP[app])
 
   return new URL(REVALIDATE_PATH, `${normalizeBaseUrl(baseUrl)}/`).toString()
 }
@@ -316,12 +327,25 @@ function normalizeBaseUrl(value: string): string {
   return value.endsWith('/') ? value.slice(0, -1) : value
 }
 
+function readOptionalEnv(
+  name: 'COURSES_REVALIDATE_URL' | 'MARKETING_REVALIDATE_URL',
+): string | undefined {
+  const value = process.env[name]?.trim()
+
+  return value ? value : undefined
+}
+
 function normalizeSlug(value?: null | string): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
 function readRequiredEnv(
-  name: 'COURSES_APP_BASE_URL' | 'MARKETING_APP_BASE_URL' | 'REVALIDATE_SECRET',
+  name:
+    | 'COURSES_APP_BASE_URL'
+    | 'COURSES_REVALIDATE_URL'
+    | 'MARKETING_APP_BASE_URL'
+    | 'MARKETING_REVALIDATE_URL'
+    | 'REVALIDATE_SECRET',
 ): string {
   const value = process.env[name]?.trim()
 

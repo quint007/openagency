@@ -136,6 +136,12 @@ tasks:
           if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
           fi
+          if [ -n "${MARKETING_REVALIDATE_URL:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,MARKETING_REVALIDATE_URL=\"$MARKETING_REVALIDATE_URL\""
+          fi
+          if [ -n "${COURSES_REVALIDATE_URL:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,COURSES_REVALIDATE_URL=\"$COURSES_REVALIDATE_URL\""
+          fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
@@ -224,9 +230,15 @@ tasks:
           if [ -n "${RESEND_API_KEY:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
           fi
-          if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
-            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
-          fi
+           if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+           fi
+           if [ -n "${MARKETING_REVALIDATE_URL:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,MARKETING_REVALIDATE_URL=\"$MARKETING_REVALIDATE_URL\""
+           fi
+           if [ -n "${COURSES_REVALIDATE_URL:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,COURSES_REVALIDATE_URL=\"$COURSES_REVALIDATE_URL\""
+           fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
@@ -313,9 +325,15 @@ tasks:
           if [ -n "${RESEND_API_KEY:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
           fi
-          if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
-            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
-          fi
+           if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
+           fi
+           if [ -n "${MARKETING_REVALIDATE_URL:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,MARKETING_REVALIDATE_URL=\"$MARKETING_REVALIDATE_URL\""
+           fi
+           if [ -n "${COURSES_REVALIDATE_URL:-}" ]; then
+             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,COURSES_REVALIDATE_URL=\"$COURSES_REVALIDATE_URL\""
+           fi
          if [ -n "$OPTIONAL_BACKEND_ENV" ]; then
            VARS="$VARS -var=backend_optional_environment={${OPTIONAL_BACKEND_ENV#,}}"
          fi
@@ -390,6 +408,8 @@ tasks:
         NEXT_PUBLIC_SERVER_URL="${NEXT_PUBLIC_SERVER_URL:-https://admin.open-agency.io}" \
         MARKETING_APP_BASE_URL="${MARKETING_APP_BASE_URL:-https://open-agency.io}" \
         COURSES_APP_BASE_URL="${COURSES_APP_BASE_URL:-https://courses.open-agency.io}" \
+        MARKETING_REVALIDATE_URL="${MARKETING_REVALIDATE_URL:-}" \
+        COURSES_REVALIDATE_URL="${COURSES_REVALIDATE_URL:-}" \
         REVALIDATE_TIMEOUT_MS="${REVALIDATE_TIMEOUT_MS:-5000}" \
         pnpm --dir backend/openagency-backend exec payload migrate --yes
 
