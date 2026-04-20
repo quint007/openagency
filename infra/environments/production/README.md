@@ -4,6 +4,8 @@ This root module encodes production defaults for `admin.open-agency.io` as the c
 
 The admin/backend hostname is expected to stay **DNS-only** in Cloudflare so the Railway custom domain terminates TLS directly. If `admin.open-agency.io` returns a Cloudflare 525, verify the record is not proxied before debugging the app runtime.
 
+`task deploy:verify` now treats `server: cloudflare` on `https://admin.open-agency.io/admin` as a deployment failure because that header means the admin hostname is still proxied through Cloudflare instead of terminating TLS at Railway.
+
 ## Operator inputs
 
 Local production operations use the repo-root `.env`. Start from:
@@ -65,6 +67,8 @@ task deploy:verify
 - `NEXT_PUBLIC_SERVER_URL/api/globals/header?depth=0`
 - `MARKETING_APP_BASE_URL/`
 - `COURSES_APP_BASE_URL/`
+
+When `MARKETING_REVALIDATE_URL` or `COURSES_REVALIDATE_URL` are set, the smoke check also probes their `/api/revalidate` endpoints directly. This is the intended production escape hatch whenever public frontend hostnames are proxied through Cloudflare but backend-triggered revalidation should hit a direct origin.
 
 If the alpha HTTP Basic Auth gate is enabled, set `ALPHA_BASIC_AUTH_USERNAME` and `ALPHA_BASIC_AUTH_PASSWORD` in `.env` before running the smoke check.
 

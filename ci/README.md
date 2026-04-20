@@ -48,14 +48,16 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `R2_PUBLIC_HOSTNAME` | Public media hostname (e.g., `media.open-agency.io`) |
 | `MARKETING_APP_BASE_URL` | Marketing app URL (e.g., `https://open-agency.io`) |
 | `COURSES_APP_BASE_URL` | Courses app URL (e.g., `https://courses.open-agency.io`) |
-| `MARKETING_REVALIDATE_URL` | Optional direct marketing revalidation origin for the backend |
-| `COURSES_REVALIDATE_URL` | Optional direct courses revalidation origin for the backend |
+| `MARKETING_REVALIDATE_URL` | Direct marketing revalidation origin for the backend when the public hostname is proxied or unstable |
+| `COURSES_REVALIDATE_URL` | Direct courses revalidation origin for the backend when the public hostname is proxied or unstable |
 
 ### Environment
 
 Create a `production` environment in GitHub and assign the secrets/variables to it.
 
 For `admin.open-agency.io`, keep the Cloudflare DNS record DNS-only. The backend/admin origin is expected to terminate TLS at Railway rather than through Cloudflare proxying.
+
+If `open-agency.io` or `courses.open-agency.io` sit behind Cloudflare or any other edge that can fail TLS separately from the app origin, set `MARKETING_REVALIDATE_URL` / `COURSES_REVALIDATE_URL` to the direct deployment origin used for server-to-server calls. The backend revalidation hook prefers those values over the public app URL.
 
 ## Local Production Ops Tasks
 
