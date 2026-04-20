@@ -2,6 +2,8 @@
 
 This root module encodes production defaults for `admin.open-agency.io` as the canonical backend/admin URL, with API traffic served from the same hostname under `/api`, while composing the reusable contracts in `infra/modules/`.
 
+The admin/backend hostname is expected to stay **DNS-only** in Cloudflare so the Railway custom domain terminates TLS directly. If `admin.open-agency.io` returns a Cloudflare 525, verify the record is not proxied before debugging the app runtime.
+
 ## Operator inputs
 
 Local production operations use the repo-root `.env`. Start from:
@@ -75,6 +77,7 @@ Important caveats:
 - The current provider surface does **not** expose first-class spending caps or explicit free-tier sizing controls.
 - This repo keeps the footprint minimal by using one Railway custom domain, one Postgres service, one volume, and no backup automation surface.
 - The backend runtime `DATABASE_URL` is generated internally from `POSTGRES_DATABASE_NAME`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` and injected into the backend Railway variable collection.
+- The backend runtime now requires R2 media storage variables in the Railway variable collection: `R2_ACCESS_KEY_ID`, `R2_BUCKET`, `R2_ENDPOINT`, `R2_PUBLIC_BASE_URL`, and `R2_SECRET_ACCESS_KEY`.
 - The Postgres volume mounts at `/var/lib/postgresql`, while `PGDATA=/var/lib/postgresql/data/pgdata` keeps initdb off the mount root and avoids the Railway `lost+found` failure.
 - If you need to run migrations or restore tooling from outside Railway, provide an operator-only `BACKEND_DATABASE_URL` in the repo-root `.env`.
 
@@ -130,7 +133,7 @@ task deploy:verify
 ### DNS or domain failure
 
 1. Re-apply the last known-good DNS target values in Cloudflare.
-2. Confirm `admin.open-agency.io` resolves to the expected Railway-managed target and that `/api/*` requests succeed through the same hostname.
+2. Confirm `admin.open-agency.io` resolves to the expected Railway-managed target, remains DNS-only in Cloudflare, and that `/api/*` requests succeed through the same hostname.
 3. Re-run smoke checks once DNS propagates.
 
 Concrete commands:

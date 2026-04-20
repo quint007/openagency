@@ -160,6 +160,7 @@ locals {
       R2_ENDPOINT        = local.r2_contract.s3_compatible_endpoint
       R2_PUBLIC_BASE_URL = local.r2_contract.public_custom_domain == null ? null : "https://${local.r2_contract.public_custom_domain}"
       R2_REGION          = local.r2_contract.aws_region
+      RESEND_API_KEY     = try(var.backend_optional_environment.RESEND_API_KEY, null)
     },
   )
 }

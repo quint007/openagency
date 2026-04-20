@@ -5,10 +5,13 @@ declare global {
       ALPHA_BASIC_AUTH_USERNAME?: string
       CRON_SECRET: string
       COURSES_APP_BASE_URL: string
+      COURSES_REVALIDATE_URL?: string
       DATABASE_URL: string
       MARKETING_APP_BASE_URL: string
+      MARKETING_REVALIDATE_URL?: string
       NEXT_PUBLIC_SERVER_URL: string
       PAYLOAD_SECRET: string
+      RESEND_API_KEY?: string
       PREVIEW_SECRET: string
       REVALIDATE_SECRET: string
       REVALIDATE_TIMEOUT_MS?: string

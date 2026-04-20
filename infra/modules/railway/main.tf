@@ -48,6 +48,7 @@ locals {
     "R2_PUBLIC_BASE_URL",
     "R2_REGION",
     "R2_SECRET_ACCESS_KEY",
+    "RESEND_API_KEY",
     "REVALIDATE_TIMEOUT_MS",
   ]
 

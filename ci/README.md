@@ -27,8 +27,9 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `RAILWAY_TOKEN` | Railway API token (only if `RAILWAY_ENABLED=true`) |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token (only if `CLOUDFLARE_DNS_ENABLED=true`) |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID for R2 |
-| `R2_ACCESS_KEY_ID` | R2 access key ID (only if `R2_ENABLED=true`) |
-| `R2_SECRET_ACCESS_KEY` | R2 secret access key (only if `R2_ENABLED=true`) |
+| `R2_ACCESS_KEY_ID` | R2 access key ID (required for production media) |
+| `R2_SECRET_ACCESS_KEY` | R2 secret access key (required for production media) |
+| `RESEND_API_KEY` | Resend API key for backend email delivery |
 
 ### Required Variables
 
@@ -41,13 +42,20 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `CLOUDFLARE_ZONE_ID` | Cloudflare zone ID (e.g., `abc123`) |
 | `CLOUDFLARE_ZONE_NAME` | DNS zone name (e.g., `open-agency.io`) |
 | `R2_ENABLED` | `true` or `false` |
+| `R2_BUCKET` | R2 bucket name used by the backend |
+| `R2_ENDPOINT` | S3-compatible R2 endpoint |
+| `R2_PUBLIC_BASE_URL` | Public media URL used by the backend |
 | `R2_PUBLIC_HOSTNAME` | Public media hostname (e.g., `media.open-agency.io`) |
 | `MARKETING_APP_BASE_URL` | Marketing app URL (e.g., `https://open-agency.io`) |
 | `COURSES_APP_BASE_URL` | Courses app URL (e.g., `https://courses.open-agency.io`) |
+| `MARKETING_REVALIDATE_URL` | Optional direct marketing revalidation origin for the backend |
+| `COURSES_REVALIDATE_URL` | Optional direct courses revalidation origin for the backend |
 
 ### Environment
 
 Create a `production` environment in GitHub and assign the secrets/variables to it.
+
+For `admin.open-agency.io`, keep the Cloudflare DNS record DNS-only. The backend/admin origin is expected to terminate TLS at Railway rather than through Cloudflare proxying.
 
 ## Local Production Ops Tasks
 
@@ -66,3 +74,5 @@ Additional optional `.env` values used by those tasks/scripts:
 | `NEXT_PUBLIC_SERVER_URL` | Override for backend smoke checks; defaults to `https://admin.open-agency.io` |
 | `ALPHA_BASIC_AUTH_USERNAME` | Optional smoke-check username when the alpha gate is enabled |
 | `ALPHA_BASIC_AUTH_PASSWORD` | Optional smoke-check password when the alpha gate is enabled |
+| `MARKETING_REVALIDATE_URL` | Optional direct marketing revalidation origin when the public site hostname should be bypassed |
+| `COURSES_REVALIDATE_URL` | Optional direct courses revalidation origin when the public site hostname should be bypassed |

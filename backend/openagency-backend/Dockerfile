@@ -62,6 +62,9 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
+# Enforce remote media storage in Railway runtime. The app must not fall back to
+# local filesystem uploads in production.
+ENV OPENAGENCY_REQUIRE_R2_STORAGE=true
 # Uncomment the following line in case you want to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -95,7 +98,7 @@ EXPOSE 8080
 ENV PORT=8080
 
 # server.js is created by next build from the standalone output.
-# Run Payload migrations at container startup so they execute inside Railway's
-# runtime private network instead of during the build.
+# Regenerate the Payload import map and run migrations at container startup so
+# both steps see the live Railway environment before the app begins serving.
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]
+CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload generate:importmap && NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]

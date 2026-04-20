@@ -6,7 +6,9 @@ import { deliverRevalidationRequest } from '@/hooks/revalidateContent'
 
 const originalEnv = {
   COURSES_APP_BASE_URL: process.env.COURSES_APP_BASE_URL,
+  COURSES_REVALIDATE_URL: process.env.COURSES_REVALIDATE_URL,
   MARKETING_APP_BASE_URL: process.env.MARKETING_APP_BASE_URL,
+  MARKETING_REVALIDATE_URL: process.env.MARKETING_REVALIDATE_URL,
   REVALIDATE_SECRET: process.env.REVALIDATE_SECRET,
   REVALIDATE_TIMEOUT_MS: process.env.REVALIDATE_TIMEOUT_MS,
 }
@@ -31,6 +33,8 @@ describe('backend revalidation delivery', () => {
   beforeEach(() => {
     process.env.MARKETING_APP_BASE_URL = 'http://marketing.test'
     process.env.COURSES_APP_BASE_URL = 'http://courses.test'
+    delete process.env.MARKETING_REVALIDATE_URL
+    delete process.env.COURSES_REVALIDATE_URL
     process.env.REVALIDATE_SECRET = 'shared-secret'
     delete process.env.REVALIDATE_TIMEOUT_MS
   })
@@ -134,6 +138,34 @@ describe('backend revalidation delivery', () => {
     expect(logger.error).toHaveBeenCalledWith(
       'Revalidation delivery failed with 502 Bad Gateway: {"ok":false}',
     )
+  })
+
+  it('prefers dedicated revalidation URLs over public app URLs when provided', async () => {
+    const logger = createLogger()
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          'content-type': 'application/json',
+        },
+        status: 200,
+      }),
+    )
+
+    process.env.MARKETING_REVALIDATE_URL = 'https://marketing-origin.internal'
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(
+      deliverRevalidationRequest({
+        collection: 'blog-posts',
+        eventType: 'publish',
+        logger,
+        slug: 'launch-week',
+      }),
+    ).resolves.toBeUndefined()
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://marketing-origin.internal/api/revalidate')
   })
 
   it('times out deterministically when the frontend app does not respond', async () => {

@@ -211,6 +211,7 @@ variable "backend_optional_environment" {
     R2_PUBLIC_BASE_URL        = optional(string)
     R2_REGION                 = optional(string)
     R2_SECRET_ACCESS_KEY      = optional(string)
+    RESEND_API_KEY            = optional(string)
     REVALIDATE_TIMEOUT_MS     = optional(string)
   })
   default = {}

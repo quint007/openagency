@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { s3Storage } from '@payloadcms/storage-s3'
 import sharp from 'sharp'
 import path from 'path'
@@ -26,6 +27,12 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const r2StorageEnabled = isR2StorageConfigured()
 const r2StorageEndpoint = getR2StorageEndpoint()
+
+if (process.env.OPENAGENCY_REQUIRE_R2_STORAGE === 'true' && !r2StorageEnabled) {
+  throw new Error(
+    'R2 storage is required in production. Set R2_ACCESS_KEY_ID, R2_BUCKET, R2_ENDPOINT, R2_PUBLIC_BASE_URL, and R2_SECRET_ACCESS_KEY.',
+  )
+}
 
 export default buildConfig({
   admin: {
@@ -71,6 +78,11 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL,
     },
   }),
+  email: resendAdapter({
+    apiKey: process.env.RESEND_API_KEY || '',
+    defaultFromAddress: 'no-reply@open-agency.io',
+    defaultFromName: 'Open Agency',
+  }),
   collections: [
     Pages,
     Posts,
@@ -102,6 +114,7 @@ export default buildConfig({
                 secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
               },
               endpoint: r2StorageEndpoint,
+              forcePathStyle: true,
               region: process.env.R2_REGION || 'auto',
             },
           }),

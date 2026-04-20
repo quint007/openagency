@@ -173,6 +173,11 @@ tasks:
     cmds:
       - task production:deploy:verify
 
+  deploy:backend:
+    desc: Deploy the backend Payload instance to Railway production
+    cmds:
+      - task production:deploy:backend
+
   restore:drill:plan:
     desc: Print the isolated restore drill steps and smoke checks
     cmds:
