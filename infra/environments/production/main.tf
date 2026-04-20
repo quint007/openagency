@@ -6,6 +6,7 @@ locals {
   canonical_server_url             = "https://${local.admin_hostname}"
   bucket_name                      = "open-agency-production-media"
   marketing_api_url                = "${local.canonical_server_url}/api"
+  marketing_vercel_apex_ipv4       = "76.76.21.21"
 
   railway_contract = var.railway_enabled ? module.railway[0].backend_service_contract : {
     admin_hostname                = local.admin_hostname
@@ -91,12 +92,12 @@ locals {
     variable_collection_id = null
   }
 
-  cloudflare_contract = var.cloudflare_dns_enabled && var.railway_enabled ? module.cloudflare[0].dns_contract : {
+  cloudflare_contract = var.cloudflare_dns_enabled && (var.railway_enabled || var.vercel_enabled) ? module.cloudflare[0].dns_contract : {
     api = {
       id            = null
       hostname      = local.api_hostname
       managed       = false
-      proxied       = null
+      proxied       = false
       record_type   = "CNAME"
       target        = local.railway_contract.service_domains.admin.dns_record_value
       target_source = "admin hostname /api route"
@@ -105,19 +106,28 @@ locals {
       id            = null
       hostname      = local.admin_hostname
       managed       = false
-      proxied       = null
+      proxied       = false
       record_type   = "CNAME"
       target        = local.railway_contract.service_domains.admin.dns_record_value
       target_source = "railway_custom_domain.admin.dns_record_value"
+    }
+    marketing = {
+      id            = null
+      hostname      = var.marketing_vercel_domain
+      managed       = false
+      proxied       = false
+      record_type   = "A"
+      target        = var.vercel_enabled ? local.marketing_vercel_apex_ipv4 : null
+      target_source = var.vercel_enabled ? "vercel_apex_a_record" : "not_configured"
     }
     zone_id   = var.cloudflare_zone_id
     zone_name = var.cloudflare_zone_name
     fallback_markers = {
       provider_auth = {
         status = "fallback_mode"
-        reason = "Cloudflare DNS records are disabled until Cloudflare credentials and Railway-managed DNS targets are available."
+        reason = "Cloudflare DNS records are disabled until Cloudflare credentials and managed DNS targets are available."
         procedure = [
-          "Set cloudflare_dns_enabled = true for production after Railway management is enabled and Cloudflare credentials are available.",
+          "Set cloudflare_dns_enabled = true for production after Railway and/or Vercel management is enabled and Cloudflare credentials are available.",
           "Provide CLOUDFLARE_API_TOKEN and either cloudflare_zone_id or a resolvable cloudflare_zone_name before planning managed DNS resources.",
         ]
       }
@@ -178,7 +188,6 @@ locals {
     build = {
       build_command   = "pnpm turbo build --filter=marketing"
       install_command = "pnpm install --frozen-lockfile"
-      root_directory  = "frontend"
     }
     domain = {
       configured = var.marketing_vercel_domain != null
@@ -242,17 +251,19 @@ module "railway" {
 }
 
 module "cloudflare" {
-  count  = var.cloudflare_dns_enabled && var.railway_enabled ? 1 : 0
+  count  = var.cloudflare_dns_enabled && (var.railway_enabled || var.vercel_enabled) ? 1 : 0
   source = "../../modules/cloudflare"
 
   dns_targets = {
     admin = local.railway_contract.service_domains.admin.dns_record_value
     api   = local.railway_contract.service_domains.api.dns_record_value
+    marketing = var.vercel_enabled ? local.marketing_vercel_apex_ipv4 : null
   }
 
   managed_hostnames = {
-    admin = local.admin_hostname
-    api   = local.api_hostname
+    admin     = local.admin_hostname
+    api       = local.api_hostname
+    marketing = var.marketing_vercel_domain
   }
   zone_id   = var.cloudflare_zone_id
   zone_name = var.cloudflare_zone_name
@@ -277,11 +288,11 @@ module "vercel" {
   team_id           = var.vercel_team
   project_name      = var.marketing_vercel_project_name
   framework         = "nextjs"
-  git_repository    = "quint007/openagency"
+  git_repository    = var.vercel_github_repository
   production_branch = "main"
   build_command     = "pnpm turbo build --filter=marketing"
   install_command   = "pnpm install --frozen-lockfile"
-  root_directory    = "frontend"
+  root_directory    = null
   domain            = var.marketing_vercel_domain
 
   production_environment = {
@@ -291,12 +302,16 @@ module "vercel" {
   }
 
   production_secret_environment = {
+    ALPHA_BASIC_AUTH_USERNAME = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_USERNAME, null)
+    ALPHA_BASIC_AUTH_PASSWORD = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_PASSWORD, null)
+    PAYLOAD_API_KEY   = var.marketing_payload_api_key
     REVALIDATE_SECRET = var.backend_secret_environment.REVALIDATE_SECRET
   }
 }
 
 output "environment_contract" {
   description = "Production root-module composition for Railway, Cloudflare, and R2 resources plus explicit provider-gap fallbacks."
+  sensitive   = true
   value = {
     environment = "production"
     hostnames = {

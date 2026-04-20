@@ -67,7 +67,7 @@ If you need to re-run the script after editing env values, delete the generated 
 
 - Use `task dev:marketing:prod-api` when you need to verify the local marketing app against the live Payload REST API at `https://admin.open-agency.io/api` before a deploy.
 - The task keeps the site itself on `http://localhost:3000`, but overrides both `NEXT_PUBLIC_API_URL` and `PAYLOAD_API_URL` so client-side and server-side reads hit production content.
-- Keep `frontend/apps/marketing/.env.local` in place because the app still loads local server-only values such as `REVALIDATE_SECRET` from that file.
+- Keep `frontend/apps/marketing/.env.local` in place because the app still loads local server-only values such as `REVALIDATE_SECRET` and, optionally, `PAYLOAD_API_KEY` from that file.
 
 Whenever you document a new step or tool, keep this file in sync so onboarding stays under ten minutes from a clean clone.
 

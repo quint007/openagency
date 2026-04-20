@@ -32,7 +32,19 @@ tasks:
   dev-frontend:
     desc: Start the marketing and courses apps
     cmds:
-      - pnpm --dir {{.FRONTEND_DIR}} dev
+      - task --parallel dev:marketing dev:courses
+
+  dev:marketing:
+    desc: Start marketing app only
+    cmds:
+      - pnpm --dir {{.FRONTEND_DIR}}/apps/marketing dev
+
+  dev:courses:
+    desc: Start courses app only
+    env:
+      PAYLOAD_API_URL: http://localhost:3002/api
+    cmds:
+      - pnpm --dir {{.FRONTEND_DIR}}/apps/courses dev
 
   dev:marketing:prod-api:
     desc: Start marketing locally against the production CMS API
@@ -42,7 +54,7 @@ tasks:
       NEXT_PUBLIC_API_URL: https://admin.open-agency.io/api
       PAYLOAD_API_URL: https://admin.open-agency.io/api
     cmds:
-      - pnpm --dir {{.FRONTEND_DIR}} --filter marketing dev
+      - pnpm --dir {{.FRONTEND_DIR}}/apps/marketing dev
   dev-backend:
     desc: Start Payload CMS only
     cmds:

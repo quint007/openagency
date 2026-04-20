@@ -28,7 +28,7 @@ variable "vercel_api_token" {
   description = "Vercel API token placeholder for production plan-time provider configuration. Replace externally when vercel_enabled is true."
   type        = string
   sensitive   = true
-  default     = "replace-with-production-vercel-token"
+  default     = "000000000000000000000000"
 }
 
 variable "vercel_team" {
@@ -48,6 +48,19 @@ variable "marketing_vercel_domain" {
   description = "Production domain attached to the marketing Vercel project."
   type        = string
   default     = "open-agency.io"
+}
+
+variable "vercel_github_repository" {
+  description = "GitHub repository to link to the Vercel project. Null skips GitHub integration (requires manual setup)."
+  type        = string
+  default     = null
+}
+
+variable "marketing_payload_api_key" {
+  description = "Optional Payload API key assigned to a users-collection integration account for marketing CMS reads."
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
 variable "cloudflare_dns_enabled" {

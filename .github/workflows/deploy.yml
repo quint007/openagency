@@ -138,10 +138,16 @@ jobs:
           VERCEL_TEAM: ${{ secrets.VERCEL_TEAM != '' && secrets.VERCEL_TEAM || vars.VERCEL_TEAM }}
           MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
+          MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
         run: |
           VERCEL_TEAM_ARG=""
           if [ -n "${VERCEL_TEAM:-}" ]; then
             VERCEL_TEAM_ARG="-var=vercel_team=$VERCEL_TEAM"
+          fi
+
+          MARKETING_PAYLOAD_API_KEY_ARG=""
+          if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+            MARKETING_PAYLOAD_API_KEY_ARG="-var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
           fi
 
           MARKETING_VERCEL_PROJECT_NAME=${MARKETING_VERCEL_PROJECT_NAME:-open-agency-marketing}
@@ -153,7 +159,8 @@ jobs:
             -var=vercel_enabled="$VERCEL_ENABLED" \
             -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
-            $VERCEL_TEAM_ARG
+            $VERCEL_TEAM_ARG \
+            $MARKETING_PAYLOAD_API_KEY_ARG
 
   apply-production:
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
@@ -300,10 +307,16 @@ jobs:
           VERCEL_TEAM: ${{ secrets.VERCEL_TEAM != '' && secrets.VERCEL_TEAM || vars.VERCEL_TEAM }}
           MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
+          MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
         run: |
           VERCEL_TEAM_ARG=""
           if [ -n "${VERCEL_TEAM:-}" ]; then
             VERCEL_TEAM_ARG="-var=vercel_team=$VERCEL_TEAM"
+          fi
+
+          MARKETING_PAYLOAD_API_KEY_ARG=""
+          if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+            MARKETING_PAYLOAD_API_KEY_ARG="-var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
           fi
 
           MARKETING_VERCEL_PROJECT_NAME=${MARKETING_VERCEL_PROJECT_NAME:-open-agency-marketing}
@@ -316,6 +329,7 @@ jobs:
             -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
             $VERCEL_TEAM_ARG \
+            $MARKETING_PAYLOAD_API_KEY_ARG \
             -auto-approve
 
   deploy-marketing-frontend:
@@ -327,8 +341,8 @@ jobs:
       contents: read
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.MARKETING_VERCEL_PROJECT_ID != '' && secrets.MARKETING_VERCEL_PROJECT_ID || vars.MARKETING_VERCEL_PROJECT_ID }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_ORG_ID || vars.VERCEL_ORG_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -347,23 +361,14 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Deploy marketing preview build
-        if: github.event_name == 'pull_request'
-        run: |
-          : "${VERCEL_TOKEN:?Missing required Vercel token.}"
-          : "${VERCEL_ORG_ID:?Missing required VERCEL_ORG_ID.}"
-          : "${VERCEL_PROJECT_ID:?Missing required VERCEL_PROJECT_ID.}"
-          url=$(pnpm dlx vercel deploy --cwd frontend/apps/marketing --yes --token="$VERCEL_TOKEN")
-          echo "Preview deployment: $url"
-          printf 'MARKETING_VERCEL_DEPLOY_URL=%s\n' "$url" >> "$GITHUB_ENV"
-
       - name: Deploy marketing production build
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
         run: |
           : "${VERCEL_TOKEN:?Missing required Vercel token.}"
-          : "${VERCEL_ORG_ID:?Missing required VERCEL_ORG_ID.}"
           : "${VERCEL_PROJECT_ID:?Missing required VERCEL_PROJECT_ID.}"
-          url=$(pnpm dlx vercel deploy --cwd frontend/apps/marketing --prod --yes --token="$VERCEL_TOKEN")
+          : "${VERCEL_ORG_ID:?Missing required VERCEL_ORG_ID.}"
+
+          url=$(pnpm dlx vercel deploy --cwd frontend --prod --yes --token="$VERCEL_TOKEN")
           echo "Production deployment: $url"
           printf 'MARKETING_VERCEL_DEPLOY_URL=%s\n' "$url" >> "$GITHUB_ENV"
 
@@ -377,7 +382,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-backend:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
     needs: apply-production
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest

@@ -34,6 +34,6 @@ provider "railway" {
 }
 
 provider "vercel" {
-  api_token = var.vercel_api_token
+  api_token = var.vercel_enabled ? var.vercel_api_token : "000000000000000000000000"
   team      = var.vercel_team
 }

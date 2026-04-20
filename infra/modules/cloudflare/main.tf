@@ -24,16 +24,16 @@ locals {
 }
 
 resource "cloudflare_dns_record" "admin" {
-  count = var.enabled ? 1 : 0
+  count = var.enabled && var.dns_targets.admin != null ? 1 : 0
 
   zone_id = local.resolved_zone_id
   name    = var.managed_hostnames.admin
   type    = "CNAME"
-  content = try(var.dns_targets.admin, null)
+  content = var.dns_targets.admin
   proxied = false
   ttl     = 1
 
-  comment = "Managed by OpenTofu for the Railway-backed admin hostname. Keep DNS-only so Railway terminates TLS directly."
+  comment = "Managed by OpenTofu for Railway-backed admin hostname."
 }
 
 output "dns_contract" {
@@ -56,6 +56,15 @@ output "dns_contract" {
       record_type   = try(cloudflare_dns_record.admin[0].type, "CNAME")
       target        = try(var.dns_targets.admin, null)
       target_source = try(var.dns_targets.admin, null) == null ? "railway_custom_domain.admin.dns_record_value" : "explicit"
+    }
+    marketing = {
+      id            = null
+      hostname      = var.managed_hostnames.marketing
+      managed       = false
+      proxied       = false
+      record_type   = "A"
+      target        = try(var.dns_targets.marketing, null)
+      target_source = try(var.dns_targets.marketing, null) == null ? "not_configured" : "manual_vercel_apex_a_record"
     }
     zone_id   = local.resolved_zone_id
     zone_name = local.normalized_zone_name

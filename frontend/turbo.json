@@ -5,7 +5,9 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "cache": true
+      "env": ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "REVALIDATE_SECRET"],
+      "cache": true,
+      "inputs": ["**/*.ts", "**/*.tsx", "**/*.css", "package.json"]
     },
     "dev": {
       "cache": false,

@@ -26,6 +26,7 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `POSTGRES_PASSWORD`                   | Managed Railway Postgres password                              |
 | `RAILWAY_TOKEN`                       | Railway API token (only if `RAILWAY_ENABLED=true`)             |
 | `VERCEL_API_TOKEN`                    | Vercel API token (only if `VERCEL_ENABLED=true`)               |
+| `MARKETING_PAYLOAD_API_KEY`           | Optional Payload API key for a `users` integration account     |
 | `CLOUDFLARE_API_TOKEN`                | Cloudflare API token (only if `CLOUDFLARE_DNS_ENABLED=true`)   |
 | `CLOUDFLARE_ACCOUNT_ID`               | Cloudflare account ID for R2                                   |
 | `R2_ACCESS_KEY_ID`                    | R2 access key ID (required for production media)               |

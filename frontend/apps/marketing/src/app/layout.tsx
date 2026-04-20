@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./brand/fonts.css";
 import "./globals.css";
 
 import { getSiteUrl } from '../lib/site';

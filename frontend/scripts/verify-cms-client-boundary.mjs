@@ -33,8 +33,13 @@ const forbiddenSourcePatterns = [
 
 function getSecretNeedles() {
   const needles = [
+    { label: 'env name PAYLOAD_API_KEY', value: 'PAYLOAD_API_KEY' },
     { label: 'env name REVALIDATE_SECRET', value: 'REVALIDATE_SECRET' },
   ];
+
+  if (process.env.PAYLOAD_API_KEY) {
+    needles.push({ label: 'PAYLOAD_API_KEY value', value: process.env.PAYLOAD_API_KEY });
+  }
 
   if (process.env.REVALIDATE_SECRET) {
     needles.push({ label: 'REVALIDATE_SECRET value', value: process.env.REVALIDATE_SECRET });

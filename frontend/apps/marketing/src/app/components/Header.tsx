@@ -39,7 +39,8 @@ export function Header({ brand }: HeaderProps) {
     };
   }, [open]);
 
-  const shellClassName = "mx-auto flex w-full max-w-[100rem] items-center gap-4 px-4 sm:px-6 lg:px-8";
+  const shellClassName =
+    "mx-auto flex w-full max-w-[100rem] items-center gap-4 px-4 sm:px-6 lg:px-8";
 
   return (
     <header
@@ -71,14 +72,18 @@ export function Header({ brand }: HeaderProps) {
 
         <div className="hidden items-center gap-3 lg:flex">
           <a
-            href="https://github.com/open-agency"
+            href="https://github.com/Open-Agency-io"
             className="inline-flex items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-4 py-2 text-sm text-[var(--on-surface-variant)] transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,transparent)] hover:text-[var(--on-surface)]"
           >
             <ExternalLink className="size-5" />
             Open source
           </a>
 
-          <Button className="min-h-11 px-6" render={<a href={header.primaryCta.href} />} nativeButton={false}>
+          <Button
+            className="min-h-11 px-6"
+            render={<a href={header.primaryCta.href} />}
+            nativeButton={false}
+          >
             {header.primaryCta.label}
             <ArrowRight data-icon="inline-end" />
           </Button>
@@ -101,8 +106,13 @@ export function Header({ brand }: HeaderProps) {
           id="marketing-mobile-menu"
           className="border-t border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--surface)_92%,transparent)] backdrop-blur-xl lg:hidden"
         >
-          <div className={`${shellClassName} flex-col items-stretch gap-6 py-6`}>
-            <nav className="flex flex-col gap-2" aria-label={header.mobileNavigationLabel}>
+          <div
+            className={`${shellClassName} flex-col items-stretch gap-6 py-6`}
+          >
+            <nav
+              className="flex flex-col gap-2"
+              aria-label={header.mobileNavigationLabel}
+            >
               {header.links.map((item) => (
                 <a
                   key={item.label}
@@ -118,14 +128,18 @@ export function Header({ brand }: HeaderProps) {
 
             <div className="flex flex-col gap-3">
               <a
-                href="https://github.com/open-agency"
+                href="https://github.com/Open-Agency-io"
                 className="inline-flex items-center justify-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-4 py-3 text-sm text-[var(--on-surface-variant)]"
               >
                 <ExternalLink className="size-5" />
                 Open source
               </a>
 
-              <Button className="min-h-11 w-full px-6" render={<a href={header.primaryCta.href} />} nativeButton={false}>
+              <Button
+                className="min-h-11 w-full px-6"
+                render={<a href={header.primaryCta.href} />}
+                nativeButton={false}
+              >
                 {header.primaryCta.label}
                 <ArrowRight data-icon="inline-end" />
               </Button>

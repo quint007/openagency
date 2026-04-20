@@ -23,6 +23,7 @@ import {
   type Lesson,
 } from '../src/index';
 
+const originalPayloadApiKey = process.env.PAYLOAD_API_KEY;
 const originalPayloadApiUrl = process.env.PAYLOAD_API_URL;
 
 function createJsonResponse(data: unknown, init?: ResponseInit): Response {
@@ -76,6 +77,12 @@ afterEach(() => {
     process.env.PAYLOAD_API_URL = originalPayloadApiUrl;
   }
 
+  if (originalPayloadApiKey === undefined) {
+    delete process.env.PAYLOAD_API_KEY;
+  } else {
+    process.env.PAYLOAD_API_KEY = originalPayloadApiKey;
+  }
+
 });
 
 describe('cms-client typed Payload fetchers', () => {
@@ -90,6 +97,7 @@ describe('cms-client typed Payload fetchers', () => {
 
   test('builds the blog post request with the canonical ISR tag contract', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api/';
+    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ docs: [createBlogPost()] })));
 
@@ -107,6 +115,7 @@ describe('cms-client typed Payload fetchers', () => {
     expect(init.cache).toBe('force-cache');
     expect(init.headers).toEqual({
       Accept: 'application/json',
+      Authorization: 'users API-Key server-secret',
     });
     expect(init.next).toEqual({
       revalidate: 3600,
@@ -151,6 +160,21 @@ describe('cms-client typed Payload fetchers', () => {
       tags: [getCourseListTag()],
     });
     expect(request.init.next?.revalidate).toBeUndefined();
+  });
+
+  test('omits the authorization header when no Payload API key is configured', async () => {
+    process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
+    delete process.env.PAYLOAD_API_KEY;
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ docs: [createBlogPost()] })));
+
+    await expect(getBlogPosts()).resolves.toEqual([createBlogPost()]);
+
+    const { init } = readFetchCall();
+
+    expect(init.headers).toEqual({
+      Accept: 'application/json',
+    });
   });
 
   test('uses real lesson and author collection slugs and returns null for misses', async () => {

@@ -34,6 +34,7 @@ variable "managed_hostnames" {
   type = object({
     admin = string
     api   = string
+    marketing = string
   })
   nullable = false
 
@@ -50,6 +51,7 @@ variable "dns_targets" {
   type = object({
     admin = optional(string)
     api   = optional(string)
+    marketing = optional(string)
   })
   default = {}
 }

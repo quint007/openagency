@@ -34,13 +34,13 @@ variable "framework" {
 }
 
 variable "git_repository" {
-  description = "GitHub repository connected to the Vercel project."
+  description = "GitHub repository connected to the Vercel project. Null skips GitHub integration (requires manual setup)."
   type        = string
-  nullable    = false
+  default     = null
 
   validation {
-    condition     = can(regex("^[^/]+/[^/]+$", trimspace(var.git_repository)))
-    error_message = "git_repository must be in owner/repo format."
+    condition     = var.git_repository == null || can(regex("^[^/]+/[^/]+$", trimspace(var.git_repository)))
+    error_message = "git_repository must be null or in owner/repo format."
   }
 }
 
@@ -64,9 +64,9 @@ variable "install_command" {
 }
 
 variable "root_directory" {
-  description = "Relative root directory for the Vercel project."
+  description = "Relative root directory for the Vercel project. Null to use CI --cwd."
   type        = string
-  nullable    = false
+  default     = null
 }
 
 variable "domain" {

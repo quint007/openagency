@@ -4,7 +4,9 @@ import type { Config } from '../../../../backend/openagency-backend/src/public-c
 
 const PACKAGE_NAME = '@open-agency/cms-client';
 const PAYLOAD_API_URL_ENV = 'PAYLOAD_API_URL';
+const PAYLOAD_API_KEY_ENV = 'PAYLOAD_API_KEY';
 const REVALIDATE_SECRET_ENV = 'REVALIDATE_SECRET';
+const PAYLOAD_USERS_COLLECTION_SLUG = 'users';
 const DEFAULT_PAYLOAD_DEPTH = '2';
 const BLOG_REVALIDATE_SECONDS = 3600;
 
@@ -99,9 +101,15 @@ function normalizeApiUrl(value: string): string {
 assertServerOnlyContext();
 
 export type CmsServerEnv = Readonly<{
+  apiKey?: string;
   apiUrl: string;
   revalidateSecret: string;
 }>;
+
+function getPayloadApiKey(): string | undefined {
+  const value = process.env[PAYLOAD_API_KEY_ENV]?.trim();
+  return value ? value : undefined;
+}
 
 export function getBlogListTag(): 'blog:list' {
   return 'blog:list';
@@ -137,6 +145,7 @@ export function getRevalidateSecret(): string {
 
 export function getCmsServerEnv(): CmsServerEnv {
   return {
+    apiKey: getPayloadApiKey(),
     apiUrl: getPayloadApiUrl(),
     revalidateSecret: getRevalidateSecret(),
   };
@@ -379,11 +388,17 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     sort?: string;
   },
 ): Promise<Array<CollectionDocument<TSlug>>> {
+  const apiKey = getPayloadApiKey();
   const requestOptions: CmsFetchOptions = {
     cache: 'force-cache',
     method: 'GET',
     headers: {
       Accept: 'application/json',
+      ...(apiKey
+        ? {
+            Authorization: `${PAYLOAD_USERS_COLLECTION_SLUG} API-Key ${apiKey}`,
+          }
+        : {}),
     },
     next: options.next,
   };

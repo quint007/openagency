@@ -17,27 +17,6 @@ locals {
     if length(trimspace(value)) > 0
   }
 
-  environment_variables = merge(
-    {
-      for key, value in local.production_environment : "production:${key}" => {
-        comment   = "Managed by OpenTofu for the marketing Vercel project."
-        key       = key
-        sensitive = false
-        target    = ["production"]
-        value     = value
-      }
-    },
-    {
-      for key, value in local.production_secret_environment : "production-secret:${key}" => {
-        comment   = "Managed by OpenTofu for the marketing Vercel project."
-        key       = key
-        sensitive = true
-        target    = ["production"]
-        value     = value
-      }
-    },
-  )
-
   required_environment_variable_names = sort(distinct(concat(
     keys(local.production_environment),
     keys(local.production_secret_environment),
@@ -75,23 +54,29 @@ resource "vercel_project" "marketing" {
   install_command                                   = var.install_command
   root_directory                                    = var.root_directory
   team_id                                           = var.team_id
-
-  git_repository = {
-    repo              = var.git_repository
-    type              = "github"
-    production_branch = var.production_branch
-  }
 }
 
 resource "vercel_project_environment_variable" "marketing" {
-  for_each = var.enabled ? local.environment_variables : {}
+  for_each = var.enabled ? local.production_environment : {}
 
   project_id = vercel_project.marketing[0].id
-  key        = each.value.key
-  value      = each.value.value
-  target     = each.value.target
-  sensitive  = each.value.sensitive
-  comment    = each.value.comment
+  key        = each.key
+  value      = each.value
+  target     = ["production"]
+  sensitive  = false
+  comment    = "Managed by OpenTofu for the marketing Vercel project."
+  team_id    = var.team_id
+}
+
+resource "vercel_project_environment_variable" "marketing_secret" {
+  for_each = var.enabled ? nonsensitive(toset(keys(local.production_secret_environment))) : []
+
+  project_id = vercel_project.marketing[0].id
+  key        = each.value
+  value      = local.production_secret_environment[each.value]
+  target     = ["production"]
+  sensitive  = true
+  comment    = "Managed by OpenTofu for the marketing Vercel project."
   team_id    = var.team_id
 }
 
@@ -130,7 +115,7 @@ output "project_contract" {
       production_public_names = sort(keys(local.production_environment))
       production_secret_names = sort(keys(local.production_secret_environment))
       required_names          = local.required_environment_variable_names
-      managed_count           = length(local.environment_variables)
+      managed_count           = length(local.production_environment) + length(local.production_secret_environment)
     }
     fallback_markers = local.fallback_markers
   }

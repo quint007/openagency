@@ -100,6 +100,9 @@ tasks:
         if [ -n "${VERCEL_API_TOKEN:-}" ]; then
           VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
         fi
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
         fi
@@ -207,6 +210,9 @@ tasks:
         fi
         if [ -n "${VERCEL_API_TOKEN:-}" ]; then
           VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
+        fi
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -317,6 +323,9 @@ tasks:
         fi
         if [ -n "${VERCEL_API_TOKEN:-}" ]; then
           VARS="$VARS -var=vercel_api_token=$VERCEL_API_TOKEN"
+        fi
+        if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"

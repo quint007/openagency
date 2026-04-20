@@ -23,7 +23,7 @@ export type HomepageRouteHref =
   | "/about"
   | "/privacy"
   | "/terms"
-  | "https://github.com/open-agency"
+  | "https://github.com/Open-Agency-io"
   | "https://www.linkedin.com/company/open-agency"
   | "mailto:hello@open-agency.io";
 
@@ -47,7 +47,7 @@ export const allowedFooterLinkHrefs = [
   "/guides",
   "/awesome",
   "/tools",
-  "https://github.com/open-agency",
+  "https://github.com/Open-Agency-io",
   "/privacy",
   "/terms",
 ] as const;
@@ -336,7 +336,7 @@ export const homepageContent = {
       },
       {
         title: "Open source",
-        links: [{ label: "GitHub", href: "https://github.com/open-agency" }],
+        links: [{ label: "GitHub", href: "https://github.com/Open-Agency-io" }],
       },
       {
         title: "Legal",
