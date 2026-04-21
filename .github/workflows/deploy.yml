@@ -163,7 +163,7 @@ jobs:
             $MARKETING_PAYLOAD_API_KEY_ARG
 
   apply-production:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: plan-production
     runs-on: ubuntu-latest
     environment: production
@@ -333,7 +333,7 @@ jobs:
             -auto-approve
 
   deploy-marketing-frontend:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: apply-production
     runs-on: ubuntu-latest
     environment: production
@@ -362,7 +362,7 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Deploy marketing production build
-        if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           : "${VERCEL_TOKEN:?Missing required Vercel token.}"
           : "${VERCEL_PROJECT_ID:?Missing required VERCEL_PROJECT_ID.}"
@@ -382,7 +382,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy-backend:
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: apply-production
     runs-on: ubuntu-latest
     container: ghcr.io/railwayapp/cli:latest
