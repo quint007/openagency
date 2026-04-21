@@ -14,8 +14,11 @@ After cloning the repo, run `task setup` (or `devbox run task setup`). That task
 
 1. Installs frontend (`frontend/`) and backend (`backend/openagency-backend/`) dependencies via pnpm.
 2. Copies the example env files into place (`backend/openagency-backend/.env`, `frontend/apps/marketing/.env.local`, `frontend/apps/courses/.env.local`) without overwriting any edits.
-3. Detects whichever Docker Compose binary is available and starts the `postgres` service defined in `docker-compose.yml`.
-4. Waits until PostgreSQL accepts connections and then runs `pnpm --dir backend/openagency-backend exec payload migrate --yes`.
+3. Installs the repo pre-commit hook from `.githooks/pre-commit` into `.git/hooks/pre-commit`.
+4. Detects whichever Docker Compose binary is available and starts the `postgres` service defined in `docker-compose.yml`.
+5. Waits until PostgreSQL accepts connections and then runs `pnpm --dir backend/openagency-backend exec payload migrate --yes`.
+
+> Note: devbox also installs the same Git hook automatically via `devbox shell` / `devbox run`, so the pre-commit checks stay active in the standard repo workflow.
 
 If you need to re-run the script after editing env values, delete the generated `.env*` files first so the task can regenerate them from the examples.
 
@@ -43,7 +46,9 @@ If you need to re-run the script after editing env values, delete the generated 
 - `task setup` – run the bootstrapper discussed above.
 - `task dev` – run the reusable dev preflight tasks, then bring up Payload plus the marketing/courses apps.
 - `task dev-frontend` – just run the marketing/courses apps.
+- `task dev:marketing:prod-api` – run only the marketing app locally while pointing both public and server-side CMS reads at `https://admin.open-agency.io/api` for pre-deploy verification.
 - `task dev-backend` – just run Payload CMS.
+- `task prepare` – run the same file-based pre-commit checks that the installed hook uses.
 - Visit the services after `task dev`:
   - Payload admin: `http://localhost:3002/admin`
   - Marketing site: `http://localhost:3000`
@@ -61,6 +66,13 @@ If you need to re-run the script after editing env values, delete the generated 
 - The marketing and courses apps read `NEXT_PUBLIC_API_URL` at build time to reach Payload's REST endpoints.
 - The marketing and courses apps run on separate ports (3000 and 3001) so they can both be up in dev without conflicts.
 - Turbo (`pnpm --dir frontend dev`) watches both apps and automatically rebuilds shared packages.
+- The repo's pre-commit hook runs `task prepare`, which inspects staged paths and only runs the relevant checks (deploy-config validation, auth-contract validation, and the app/backend builds that match the files you changed).
+
+### Running marketing against the production CMS API
+
+- Use `task dev:marketing:prod-api` when you need to verify the local marketing app against the live Payload REST API at `https://admin.open-agency.io/api` before a deploy.
+- The task keeps the site itself on `http://localhost:3000`, but overrides both `NEXT_PUBLIC_API_URL` and `PAYLOAD_API_URL` so client-side and server-side reads hit production content.
+- Keep `frontend/apps/marketing/.env.local` in place because the app still loads local server-only values such as `REVALIDATE_SECRET` and, optionally, `PAYLOAD_API_KEY` from that file.
 
 Whenever you document a new step or tool, keep this file in sync so onboarding stays under ten minutes from a clean clone.
 

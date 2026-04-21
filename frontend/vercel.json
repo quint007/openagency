@@ -1,0 +1,6 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm turbo build --filter=marketing",
+  "installCommand": "pnpm install",
+  "outputDirectory": "apps/marketing/.next"
+}

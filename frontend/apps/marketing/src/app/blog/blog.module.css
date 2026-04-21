@@ -1,0 +1,83 @@
+.heroSurface {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--brand-primary) 12%, transparent) 0, transparent 28rem),
+    linear-gradient(180deg, var(--surface-container) 0%, var(--surface-container-low) 100%);
+  box-shadow: 0 var(--spacing-8) var(--spacing-16) color-mix(in srgb, var(--brand-primary) 12%, transparent);
+}
+
+.panelSurface {
+  background:
+    linear-gradient(180deg, var(--surface-container-lowest) 0%, color-mix(in srgb, var(--brand-primary) 7%, var(--surface-container-low) 93%) 100%);
+  box-shadow: 0 var(--spacing-8) var(--spacing-16) color-mix(in srgb, var(--brand-primary) 12%, transparent);
+}
+
+.eyebrow {
+  background: color-mix(in srgb, var(--brand-primary) 12%, var(--surface-container-low) 88%);
+  font-family: var(--brand-font-body);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  color: var(--brand-primary-light);
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.pageDescription {
+  font-size: clamp(var(--font-size-base), 0.95rem + 0.35vw, var(--font-size-xl));
+  line-height: 1.85;
+  color: var(--on-surface-variant);
+  text-wrap: pretty;
+}
+
+.kicker {
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  color: var(--brand-primary-light);
+  text-transform: uppercase;
+}
+
+.cardTitle {
+  font-size: clamp(1.35rem, 1.2rem + 0.4vw, 1.75rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.cardBody {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--on-surface-variant);
+  text-wrap: pretty;
+}
+
+.proseLead {
+  font-size: clamp(1.08rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.9;
+  color: var(--on-surface-variant);
+  text-wrap: pretty;
+}
+
+.metaText {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+}
+
+.chip {
+  background: color-mix(in srgb, var(--surface-container-high) 88%, transparent);
+  color: var(--on-surface);
+}
+
+.chipActive {
+  background: color-mix(in srgb, var(--brand-primary) 18%, var(--surface-container-high) 82%);
+  color: var(--on-surface);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-primary) 38%, transparent) inset;
+}

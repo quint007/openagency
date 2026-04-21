@@ -18,6 +18,51 @@ variable "railway_token" {
   default     = "replace-with-production-railway-token"
 }
 
+variable "vercel_enabled" {
+  description = "Whether production should manage the marketing Vercel project directly. Defaults to fallback mode until provider credentials are available."
+  type        = bool
+  default     = false
+}
+
+variable "vercel_api_token" {
+  description = "Vercel API token placeholder for production plan-time provider configuration. Replace externally when vercel_enabled is true."
+  type        = string
+  sensitive   = true
+  default     = "000000000000000000000000"
+}
+
+variable "vercel_team" {
+  description = "Optional Vercel team slug or ID used by the production environment root."
+  type        = string
+  default     = null
+}
+
+variable "marketing_vercel_project_name" {
+  description = "Vercel project name used for the production marketing site."
+  type        = string
+  nullable    = false
+  default     = "open-agency-marketing"
+}
+
+variable "marketing_vercel_domain" {
+  description = "Production domain attached to the marketing Vercel project."
+  type        = string
+  default     = "open-agency.io"
+}
+
+variable "vercel_github_repository" {
+  description = "GitHub repository to link to the Vercel project. Null skips GitHub integration (requires manual setup)."
+  type        = string
+  default     = null
+}
+
+variable "marketing_payload_api_key" {
+  description = "Optional Payload API key assigned to a users-collection integration account for marketing CMS reads."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "cloudflare_dns_enabled" {
   description = "Whether production should manage Cloudflare DNS records directly. Defaults to fallback mode until provider credentials are available."
   type        = bool

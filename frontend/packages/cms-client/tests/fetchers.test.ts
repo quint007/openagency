@@ -82,6 +82,7 @@ afterEach(() => {
   } else {
     process.env.PAYLOAD_API_KEY = originalPayloadApiKey;
   }
+
 });
 
 describe('cms-client typed Payload fetchers', () => {
@@ -124,7 +125,6 @@ describe('cms-client typed Payload fetchers', () => {
 
   test('builds list requests with collection-specific cache tags', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
-    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     const fetchMock = vi
       .fn()
@@ -162,9 +162,23 @@ describe('cms-client typed Payload fetchers', () => {
     expect(request.init.next?.revalidate).toBeUndefined();
   });
 
+  test('omits the authorization header when no Payload API key is configured', async () => {
+    process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
+    delete process.env.PAYLOAD_API_KEY;
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ docs: [createBlogPost()] })));
+
+    await expect(getBlogPosts()).resolves.toEqual([createBlogPost()]);
+
+    const { init } = readFetchCall();
+
+    expect(init.headers).toEqual({
+      Accept: 'application/json',
+    });
+  });
+
   test('uses real lesson and author collection slugs and returns null for misses', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
-    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     const fetchMock = vi
       .fn()
@@ -204,7 +218,6 @@ describe('cms-client typed Payload fetchers', () => {
 
   test('fails safely when Payload returns a malformed list response', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
-    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ totalDocs: 1 })));
 
@@ -215,7 +228,6 @@ describe('cms-client typed Payload fetchers', () => {
 
   test('fails safely when a fetched document is missing required identifiers', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
-    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ docs: [{ title: 'Broken course' }] })));
 
@@ -226,7 +238,6 @@ describe('cms-client typed Payload fetchers', () => {
 
   test('rejects blank slugs in tag helpers and detail fetchers', async () => {
     process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
-    process.env.PAYLOAD_API_KEY = 'server-secret';
 
     expect(() => getCourseSlugTag('   ')).toThrow(
       '@open-agency/cms-client requires a non-empty course slug.',

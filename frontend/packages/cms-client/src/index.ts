@@ -83,7 +83,7 @@ function assertServerOnlyContext(): void {
 }
 
 function readRequiredEnv(
-  name: typeof PAYLOAD_API_URL_ENV | typeof PAYLOAD_API_KEY_ENV | typeof REVALIDATE_SECRET_ENV,
+  name: typeof PAYLOAD_API_URL_ENV | typeof REVALIDATE_SECRET_ENV,
 ): string {
   const value = process.env[name]?.trim();
 
@@ -101,15 +101,15 @@ function normalizeApiUrl(value: string): string {
 assertServerOnlyContext();
 
 export type CmsServerEnv = Readonly<{
-  apiKey: string;
+  apiKey?: string;
   apiUrl: string;
   revalidateSecret: string;
 }>;
 
-type CmsReadEnv = Readonly<{
-  apiKey: string;
-  apiUrl: string;
-}>;
+function getPayloadApiKey(): string | undefined {
+  const value = process.env[PAYLOAD_API_KEY_ENV]?.trim();
+  return value ? value : undefined;
+}
 
 export function getBlogListTag(): 'blog:list' {
   return 'blog:list';
@@ -139,10 +139,6 @@ export function getPayloadApiUrl(): string {
   return normalizeApiUrl(readRequiredEnv(PAYLOAD_API_URL_ENV));
 }
 
-export function getPayloadApiKey(): string {
-  return readRequiredEnv(PAYLOAD_API_KEY_ENV);
-}
-
 export function getRevalidateSecret(): string {
   return readRequiredEnv(REVALIDATE_SECRET_ENV);
 }
@@ -152,13 +148,6 @@ export function getCmsServerEnv(): CmsServerEnv {
     apiKey: getPayloadApiKey(),
     apiUrl: getPayloadApiUrl(),
     revalidateSecret: getRevalidateSecret(),
-  };
-}
-
-function getCmsReadEnv(): CmsReadEnv {
-  return {
-    apiKey: getPayloadApiKey(),
-    apiUrl: getPayloadApiUrl(),
   };
 }
 
@@ -399,13 +388,17 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     sort?: string;
   },
 ): Promise<Array<CollectionDocument<TSlug>>> {
-  const { apiKey } = getCmsReadEnv();
+  const apiKey = getPayloadApiKey();
   const requestOptions: CmsFetchOptions = {
     cache: 'force-cache',
     method: 'GET',
     headers: {
       Accept: 'application/json',
-      Authorization: `${PAYLOAD_USERS_COLLECTION_SLUG} API-Key ${apiKey}`,
+      ...(apiKey
+        ? {
+            Authorization: `${PAYLOAD_USERS_COLLECTION_SLUG} API-Key ${apiKey}`,
+          }
+        : {}),
     },
     next: options.next,
   };
