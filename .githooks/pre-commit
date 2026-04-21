@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v devbox >/dev/null 2>&1; then
+  exec devbox run task prepare
+fi
+
+exec task prepare

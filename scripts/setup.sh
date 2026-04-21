@@ -17,6 +17,16 @@ copy_env_file() {
   echo "  - created $dst"
 }
 
+install_git_hook() {
+  local src="$1"
+  local dst="$2"
+
+  mkdir -p "$(dirname "$dst")"
+  cp "$src" "$dst"
+  chmod +x "$dst"
+  echo "  - installed $(basename "$dst")"
+}
+
 detect_docker_compose() {
   if docker compose version >/dev/null 2>&1; then
     echo "docker compose"
@@ -40,6 +50,9 @@ echo "Copying environment files"
 copy_env_file "$REPO_ROOT/backend/openagency-backend/.env.example" "$REPO_ROOT/backend/openagency-backend/.env"
 copy_env_file "$REPO_ROOT/frontend/apps/marketing/.env.local.example" "$REPO_ROOT/frontend/apps/marketing/.env.local"
 copy_env_file "$REPO_ROOT/frontend/apps/courses/.env.local.example" "$REPO_ROOT/frontend/apps/courses/.env.local"
+
+echo "Installing git hooks"
+install_git_hook "$REPO_ROOT/.githooks/pre-commit" "$REPO_ROOT/.git/hooks/pre-commit"
 
 DOCKER_COMPOSE_CMD=$(detect_docker_compose)
 

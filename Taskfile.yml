@@ -69,6 +69,36 @@ tasks:
       - task dev:db:wait
       - task dev:cms:migrate
 
+  prepare:
+    desc: Run staged-change pre-commit checks
+    cmds:
+      - bash scripts/prepare.sh
+
+  prepare:deploy-config:
+    desc: Validate deployment root and output configuration
+    cmds:
+      - bash scripts/prepare-deploy-config.sh
+
+  prepare:auth-contract:
+    desc: Validate basic auth env and redirect contract
+    cmds:
+      - bash scripts/prepare-auth-contract.sh
+
+  prepare:backend:
+    desc: Build the backend when backend files change
+    cmds:
+      - pnpm --dir {{.BACKEND_DIR}} build
+
+  prepare:marketing:
+    desc: Build the marketing app when marketing or shared frontend files change
+    cmds:
+      - pnpm --dir {{.FRONTEND_DIR}}/apps/marketing build
+
+  prepare:courses:
+    desc: Build the courses app when courses or shared frontend files change
+    cmds:
+      - pnpm --dir {{.FRONTEND_DIR}}/apps/courses build
+
   dev:ensure-env:
     desc: Verify local environment files and required backend variables exist
     preconditions:

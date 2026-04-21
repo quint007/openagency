@@ -10,5 +10,10 @@
     "gh",
     "railway@latest",
     "git@latest"
-  ]
+  ],
+  "shell": {
+    "init_hook": [
+      "if [ -f .githooks/pre-commit ]; then mkdir -p .git/hooks && cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit; fi"
+    ]
+  }
 }
