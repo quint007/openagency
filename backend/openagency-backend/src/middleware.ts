@@ -56,27 +56,25 @@ export const middleware = (request: NextRequest): NextResponse => {
   const username = process.env.ALPHA_BASIC_AUTH_USERNAME
   const password = process.env.ALPHA_BASIC_AUTH_PASSWORD
   const adminHostname = getHostname(process.env.NEXT_PUBLIC_SERVER_URL)
-  const publicHostname = getHostname(process.env.MARKETING_APP_BASE_URL)
   const requestHostname = request.nextUrl.host
   const isAdminHostRequest = Boolean(
     (adminHostname && requestHostname === adminHostname) || requestHostname === 'admin.open-agency.io',
   )
 
+  const marketingSiteUrl = process.env.MARKETING_APP_BASE_URL || 'https://open-agency.io'
+
   if (isAdminHostRequest && request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/', process.env.MARKETING_APP_BASE_URL || 'https://open-agency.io'))
+    return NextResponse.redirect(new URL('/', marketingSiteUrl))
   }
 
   const hideNonAdminRoutes = Boolean(
     isAdminHostRequest &&
-    adminHostname &&
-    publicHostname &&
-    adminHostname !== publicHostname &&
     !isStaticAssetRequest(request.nextUrl.pathname) &&
     !isAllowedAdminRoute(request.nextUrl.pathname),
   )
 
   if (hideNonAdminRoutes) {
-    return new NextResponse(null, { status: 404 })
+    return NextResponse.redirect(new URL('/', marketingSiteUrl))
   }
 
   if (
@@ -84,7 +82,7 @@ export const middleware = (request: NextRequest): NextResponse => {
     !username ||
     !password ||
     isStaticAssetRequest(request.nextUrl.pathname) ||
-    !request.nextUrl.pathname.startsWith('/admin')
+    !isAllowedAdminRoute(request.nextUrl.pathname)
   ) {
     return NextResponse.next()
   }

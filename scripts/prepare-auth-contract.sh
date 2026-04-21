@@ -24,6 +24,12 @@ check_file_contains backend/openagency-backend/src/middleware.ts 'ALPHA_BASIC_AU
 check_file_contains backend/openagency-backend/src/middleware.ts 'NextResponse.redirect'
 check_file_contains backend/openagency-backend/src/middleware.ts 'open-agency.io'
 
+if grep -q 'useAPIKey: true' backend/openagency-backend/src/collections/Users/index.ts; then
+  fail 'backend/openagency-backend/src/collections/Users/index.ts must not enable API keys during alpha.'
+fi
+
+check_file_contains backend/openagency-backend/src/collections/Users/index.ts 'auth: true'
+
 check_file_contains backend/openagency-backend/src/environment.d.ts 'ALPHA_BASIC_AUTH_USERNAME'
 check_file_contains backend/openagency-backend/src/environment.d.ts 'ALPHA_BASIC_AUTH_PASSWORD'
 check_file_contains backend/openagency-backend/.env.example 'ALPHA_BASIC_AUTH_USERNAME='
