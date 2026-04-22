@@ -10,6 +10,7 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/robots\.txt$/i,
   /^\/sitemap(?:.*)?\.xml$/i,
   /^\/feed\.xml$/i,
+  /^\/newsletter(?:\/.*)?$/i,
   /^\/api\/revalidate(?:\/.*)?$/i,
 ];
 
