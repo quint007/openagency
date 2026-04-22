@@ -1,6 +1,5 @@
-import { Separator } from "@open-agency/ui";
+import { Logo, Separator } from "@open-agency/ui";
 import { ExternalLink } from "pixelarticons/react/ExternalLink";
-import { BrandLockup } from "../BrandLockup";
 import { allowedFooterLinkHrefs, type HomepageContent, type HomepageFooterLinkHref } from "../../homepage-content";
 import styles from "../../page.module.css";
 
@@ -30,7 +29,7 @@ export function FooterSection({ content }: FooterSectionProps) {
     <div className="mx-auto flex w-full max-w-[100rem] flex-col gap-12 px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
       <div className="flex flex-col gap-10 xl:flex-row xl:items-start xl:justify-between xl:gap-16">
         <div className="flex max-w-[28rem] flex-1 flex-col gap-6">
-          <BrandLockup />
+          <Logo ariaLabel="Open Agency" size="md" variant="text" />
           <p className={styles.footerLead}>{content.description}</p>
         </div>
 

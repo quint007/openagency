@@ -9,8 +9,6 @@ export type HomepageRouteHref =
   | "/blog/opencode-starter"
   | "/blog?category=writing"
   | "/blog?category=automation"
-  | "/guides"
-  | "/guides/start-here"
   | "/awesome"
   | "/awesome/agents"
   | "/awesome/workflows"
@@ -24,7 +22,6 @@ export type HomepageRouteHref =
   | "/privacy"
   | "/terms"
   | "https://github.com/Open-Agency-io"
-  | "https://www.linkedin.com/company/open-agency"
   | "mailto:hello@open-agency.io";
 
 export type HomepageLink = {
@@ -44,7 +41,7 @@ export type HomepageFeatureCard = {
 };
 
 export const allowedFooterLinkHrefs = [
-  "/guides",
+  "/blog",
   "/awesome",
   "/tools",
   "https://github.com/Open-Agency-io",
@@ -155,20 +152,15 @@ export const homepageContent = {
     navigationLabel: "Primary",
     mobileNavigationLabel: "Mobile primary",
     menuLabel: "Menu",
-    links: [
-      { label: "Platform", href: homepageAnchors.platform },
-      { label: "Solutions", href: homepageAnchors.solutions },
-      { label: "About", href: homepageAnchors.about },
-      { label: "Contact", href: homepageAnchors.contact },
-    ],
-    primaryCta: { label: "View the guides", href: "/guides" },
+    links: [{ label: "Guides", href: "/blog" }],
+    primaryCta: { label: "View the guides", href: "/blog" },
   },
   hero: {
     sectionId: "platform",
     eyebrow: "",
     title: "Work smarter with AI — not harder with hype.",
     body: "open-agency is a free, open-source platform for creators and builders who want practical AI in their workflows. Guides, tools, templates, and courses — all built in public, all usable today.",
-    primaryCta: { label: "Browse the guides", href: "/guides" },
+    primaryCta: { label: "Browse the guides", href: "/blog" },
     secondaryCta: { label: "See the tools", href: "/tools" },
     supportingLine:
       "Everything free. No paywall. No account required to get started.",
@@ -329,7 +321,7 @@ export const homepageContent = {
       {
         title: "Navigation",
         links: [
-          { label: "Guides", href: "/guides" },
+          { label: "Guides", href: "/blog" },
           { label: "Awesome lists", href: "/awesome" },
           { label: "Tools", href: "/tools" },
         ],

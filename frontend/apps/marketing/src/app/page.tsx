@@ -13,7 +13,15 @@ import { ToolsTeaserSection } from "./components/homepage/ToolsTeaserSection";
 import { TrustBarSection } from "./components/homepage/TrustBarSection";
 
 export default async function Home() {
-  const { awesomeLists, footer, latestGuides, newsletter, startHere, toolsTeaser, trustBar } = homepageContent;
+  const {
+    awesomeLists,
+    footer,
+    latestGuides,
+    newsletter,
+    startHere,
+    toolsTeaser,
+    trustBar,
+  } = homepageContent;
   const latestGuidesState = await getLatestGuidesSectionState();
 
   return (
@@ -22,11 +30,11 @@ export default async function Home() {
 
       <main className="flex w-full flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
         <Hero />
-        <TrustBarSection content={trustBar} />
-        <StartHereSection content={startHere} />
         <LatestGuidesSection content={latestGuides} state={latestGuidesState} />
+        {/*<StartHereSection content={startHere} />
+        <TrustBarSection content={trustBar} />
         <AwesomeListsSection content={awesomeLists} />
-        <ToolsTeaserSection content={toolsTeaser} />
+        <ToolsTeaserSection content={toolsTeaser} />*/}
         <NewsletterSection content={newsletter} />
       </main>
 

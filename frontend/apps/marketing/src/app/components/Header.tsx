@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "@open-agency/ui";
 import { ArrowRight } from "pixelarticons/react/ArrowRight";
@@ -52,20 +53,22 @@ export function Header({ brand }: HeaderProps) {
     >
       <div className={`${shellClassName} justify-between py-4`}>
         <div className="flex min-w-0 items-center gap-6 lg:gap-10">
-          <div className="shrink-0">{brand}</div>
+          <Link href="/" className="shrink-0" aria-label="Open Agency home">
+            {brand}
+          </Link>
 
           <nav
             className="hidden items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-high)_72%,transparent)] px-2 py-2 lg:flex"
             aria-label={header.navigationLabel}
           >
             {header.links.map((item) => (
-              <a
+              <Link
                 key={item.label}
                 href={item.href}
                 className={`${styles.navLink} inline-flex items-center rounded-full px-4 py-2 text-sm transition-colors hover:bg-[color:color-mix(in_srgb,var(--brand-primary)_10%,transparent)]`}
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -81,7 +84,7 @@ export function Header({ brand }: HeaderProps) {
 
           <Button
             className="min-h-11 px-6"
-            render={<a href={header.primaryCta.href} />}
+            render={<Link href={header.primaryCta.href} />}
             nativeButton={false}
           >
             {header.primaryCta.label}
@@ -114,7 +117,7 @@ export function Header({ brand }: HeaderProps) {
               aria-label={header.mobileNavigationLabel}
             >
               {header.links.map((item) => (
-                <a
+                <Link
                   key={item.label}
                   href={item.href}
                   className="flex items-center justify-between rounded-2xl border border-[color:color-mix(in_srgb,var(--outline-variant)_35%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-high)_78%,transparent)] px-4 py-4 text-sm text-[var(--on-surface)]"
@@ -122,7 +125,7 @@ export function Header({ brand }: HeaderProps) {
                 >
                   <span>{item.label}</span>
                   <ArrowRight className="size-5 text-[var(--brand-primary)]" />
-                </a>
+                </Link>
               ))}
             </nav>
 
@@ -137,7 +140,7 @@ export function Header({ brand }: HeaderProps) {
 
               <Button
                 className="min-h-11 w-full px-6"
-                render={<a href={header.primaryCta.href} />}
+                render={<Link href={header.primaryCta.href} />}
                 nativeButton={false}
               >
                 {header.primaryCta.label}
