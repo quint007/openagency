@@ -1,7 +1,7 @@
 import { cn } from "../../lib/utils";
 
 type LogoVariant = "full" | "text" | "mascot";
-type LogoSize = "sm" | "md" | "lg";
+type LogoSize = "sm" | "md" | "lg" | "xl";
 
 type LogoProps = {
   variant?: LogoVariant;
@@ -12,10 +12,14 @@ type LogoProps = {
   ariaLabel?: string;
 };
 
-const sizeClasses: Record<LogoSize, { mascot: string; text: string; gap: string }> = {
+const sizeClasses: Record<
+  LogoSize,
+  { mascot: string; text: string; gap: string }
+> = {
   sm: { mascot: "size-6", text: "text-base", gap: "gap-2" },
   md: { mascot: "size-8", text: "text-lg", gap: "gap-2.5" },
   lg: { mascot: "size-10", text: "text-xl", gap: "gap-3" },
+  xl: { mascot: "size-100", text: "text-6xl", gap: "gap-3.5" },
 };
 
 function LogoMascot({ className }: { className?: string }) {
@@ -453,7 +457,11 @@ function Logo({
 
   if (variant === "mascot") {
     return (
-      <span aria-label={ariaLabel} role="img" className={cn("inline-flex", className)}>
+      <span
+        aria-label={ariaLabel}
+        role="img"
+        className={cn("inline-flex", className)}
+      >
         <LogoMascot className={cn(classes.mascot, mascotClassName)} />
       </span>
     );
@@ -474,7 +482,11 @@ function Logo({
 
   if (variant === "text") {
     return (
-      <span aria-label={ariaLabel} role="img" className={cn("inline-flex", className)}>
+      <span
+        aria-label={ariaLabel}
+        role="img"
+        className={cn("inline-flex", className)}
+      >
         {wordmark}
       </span>
     );
