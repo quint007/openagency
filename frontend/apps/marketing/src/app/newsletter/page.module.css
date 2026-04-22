@@ -1,0 +1,75 @@
+.heroSurface {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--brand-primary) 12%, transparent) 0, transparent 26rem),
+    linear-gradient(180deg, var(--surface-container) 0%, var(--surface-container-low) 100%);
+  box-shadow: 0 var(--spacing-8) var(--spacing-16) color-mix(in srgb, var(--brand-primary) 12%, transparent);
+}
+
+.panelSurface {
+  background:
+    linear-gradient(180deg, var(--surface-container-lowest) 0%, color-mix(in srgb, var(--brand-tertiary) 7%, var(--surface-container-low) 93%) 100%);
+  box-shadow: 0 var(--spacing-8) var(--spacing-16) color-mix(in srgb, var(--brand-primary) 12%, transparent);
+}
+
+.eyebrow {
+  background: color-mix(in srgb, var(--brand-tertiary) 12%, var(--surface-container-low) 88%);
+  font-family: var(--brand-font-body);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  color: var(--brand-tertiary);
+  text-transform: uppercase;
+}
+
+.pageTitle {
+  font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.pageDescription {
+  font-size: clamp(var(--font-size-base), 0.95rem + 0.35vw, var(--font-size-xl));
+  line-height: 1.85;
+  color: var(--on-surface-variant);
+  text-wrap: pretty;
+}
+
+.countdownStat {
+  background: color-mix(in srgb, var(--surface-container-high) 78%, transparent);
+}
+
+.countdownValue {
+  font-family: var(--brand-font-heading);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  line-height: 0.9;
+  letter-spacing: -0.08em;
+  color: var(--on-surface);
+}
+
+.countdownLabel {
+  font-family: var(--brand-font-body);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+}
+
+.metaText {
+  font-family: var(--brand-font-body);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  letter-spacing: 0.14em;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+}
+
+.fieldLabel {
+  font-family: var(--brand-font-heading);
+  font-size: 0.78rem;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  color: var(--on-surface);
+  text-transform: uppercase;
+}

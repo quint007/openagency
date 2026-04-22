@@ -310,9 +310,9 @@ export const homepageContent = {
       },
     },
     success: {
-      title: "You are all set.",
+      title: "You’re on the list.",
       description:
-        "This preview keeps the interaction local, but the signup flow is ready and your address passed validation.",
+        "We’ll confirm your spot when the waitlist opens and send the first issue when launch day arrives.",
     },
   },
   footer: {

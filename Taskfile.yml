@@ -36,6 +36,7 @@ tasks:
 
   dev:marketing:
     desc: Start marketing app only
+    dotenv: [.env]
     cmds:
       - pnpm --dir {{.FRONTEND_DIR}}/apps/marketing dev
 
@@ -48,6 +49,7 @@ tasks:
 
   dev:marketing:prod-api:
     desc: Start marketing locally against the production CMS API
+    dotenv: [.env]
     env:
       PORT: '{{.MARKETING_PORT}}'
       NEXT_PUBLIC_SERVER_URL: http://localhost:{{.MARKETING_PORT}}

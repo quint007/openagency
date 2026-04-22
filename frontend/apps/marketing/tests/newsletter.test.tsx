@@ -1,81 +1,119 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { expect, test, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { NewsletterSection } from '../src/app/components/homepage/NewsletterSection'
-import { homepageContent } from '../src/app/homepage-content'
+const { sendMock } = vi.hoisted(() => ({
+  sendMock: vi.fn(),
+}))
 
-test('newsletter requires an email address before local submit', async () => {
-  render(<NewsletterSection content={homepageContent.newsletter} />)
+vi.mock('resend', () => ({
+  Resend: vi.fn(function MockResend(this: unknown) {
+    return {
+      emails: {
+        send: sendMock,
+      },
+    }
+  }),
+}))
 
-  const input = screen.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel })
+const originalResendApiKey = process.env.RESEND_API_KEY
+const originalServerUrl = process.env.NEXT_PUBLIC_SERVER_URL
+let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
-  fireEvent.click(screen.getByRole('button', { name: homepageContent.newsletter.submitLabel }))
+async function loadActionsModule() {
+  return import('../src/app/newsletter/actions')
+}
 
-  const alert = screen.getByRole('alert')
+async function loadUnsubscribePageModule() {
+  return import('../src/app/newsletter/unsubscribe/page')
+}
 
-  expect(alert.textContent).toContain(homepageContent.newsletter.errors.required.title)
-  expect(alert.textContent).toContain(homepageContent.newsletter.errors.required.description)
-  expect(input.getAttribute('aria-invalid')).toBe('true')
+function createFormData(email: string) {
+  const formData = new FormData()
+  formData.set('email', email)
+  return formData
+}
 
-  await waitFor(() => {
-    expect(document.activeElement).toBe(input)
-  })
+beforeEach(() => {
+  process.env.RESEND_API_KEY = 'test-resend-key'
+  process.env.NEXT_PUBLIC_SERVER_URL = 'http://localhost:3000'
+  consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+  sendMock.mockReset()
+  sendMock.mockResolvedValue({ id: 'email_123' })
 })
 
-test('newsletter validates email format and offers a retry path after invalid submit', async () => {
-  render(<NewsletterSection content={homepageContent.newsletter} />)
+afterEach(() => {
+  vi.resetModules()
+  sendMock.mockReset()
+  consoleErrorSpy.mockRestore()
 
-  const input = screen.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel })
+  if (originalResendApiKey === undefined) {
+    delete process.env.RESEND_API_KEY
+  } else {
+    process.env.RESEND_API_KEY = originalResendApiKey
+  }
 
-  fireEvent.change(input, { target: { value: 'not-an-email' } })
-  fireEvent.click(screen.getByRole('button', { name: homepageContent.newsletter.submitLabel }))
-
-  const alert = screen.getByRole('alert')
-
-  expect(alert.textContent).toContain(homepageContent.newsletter.errors.invalid.title)
-  expect(alert.textContent).toContain(homepageContent.newsletter.errors.invalid.description)
-
-  fireEvent.click(screen.getByRole('button', { name: homepageContent.newsletter.retryLabel }))
-
-  expect(screen.queryByRole('alert')).toBeNull()
-
-  await waitFor(() => {
-    expect(document.activeElement).toBe(input)
-  })
+  if (originalServerUrl === undefined) {
+    delete process.env.NEXT_PUBLIC_SERVER_URL
+  } else {
+    process.env.NEXT_PUBLIC_SERVER_URL = originalServerUrl
+  }
 })
 
-test('newsletter shows a deterministic local success state after valid submit', async () => {
-  render(<NewsletterSection content={homepageContent.newsletter} />)
+describe('newsletter subscribe + unsubscribe flow', () => {
+  test('subscribes with Resend, includes unsubscribe link, and renders unsubscribe confirmation', async () => {
+    const { newsletterSignup } = await loadActionsModule()
+    const email = 'hello@example.com'
 
-  const input = screen.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel })
+    const result = await newsletterSignup({ status: 'idle' }, createFormData(email))
 
-  fireEvent.change(input, { target: { value: 'hello@example.com' } })
-  fireEvent.click(screen.getByRole('button', { name: homepageContent.newsletter.submitLabel }))
+    expect(result).toEqual({ status: 'success' })
+    expect(sendMock).toHaveBeenCalledTimes(1)
+    expect(sendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        from: 'Open Agency <hello@open-agency.io>',
+        subject: 'Welcome to the Open Agency newsletter!',
+        to: email,
+      }),
+    )
 
-  const alert = screen.getByRole('alert')
+    const [{ html }] = sendMock.mock.calls[0] ?? []
 
-  expect(alert.textContent).toContain(homepageContent.newsletter.success.title)
-  expect(alert.textContent).toContain(homepageContent.newsletter.success.description)
+    expect(html).toContain('Welcome to Open Agency')
+    expect(html).toContain('/newsletter/unsubscribe?email=hello%40example.com')
 
-  await waitFor(() => {
-    expect(document.activeElement).toBe(alert.parentElement)
+    const { default: UnsubscribePage } = await loadUnsubscribePageModule()
+    render(
+      await UnsubscribePage({
+        searchParams: Promise.resolve({ email }),
+      }),
+    )
+
+    expect(screen.getByRole('heading', { name: 'You are unsubscribed.' })).toBeTruthy()
+    expect(screen.getByText('You will no longer receive emails at hello@example.com.')).toBeTruthy()
   })
-})
 
-test('newsletter submit stays local and never triggers a network request or form action', () => {
-  const fetchSpy = vi.spyOn(globalThis, 'fetch')
+  test('rejects invalid email without calling Resend', async () => {
+    const { newsletterSignup } = await loadActionsModule()
 
-  render(<NewsletterSection content={homepageContent.newsletter} />)
+    const result = await newsletterSignup({ status: 'idle' }, createFormData('not-an-email'))
 
-  const input = screen.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel })
-  const form = input.closest('form')
+    expect(result).toEqual({
+      error: 'Please enter a valid email address',
+      status: 'error',
+    })
+    expect(sendMock).not.toHaveBeenCalled()
+  })
 
-  fireEvent.change(input, { target: { value: 'hello@example.com' } })
-  fireEvent.click(screen.getByRole('button', { name: homepageContent.newsletter.submitLabel }))
+  test('returns a deterministic error when Resend send fails', async () => {
+    const { newsletterSignup } = await loadActionsModule()
+    sendMock.mockRejectedValueOnce(new Error('Resend unavailable'))
 
-  expect(fetchSpy).not.toHaveBeenCalled()
-  expect(form).toBeTruthy()
-  expect(form?.hasAttribute('action')).toBe(false)
+    const result = await newsletterSignup({ status: 'idle' }, createFormData('hello@example.com'))
 
-  fetchSpy.mockRestore()
+    expect(result).toEqual({
+      error: 'Something went wrong. Please try again.',
+      status: 'error',
+    })
+    expect(sendMock).toHaveBeenCalledTimes(1)
+  })
 })
