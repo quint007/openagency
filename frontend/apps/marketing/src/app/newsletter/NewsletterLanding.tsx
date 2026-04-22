@@ -28,7 +28,7 @@ type CountdownParts = {
   minutes: number;
 };
 
-const launchAt = new Date("2026-04-23T15:00:00Z");
+const launchAt = new Date("2026-05-23T12:00:00Z");
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   hour: "numeric",

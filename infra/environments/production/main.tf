@@ -255,8 +255,8 @@ module "cloudflare" {
   source = "../../modules/cloudflare"
 
   dns_targets = {
-    admin = local.railway_contract.service_domains.admin.dns_record_value
-    api   = local.railway_contract.service_domains.api.dns_record_value
+    admin     = local.railway_contract.service_domains.admin.dns_record_value
+    api       = local.railway_contract.service_domains.api.dns_record_value
     marketing = var.vercel_enabled ? local.marketing_vercel_apex_ipv4 : null
   }
 
@@ -304,9 +304,9 @@ module "vercel" {
   production_secret_environment = {
     ALPHA_BASIC_AUTH_USERNAME = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_USERNAME, null)
     ALPHA_BASIC_AUTH_PASSWORD = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_PASSWORD, null)
-    PAYLOAD_API_KEY        = var.marketing_payload_api_key
-    REVALIDATE_SECRET     = var.backend_secret_environment.REVALIDATE_SECRET
-    RESEND_API_KEY       = try(var.backend_optional_environment.RESEND_API_KEY, null)
+    PAYLOAD_API_KEY           = var.marketing_payload_api_key
+    REVALIDATE_SECRET         = var.backend_secret_environment.REVALIDATE_SECRET
+    RESEND_API_KEY            = try(var.backend_optional_environment.RESEND_API_KEY, null)
   }
 }
 
