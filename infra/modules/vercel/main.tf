@@ -8,13 +8,13 @@ terraform {
 
 locals {
   production_environment = {
-    for key, value in var.production_environment : key => trimspace(coalesce(value, ""))
-    if length(trimspace(coalesce(value, ""))) > 0
+    for key, value in var.production_environment : key => try(trimspace(value), "")
+    if length(try(trimspace(value), "")) > 0
   }
 
   production_secret_environment = {
-    for key, value in var.production_secret_environment : key => trimspace(coalesce(value, ""))
-    if length(trimspace(coalesce(value, ""))) > 0
+    for key, value in var.production_secret_environment : key => try(trimspace(value), "")
+    if length(try(trimspace(value), "")) > 0
   }
 
   required_environment_variable_names = sort(distinct(concat(

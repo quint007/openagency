@@ -112,6 +112,7 @@ jobs:
                   'R2_REGION': optional('RAW_R2_REGION'),
                   'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
                   'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
+                  'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
               }.items()
               if value is not None
