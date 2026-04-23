@@ -293,7 +293,7 @@ export const homepageContent = {
   newsletter: {
     title: "Get the good stuff in your inbox",
     description:
-      "A focused email on workflow patterns, guides, and tools for AI-native marketing teams.",
+      "A focused newsletter on open-source workflow patterns, guides, and tools for AI users.",
     fieldLabel: "Your email address",
     placeholder: "name@example.com",
     submitLabel: "Subscribe — it's free",

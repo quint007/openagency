@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Open Agency",
   description: "Brand OpenAgency marketing slice",
   metadataBase: new URL(getSiteUrl()),
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

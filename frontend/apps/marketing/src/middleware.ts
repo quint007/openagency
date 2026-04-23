@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const BASIC_AUTH_REALM = "Open Agency Alpha";
 
 const EXCLUDED_PATH_PATTERNS = [
+  /^\/$/,
   /^\/_next\//,
   /^\/favicon(?:-[\w-]+)?\.(?:ico|png|svg)$/i,
   /^\/apple-touch-icon(?:-[\w-]+)?\.png$/i,
