@@ -6,6 +6,7 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { ApiClients } from './collections/ApiClients'
 import { Authors } from './collections/Authors'
 import { BlogPosts } from './collections/BlogPosts'
 import { Categories } from './collections/Categories'
@@ -16,10 +17,12 @@ import { Modules } from './collections/Modules'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
+import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
+import { usersOnly } from './access/usersOnly'
 import { getAdminURL, getPublicSiteURL } from './utilities/getURL'
 import { isR2StorageConfigured, getR2StorageEndpoint } from './utilities/mediaStorage'
 
@@ -94,12 +97,29 @@ export default buildConfig({
     Media,
     Categories,
     Users,
+    ApiClients,
   ],
   cors: [getAdminURL(), getPublicSiteURL()].filter(Boolean),
   globals: [Header, Footer],
   serverURL: getAdminURL(),
   plugins: [
     ...plugins,
+    mcpPlugin({
+      collections: {
+        'blog-posts': { enabled: true },
+      },
+      overrideApiKeyCollection: (collection) => ({
+        ...collection,
+        access: {
+          ...collection.access,
+          admin: usersOnly,
+          create: usersOnly,
+          delete: usersOnly,
+          read: usersOnly,
+          update: usersOnly,
+        },
+      }),
+    }),
     ...(r2StorageEnabled && r2StorageEndpoint
       ? [
           s3Storage({
