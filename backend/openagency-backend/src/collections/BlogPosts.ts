@@ -8,8 +8,8 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
-import { authenticated } from '../access/authenticated'
-import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
+import { authenticatedOrApiClient } from '../access/authenticatedOrApiClient'
+import { usersOnlyOrPublished } from '../access/usersOnlyOrPublished'
 import { createGenerateUniqueSlug } from '../hooks/createGenerateUniqueSlug'
 import { populatePublishedAt } from '../hooks/populatePublishedAt'
 import { createRevalidateAfterChangeHook, createRevalidateAfterDeleteHook } from '../hooks/revalidateContent'
@@ -18,10 +18,10 @@ import { validatePublishedSeo } from '../hooks/validatePublishedSeo'
 export const BlogPosts: CollectionConfig<'blog-posts'> = {
   slug: 'blog-posts',
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
+    create: authenticatedOrApiClient,
+    delete: authenticatedOrApiClient,
+    read: usersOnlyOrPublished,
+    update: authenticatedOrApiClient,
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
