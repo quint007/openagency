@@ -1,9 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
-import { usersOnly } from '../../access/usersOnly'
+import { usersOnly } from '../access/usersOnly'
 
-export const Users: CollectionConfig = {
-  slug: 'users',
+export const ApiClients: CollectionConfig = {
+  slug: 'api-clients',
   access: {
     admin: usersOnly,
     create: usersOnly,
@@ -12,14 +12,18 @@ export const Users: CollectionConfig = {
     update: usersOnly,
   },
   admin: {
-    defaultColumns: ['name', 'email'],
+    defaultColumns: ['name', 'createdAt'],
     useAsTitle: 'name',
   },
-  auth: true,
+  auth: {
+    disableLocalStrategy: true,
+    useAPIKey: true,
+  },
   fields: [
     {
       name: 'name',
       type: 'text',
+      required: true,
     },
   ],
   timestamps: true,
