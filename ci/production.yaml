@@ -412,33 +412,11 @@ tasks:
         msg: Missing RAILWAY_TOKEN in repo-root .env.
       - sh: test -n "${RAILWAY_PROJECT_ID:-}"
         msg: Missing RAILWAY_PROJECT_ID in repo-root .env.
-      - sh: test -n "${R2_ACCESS_KEY_ID:-}"
-        msg: Missing R2_ACCESS_KEY_ID in repo-root .env.
-      - sh: test -n "${R2_BUCKET:-}"
-        msg: Missing R2_BUCKET in repo-root .env.
-      - sh: test -n "${R2_ENDPOINT:-}"
-        msg: Missing R2_ENDPOINT in repo-root .env.
-      - sh: test -n "${R2_PUBLIC_BASE_URL:-}"
-        msg: Missing R2_PUBLIC_BASE_URL in repo-root .env.
-      - sh: test -n "${R2_SECRET_ACCESS_KEY:-}"
-        msg: Missing R2_SECRET_ACCESS_KEY in repo-root .env.
-      - sh: test -n "${RESEND_API_KEY:-}"
-        msg: Missing RESEND_API_KEY in repo-root .env.
     cmds:
       - |
         set -eu
-        devbox run railway variable set \
-          R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
-          R2_BUCKET="$R2_BUCKET" \
-          R2_ENDPOINT="$R2_ENDPOINT" \
-          R2_PUBLIC_BASE_URL="$R2_PUBLIC_BASE_URL" \
-          R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
-          RESEND_API_KEY="$RESEND_API_KEY" \
-          --service open-agency-backend-production \
-          --environment production \
-          --skip-deploys
-
-        devbox run railway variables --service open-agency-backend-production
+        devbox run railway --version
+        echo "Railway variables are managed by deploy:apply."
         devbox run railway service open-agency-backend-production || true
         devbox run railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
         sleep 45

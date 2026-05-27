@@ -393,13 +393,6 @@ jobs:
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
-      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-      R2_BUCKET: ${{ secrets.R2_BUCKET != '' && secrets.R2_BUCKET || vars.R2_BUCKET }}
-      R2_ENDPOINT: ${{ secrets.R2_ENDPOINT != '' && secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
-      R2_REGION: ${{ secrets.R2_REGION != '' && secrets.R2_REGION || vars.R2_REGION }}
-      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
-      R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -410,27 +403,8 @@ jobs:
         run: |
           set -eu
 
-          : "${R2_BUCKET:?Missing required R2_BUCKET secret or variable.}"
-          : "${R2_ENDPOINT:?Missing required R2_ENDPOINT secret or variable.}"
-          : "${R2_PUBLIC_BASE_URL:?Missing required R2_PUBLIC_BASE_URL secret or variable.}"
-          : "${R2_ACCESS_KEY_ID:?Missing required R2_ACCESS_KEY_ID secret or variable.}"
-          : "${R2_SECRET_ACCESS_KEY:?Missing required R2_SECRET_ACCESS_KEY secret or variable.}"
-          : "${RESEND_API_KEY:?Missing required RESEND_API_KEY secret or variable.}"
-
-          railway variables set \
-            R2_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" \
-            R2_BUCKET="$R2_BUCKET" \
-            R2_ENDPOINT="$R2_ENDPOINT" \
-            R2_PUBLIC_BASE_URL="$R2_PUBLIC_BASE_URL" \
-            R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" \
-            RESEND_API_KEY="$RESEND_API_KEY" \
-            --service open-agency-backend-production \
-            --environment production \
-            --skip-deploys
-
-          # Debug: Print Railway variables
-          echo "=== Railway Variables ==="
-          railway variables --service open-agency-backend-production
+          railway --version
+          echo "Railway variables are managed by the apply-production OpenTofu job."
 
           # Debug: Print service status before deploy
           echo "=== Service Status Before ==="
