@@ -98,8 +98,10 @@ resource "railway_project" "backend" {
 resource "railway_service" "backend" {
   count = var.enabled ? 1 : 0
 
-  name       = var.backend_service_name
-  project_id = railway_project.backend[0].id
+  name               = var.backend_service_name
+  project_id         = railway_project.backend[0].id
+  source_repo        = var.backend_source_repo
+  source_repo_branch = var.backend_source_repo_branch
 }
 
 resource "railway_service" "postgres" {
@@ -171,6 +173,8 @@ output "backend_service_contract" {
     backend_service_domain        = null
     backend_service_domain_suffix = null
     backend_service_name          = var.backend_service_name
+    backend_source_repo           = var.backend_source_repo
+    backend_source_repo_branch    = var.backend_source_repo_branch
     environment_id                = try(railway_project.backend[0].default_environment.id, null)
     environment_name              = var.environment_name
     fallback_markers              = local.fallback_markers

@@ -241,6 +241,8 @@ module "railway" {
   backend_secret_environment       = var.backend_secret_environment
   backend_service_domain_subdomain = local.backend_service_domain_subdomain
   backend_service_name             = local.backend_service_name
+  backend_source_repo              = "quint007/openagency"
+  backend_source_repo_branch       = "main"
   environment_name                 = "production"
   postgres_database_name           = var.postgres_database_name
   postgres_data_directory          = "/var/lib/postgresql/data/pgdata"
