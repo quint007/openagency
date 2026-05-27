@@ -38,6 +38,29 @@ variable "backend_service_name" {
   }
 }
 
+variable "backend_source_repo" {
+  description = "GitHub repository attached as the Railway source for the Payload backend service."
+  type        = string
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^[^/]+/[^/]+$", trimspace(var.backend_source_repo)))
+    error_message = "backend_source_repo must use the owner/repository format."
+  }
+}
+
+variable "backend_source_repo_branch" {
+  description = "GitHub branch Railway should associate with the Payload backend source."
+  type        = string
+  nullable    = false
+  default     = "main"
+
+  validation {
+    condition     = length(trimspace(var.backend_source_repo_branch)) > 0
+    error_message = "backend_source_repo_branch must not be empty."
+  }
+}
+
 variable "api_hostname" {
   description = "Hostname reserved for the API alias in this environment."
   type        = string
