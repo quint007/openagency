@@ -47,7 +47,7 @@ ARG NEXT_BUILD_SKIP_DB=true
 ENV NEXT_BUILD_SKIP_DB=$NEXT_BUILD_SKIP_DB
 
 RUN \
-  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && corepack prepare pnpm@10.24.0 --activate && pnpm run build; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && corepack prepare pnpm@10.24.0 --activate && pnpm exec payload generate:importmap && pnpm run build; \
   elif [ -f yarn.lock ]; then yarn run build; \
   elif [ -f package-lock.json ]; then npm run build; \
   else echo "Lockfile not found." && exit 1; \
@@ -100,7 +100,7 @@ EXPOSE 8080
 ENV PORT=8080
 
 # server.js is created by next build from the standalone output.
-# Regenerate the Payload import map and run migrations at container startup so
-# both steps see the live Railway environment before the app begins serving.
+# Run migrations at container startup so they see the live Railway environment
+# before the app begins serving.
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload generate:importmap && NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]
+CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]

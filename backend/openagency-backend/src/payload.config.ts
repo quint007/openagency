@@ -120,26 +120,23 @@ export default buildConfig({
         },
       }),
     }),
-    ...(r2StorageEnabled && r2StorageEndpoint
-      ? [
-          s3Storage({
-            acl: 'public-read',
-            bucket: process.env.R2_BUCKET || '',
-            collections: {
-              [Media.slug]: true,
-            },
-            config: {
-              credentials: {
-                accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
-                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
-              },
-              endpoint: r2StorageEndpoint,
-              forcePathStyle: true,
-              region: process.env.R2_REGION || 'auto',
-            },
-          }),
-        ]
-      : []),
+    s3Storage({
+      acl: 'public-read',
+      bucket: process.env.R2_BUCKET || '',
+      collections: {
+        [Media.slug]: true,
+      },
+      config: {
+        credentials: {
+          accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+        },
+        endpoint: r2StorageEndpoint || 'https://r2-storage-unconfigured.invalid',
+        forcePathStyle: true,
+        region: process.env.R2_REGION || 'auto',
+      },
+      enabled: Boolean(r2StorageEnabled && r2StorageEndpoint),
+    }),
   ],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
