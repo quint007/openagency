@@ -24,16 +24,23 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { usersOnly } from './access/usersOnly'
 import { getAdminURL, getPublicSiteURL } from './utilities/getURL'
-import { isR2StorageConfigured, getR2StorageEndpoint } from './utilities/mediaStorage'
+import { getR2StorageDiagnostics, getR2StorageEndpoint, isR2StorageConfigured } from './utilities/mediaStorage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const r2StorageEnabled = isR2StorageConfigured()
 const r2StorageEndpoint = getR2StorageEndpoint()
+const r2StorageDiagnostics = getR2StorageDiagnostics()
 
 if (process.env.OPENAGENCY_REQUIRE_R2_STORAGE === 'true' && !r2StorageEnabled) {
   throw new Error(
-    'R2 storage is required in production. Set R2_ACCESS_KEY_ID, R2_BUCKET, R2_ENDPOINT, R2_PUBLIC_BASE_URL, and R2_SECRET_ACCESS_KEY.',
+    `R2 storage is required in production but is misconfigured: ${r2StorageDiagnostics.error}`,
+  )
+}
+
+if (r2StorageEnabled && r2StorageDiagnostics.bucket && r2StorageDiagnostics.endpointHost) {
+  console.info(
+    `R2 media storage configured for bucket ${r2StorageDiagnostics.bucket} at ${r2StorageDiagnostics.endpointHost}.`,
   )
 }
 

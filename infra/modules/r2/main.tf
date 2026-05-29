@@ -8,6 +8,8 @@ terraform {
 
 locals {
   normalized_zone_name = var.zone_name == null ? null : trimspace(var.zone_name)
+  r2_bucket_location   = "WEUR"
+  r2_endpoint_host     = "${var.account_id}.eu.r2.cloudflarestorage.com"
   fallback_markers = {
     provider_auth = {
       status = var.enabled ? "configured" : "fallback_mode"
@@ -45,7 +47,7 @@ resource "cloudflare_r2_bucket" "media" {
   count = var.enabled ? 1 : 0
 
   account_id = var.account_id
-  location   = "WEUR"
+  location   = local.r2_bucket_location
   name       = var.bucket_name
 }
 
@@ -70,7 +72,7 @@ output "bucket_contract" {
     managed                           = var.enabled
     public_hostname                   = var.public_hostname
     public_custom_domain              = try(cloudflare_r2_custom_domain.public[0].domain, var.public_hostname)
-    s3_compatible_endpoint            = "https://${var.account_id}.r2.cloudflarestorage.com"
+    s3_compatible_endpoint            = "https://${local.r2_endpoint_host}"
     secret_values_supplied_externally = true
     required_secret_variable_names = [
       "R2_ACCESS_KEY_ID",
