@@ -9,7 +9,7 @@ terraform {
 locals {
   normalized_zone_name = var.zone_name == null ? null : trimspace(var.zone_name)
   r2_bucket_location   = "WEUR"
-  r2_endpoint_host     = "${var.account_id}.eu.r2.cloudflarestorage.com"
+  r2_endpoint_host     = "${var.account_id}.r2.cloudflarestorage.com"
   fallback_markers = {
     provider_auth = {
       status = var.enabled ? "configured" : "fallback_mode"

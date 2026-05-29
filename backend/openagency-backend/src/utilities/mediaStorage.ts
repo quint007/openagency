@@ -44,7 +44,7 @@ const getR2StorageConfigurationError = (): string | undefined => {
 
   if (typeof endpointUrl === 'string') return endpointUrl
   if (!r2EndpointHostPattern.test(endpointUrl.hostname)) {
-    return 'R2_ENDPOINT must be a Cloudflare R2 S3 endpoint such as https://<account-id>.eu.r2.cloudflarestorage.com.'
+    return 'R2_ENDPOINT must be a Cloudflare R2 S3 endpoint such as https://<account-id>.r2.cloudflarestorage.com.'
   }
   if (endpointUrl.pathname !== '/') {
     return 'R2_ENDPOINT must not include the bucket name or any path; set the bucket in R2_BUCKET.'
