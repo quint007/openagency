@@ -10,6 +10,14 @@ on:
     paths:
       - 'infra/**'
 
+concurrency:
+  group: production-opentofu-state
+  cancel-in-progress: false
+
+env:
+  AWS_MAX_ATTEMPTS: "10"
+  AWS_RETRY_MODE: adaptive
+
 jobs:
   plan-production:
     runs-on: ubuntu-latest

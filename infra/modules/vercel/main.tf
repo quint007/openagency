@@ -52,6 +52,7 @@ resource "vercel_project" "marketing" {
   build_command                                     = var.build_command
   ignore_command                                    = "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"${var.production_branch}\" ]; then exit 1; else exit 0; fi"
   install_command                                   = var.install_command
+  preview_deployments_disabled                      = true
   root_directory                                    = var.root_directory
   team_id                                           = var.team_id
 }

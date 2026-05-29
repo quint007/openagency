@@ -8,7 +8,7 @@ terraform {
     }
     vercel = {
       source  = "vercel/vercel"
-      version = "~> 2.0"
+      version = "~> 5.2"
     }
   }
   backend "s3" {
@@ -19,7 +19,9 @@ terraform {
       s3 = "https://cc88628ad6e5a2e0a2c9cc9b9dd34ba3.r2.cloudflarestorage.com"
     }
 
-    region = "auto" # required but ignored by R2
+    region      = "auto" # required but ignored by R2
+    max_retries = 10
+    retry_mode  = "adaptive"
 
     # R2 doesn't support these — must disable
     skip_credentials_validation = true
