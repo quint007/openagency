@@ -9,7 +9,8 @@ terraform {
 locals {
   normalized_zone_name = var.zone_name == null ? null : trimspace(var.zone_name)
   r2_bucket_location   = "WEUR"
-  r2_endpoint_host     = "${var.account_id}.r2.cloudflarestorage.com"
+  r2_bucket_jurisdiction = "eu"
+  r2_endpoint_host       = "${var.account_id}.${local.r2_bucket_jurisdiction}.r2.cloudflarestorage.com"
   fallback_markers = {
     provider_auth = {
       status = var.enabled ? "configured" : "fallback_mode"
@@ -68,6 +69,7 @@ output "bucket_contract" {
     aws_region                        = "auto"
     bucket_name                       = var.bucket_name
     bucket_id                         = try(cloudflare_r2_bucket.media[0].id, null)
+    bucket_jurisdiction               = local.r2_bucket_jurisdiction
     fallback_markers                  = local.fallback_markers
     managed                           = var.enabled
     public_hostname                   = var.public_hostname
