@@ -172,7 +172,15 @@ locals {
       R2_REGION          = local.r2_contract.aws_region
       RESEND_API_KEY     = try(var.backend_optional_environment.RESEND_API_KEY, null)
     },
-    var.backend_optional_environment,
+    {
+      for key, value in var.backend_optional_environment : key => value
+      if !contains([
+        "R2_BUCKET",
+        "R2_ENDPOINT",
+        "R2_PUBLIC_BASE_URL",
+        "R2_REGION",
+      ], key)
+    },
   )
   vercel_contract = var.vercel_enabled ? module.vercel[0].project_contract : {
     managed      = false
