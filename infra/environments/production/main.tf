@@ -159,13 +159,12 @@ locals {
     managed                           = false
     public_hostname                   = var.r2_public_hostname
     public_custom_domain              = var.r2_public_hostname
-    s3_compatible_endpoint            = "https://${var.cloudflare_account_id}.eu.r2.cloudflarestorage.com"
+    s3_compatible_endpoint            = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
     secret_values_supplied_externally = true
     required_secret_variable_names    = ["R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]
   }
 
   backend_optional_environment = merge(
-    var.backend_optional_environment,
     {
       R2_BUCKET          = local.r2_contract.bucket_name
       R2_ENDPOINT        = local.r2_contract.s3_compatible_endpoint
@@ -173,6 +172,7 @@ locals {
       R2_REGION          = local.r2_contract.aws_region
       RESEND_API_KEY     = try(var.backend_optional_environment.RESEND_API_KEY, null)
     },
+    var.backend_optional_environment,
   )
   vercel_contract = var.vercel_enabled ? module.vercel[0].project_contract : {
     managed      = false
