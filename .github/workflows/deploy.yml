@@ -45,10 +45,7 @@ jobs:
       RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
       RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-      RAW_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT != '' && secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
-      RAW_R2_BUCKET: ${{ secrets.R2_BUCKET != '' && secrets.R2_BUCKET || vars.R2_BUCKET }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
-      RAW_R2_REGION: ${{ secrets.R2_REGION != '' && secrets.R2_REGION || vars.R2_REGION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -106,10 +103,7 @@ jobs:
                   'ALPHA_BASIC_AUTH_PASSWORD': optional('RAW_ALPHA_BASIC_AUTH_PASSWORD'),
                   'R2_ACCESS_KEY_ID': optional('RAW_R2_ACCESS_KEY_ID'),
                   'R2_SECRET_ACCESS_KEY': optional('RAW_R2_SECRET_ACCESS_KEY'),
-                  'R2_ENDPOINT': optional('RAW_R2_ENDPOINT'),
-                  'R2_BUCKET': optional('RAW_R2_BUCKET'),
                   'R2_PUBLIC_BASE_URL': optional('RAW_R2_PUBLIC_BASE_URL'),
-                  'R2_REGION': optional('RAW_R2_REGION'),
                   'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
                   'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
@@ -209,10 +203,7 @@ jobs:
       RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       RAW_RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
       RAW_RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
-      RAW_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT != '' && secrets.R2_ENDPOINT || vars.R2_ENDPOINT }}
-      RAW_R2_BUCKET: ${{ secrets.R2_BUCKET != '' && secrets.R2_BUCKET || vars.R2_BUCKET }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
-      RAW_R2_REGION: ${{ secrets.R2_REGION != '' && secrets.R2_REGION || vars.R2_REGION }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -275,10 +266,7 @@ jobs:
                   'ALPHA_BASIC_AUTH_PASSWORD': optional('RAW_ALPHA_BASIC_AUTH_PASSWORD'),
                   'R2_ACCESS_KEY_ID': optional('RAW_R2_ACCESS_KEY_ID'),
                   'R2_SECRET_ACCESS_KEY': optional('RAW_R2_SECRET_ACCESS_KEY'),
-                  'R2_ENDPOINT': optional('RAW_R2_ENDPOINT'),
-                  'R2_BUCKET': optional('RAW_R2_BUCKET'),
                   'R2_PUBLIC_BASE_URL': optional('RAW_R2_PUBLIC_BASE_URL'),
-                  'R2_REGION': optional('RAW_R2_REGION'),
                   'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
                   'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
