@@ -159,7 +159,7 @@ locals {
     managed                           = false
     public_hostname                   = var.r2_public_hostname
     public_custom_domain              = var.r2_public_hostname
-    s3_compatible_endpoint            = "https://${var.cloudflare_account_id}.r2.cloudflarestorage.com"
+    s3_compatible_endpoint            = "https://${var.cloudflare_account_id}.eu.r2.cloudflarestorage.com"
     secret_values_supplied_externally = true
     required_secret_variable_names    = ["R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY"]
   }
