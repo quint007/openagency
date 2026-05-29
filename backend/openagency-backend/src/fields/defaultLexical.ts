@@ -2,6 +2,7 @@ import type { TextFieldSingleValidation } from 'payload'
 import {
   BlocksFeature,
   BoldFeature,
+  EXPERIMENTAL_TableFeature,
   FixedToolbarFeature,
   HeadingFeature,
   HorizontalRuleFeature,
@@ -27,6 +28,7 @@ export const defaultLexical = lexicalEditor({
     BoldFeature(),
     ItalicFeature(),
     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+    EXPERIMENTAL_TableFeature(),
     HorizontalRuleFeature(),
     LinkFeature({
       enabledCollections: [
