@@ -126,18 +126,9 @@ tasks:
           if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
           fi
-         if [ -n "${R2_ENDPOINT:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
-         fi
-         if [ -n "${R2_BUCKET:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
-         fi
-         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
-         fi
-         if [ -n "${R2_REGION:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
-         fi
+        if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+          OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+        fi
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
@@ -237,18 +228,9 @@ tasks:
          if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
          fi
-         if [ -n "${R2_ENDPOINT:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
-         fi
-         if [ -n "${R2_BUCKET:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
-         fi
-         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
-         fi
-         if [ -n "${R2_REGION:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
-         fi
+        if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+          OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+        fi
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
@@ -352,18 +334,9 @@ tasks:
          if [ -n "${ALPHA_BASIC_AUTH_PASSWORD:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,ALPHA_BASIC_AUTH_PASSWORD=\"$ALPHA_BASIC_AUTH_PASSWORD\""
          fi
-         if [ -n "${R2_ENDPOINT:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ENDPOINT=\"$R2_ENDPOINT\""
-         fi
-         if [ -n "${R2_BUCKET:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_BUCKET=\"$R2_BUCKET\""
-         fi
-         if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
-         fi
-         if [ -n "${R2_REGION:-}" ]; then
-           OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_REGION=\"$R2_REGION\""
-         fi
+        if [ -n "${R2_PUBLIC_BASE_URL:-}" ]; then
+          OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_PUBLIC_BASE_URL=\"$R2_PUBLIC_BASE_URL\""
+        fi
          if [ -n "${R2_ACCESS_KEY_ID:-}" ]; then
            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,R2_ACCESS_KEY_ID=\"$R2_ACCESS_KEY_ID\""
          fi
