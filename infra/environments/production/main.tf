@@ -138,7 +138,8 @@ locals {
     account_id  = var.cloudflare_account_id
     aws_region  = "auto"
     bucket_name = local.bucket_name
-    bucket_id   = null
+    bucket_id   = ""
+    bucket_jurisdiction = "eu"
     fallback_markers = {
       provider_auth = {
         status = "fallback_mode"
