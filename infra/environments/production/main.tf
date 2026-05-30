@@ -139,7 +139,7 @@ locals {
     aws_region  = "auto"
     bucket_name = local.bucket_name
     bucket_id   = ""
-    bucket_jurisdiction = "eu"
+    bucket_jurisdiction = "default"
     fallback_markers = {
       provider_auth = {
         status = "fallback_mode"
