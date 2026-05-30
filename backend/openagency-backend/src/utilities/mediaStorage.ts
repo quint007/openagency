@@ -2,6 +2,20 @@ const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, '')
 
 const r2EndpointHostPattern = /^[a-z0-9]+(?:\.[a-z0-9-]+)?\.r2\.cloudflarestorage\.com$/
 
+const normalizeR2Endpoint = (value: string): string => {
+  const url = new URL(value)
+  const endpointHostMatch = url.hostname.match(/^([a-z0-9]+)(?:\.[a-z0-9-]+)?\.r2\.cloudflarestorage\.com$/)
+
+  if (!endpointHostMatch) {
+    return value
+  }
+
+  url.hostname = `${endpointHostMatch[1]}.r2.cloudflarestorage.com`
+  url.pathname = '/'
+
+  return url.toString()
+}
+
 const getOptionalEnv = (value: string | undefined): string | undefined => {
   if (!value) return undefined
 
@@ -46,9 +60,6 @@ const getR2StorageConfigurationError = (): string | undefined => {
   if (!r2EndpointHostPattern.test(endpointUrl.hostname)) {
     return 'R2_ENDPOINT must be a Cloudflare R2 S3 endpoint such as https://<account-id>.r2.cloudflarestorage.com.'
   }
-  if (endpointUrl.pathname !== '/') {
-    return 'R2_ENDPOINT must not include the bucket name or any path; set the bucket in R2_BUCKET.'
-  }
 
   const publicBaseUrlValue = parseHttpUrl(publicBaseUrl, 'R2_PUBLIC_BASE_URL')
 
@@ -60,7 +71,7 @@ const getR2StorageConfigurationError = (): string | undefined => {
 export const getR2StorageEndpoint = (): string | undefined => {
   const endpoint = getOptionalEnv(process.env.R2_ENDPOINT)
 
-  return endpoint ? trimTrailingSlash(endpoint) : undefined
+  return endpoint ? trimTrailingSlash(normalizeR2Endpoint(endpoint)) : undefined
 }
 
 export const getR2PublicBaseUrl = (): string | undefined => {
