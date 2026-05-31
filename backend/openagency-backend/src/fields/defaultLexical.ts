@@ -8,10 +8,12 @@ import {
   HorizontalRuleFeature,
   ItalicFeature,
   LinkFeature,
+  OrderedListFeature,
   ParagraphFeature,
   lexicalEditor,
   InlineToolbarFeature,
   UnderlineFeature,
+  UnorderedListFeature,
   type LinkFields,
 } from '@payloadcms/richtext-lexical'
 
@@ -28,6 +30,8 @@ export const defaultLexical = lexicalEditor({
     BoldFeature(),
     ItalicFeature(),
     HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+    OrderedListFeature(),
+    UnorderedListFeature(),
     EXPERIMENTAL_TableFeature(),
     HorizontalRuleFeature(),
     LinkFeature({
