@@ -120,6 +120,14 @@ export const BlogPosts: CollectionConfig<'blog-posts'> = {
       ],
     },
     {
+      name: 'thumbnail',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'publishedAt',
       type: 'date',
       admin: {

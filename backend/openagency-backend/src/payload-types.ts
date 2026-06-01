@@ -874,6 +874,7 @@ export interface BlogPost {
     image?: (number | null) | Media;
     description?: string | null;
   };
+  thumbnail?: (number | null) | Media;
   publishedAt?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1598,6 +1599,7 @@ export interface BlogPostsSelect<T extends boolean = true> {
         image?: T;
         description?: T;
       };
+  thumbnail?: T;
   publishedAt?: T;
   updatedAt?: T;
   createdAt?: T;
