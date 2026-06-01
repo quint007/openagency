@@ -112,12 +112,12 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </section>
 
       <section className="px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto grid w-full max-w-[100rem] gap-8 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-          <article className={`${styles.panelSurface} rounded-[1.85rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-6 py-7 sm:px-8 sm:py-8 lg:px-10`}>
-            <LexicalRenderer content={post.content} className="max-w-[46rem]" />
+        <div className="mx-auto grid w-full max-w-[100rem] min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+          <article className={`${styles.panelSurface} min-w-0 rounded-[1.85rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-7 sm:px-8 sm:py-8 lg:px-10`}>
+            <LexicalRenderer content={post.content} className="w-full max-w-[46rem]" />
           </article>
 
-          <aside className="flex flex-col gap-6 xl:sticky xl:top-28">
+          <aside className="flex min-w-0 flex-col gap-6 xl:sticky xl:top-28">
             <section className={`${styles.panelSurface} rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-5 sm:px-6`}>
               <div className="flex flex-col gap-4">
                 <p className={styles.kicker}>Canonical URL</p>
