@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { LexicalRenderer } from '@open-agency/ui';
 import { ArrowLeft } from 'pixelarticons/react/ArrowLeft';
 import { Calendar } from 'pixelarticons/react/Calendar';
@@ -70,6 +71,19 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             <ArrowLeft className="size-5 text-[var(--brand-primary-light)]" />
             Back to all guides
           </a>
+
+          {post.thumbnailUrl ? (
+            <div className="relative aspect-[21/9] overflow-hidden rounded-[1.2rem] border border-[color:color-mix(in_srgb,var(--brand-primary)_18%,var(--outline-variant)_82%)] bg-[linear-gradient(180deg,var(--surface-container-highest)_0%,var(--surface-container-lowest)_100%)]">
+              <Image
+                src={post.thumbnailUrl}
+                alt={`${post.title} thumbnail`}
+                fill
+                priority
+                sizes="(max-width: 1280px) 100vw, 100rem"
+                className="object-cover"
+              />
+            </div>
+          ) : null}
 
           <div className="flex max-w-[58rem] flex-col gap-5">
             <div className="flex flex-wrap items-center gap-3">

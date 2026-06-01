@@ -17,6 +17,7 @@ export type BlogCard = {
   readingTime: string;
   slug: string;
   tags: string[];
+  thumbnailUrl: string | null;
   title: string;
 };
 
@@ -139,6 +140,7 @@ export function mapBlogPostToCard(post: BlogPost): BlogCard | null {
     readingTime: calculateReadingTimeFromLexicalContent(post.content),
     slug,
     tags: getTagLabels(post),
+    thumbnailUrl: getMediaUrl(post.thumbnail),
     title,
   };
 }

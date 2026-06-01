@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { ArrowRight } from 'pixelarticons/react/ArrowRight';
 
 import { MarketingPageFrame } from '../components/MarketingPageFrame';
@@ -83,6 +84,18 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
                   key={post.id}
                   className={`${styles.panelSurface} flex h-full flex-col gap-6 rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-6 py-6 sm:px-7`}
                 >
+                  {post.thumbnailUrl ? (
+                    <div className="relative aspect-[16/10] overflow-hidden rounded-[1.2rem] border border-[color:color-mix(in_srgb,var(--brand-primary)_18%,var(--outline-variant)_82%)] bg-[linear-gradient(180deg,var(--surface-container-highest)_0%,var(--surface-container-lowest)_100%)]">
+                      <Image
+                        src={post.thumbnailUrl}
+                        alt={`${post.title} thumbnail`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
+
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`${styles.eyebrow} rounded-full px-3 py-2`}>{post.category}</span>
                     <span className={styles.metaText}>{post.publishedLabel}</span>
