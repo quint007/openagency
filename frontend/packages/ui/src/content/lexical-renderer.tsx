@@ -396,20 +396,20 @@ async function renderNode(node: LexicalNode, key: string): Promise<ReactNode> {
       } as const;
 
       return (
-        <HeadingTag key={key} className={cn('text-[var(--on-surface)]', headingClassNames[tag])}>
+        <HeadingTag key={key} className={cn('break-words text-[var(--on-surface)]', headingClassNames[tag])}>
           {children}
         </HeadingTag>
       );
     }
     case 'paragraph':
       return (
-        <p key={key} className="text-[1rem] leading-8 text-[var(--on-surface-variant)] sm:text-[1.05rem] sm:leading-9">
+        <p key={key} className="break-words text-[1rem] leading-8 text-[var(--on-surface-variant)] sm:text-[1.05rem] sm:leading-9">
           {children.length > 0 ? children : <>&nbsp;</>}
         </p>
       );
     case 'quote':
       return (
-        <blockquote key={key} className="border-l-4 border-[var(--brand-primary)] pl-5 text-[1.05rem] italic leading-8 text-[var(--on-surface)] sm:pl-6">
+        <blockquote key={key} className="break-words border-l-4 border-[var(--brand-primary)] pl-5 text-[1.05rem] italic leading-8 text-[var(--on-surface)] sm:pl-6">
           {children}
         </blockquote>
       );
@@ -417,7 +417,7 @@ async function renderNode(node: LexicalNode, key: string): Promise<ReactNode> {
       const ListTag = node.listType === 'number' ? 'ol' : 'ul';
 
       return (
-        <ListTag key={key} className={cn('ml-6 flex flex-col gap-3 text-[1rem] leading-8 text-[var(--on-surface-variant)]', node.listType === 'number' ? 'list-decimal' : 'list-disc')}>
+        <ListTag key={key} className={cn('ml-6 flex min-w-0 flex-col gap-3 break-words text-[1rem] leading-8 text-[var(--on-surface-variant)]', node.listType === 'number' ? 'list-decimal' : 'list-disc')}>
           {children}
         </ListTag>
       );
@@ -437,7 +437,7 @@ async function renderNode(node: LexicalNode, key: string): Promise<ReactNode> {
           href={link.href}
           target={link.isExternal ? '_blank' : undefined}
           rel={link.isExternal ? 'noreferrer' : undefined}
-          className="font-medium text-[var(--brand-primary-light)] underline decoration-[color:color-mix(in_srgb,var(--brand-primary)_55%,transparent)] underline-offset-4 transition-colors hover:text-[var(--on-surface)]"
+          className="break-words font-medium text-[var(--brand-primary-light)] underline decoration-[color:color-mix(in_srgb,var(--brand-primary)_55%,transparent)] underline-offset-4 transition-colors hover:text-[var(--on-surface)]"
         >
           {children}
         </a>
@@ -520,5 +520,5 @@ export async function LexicalRenderer({ className, content }: LexicalRendererPro
     return null;
   }
 
-  return <div className={cn('flex flex-col gap-6', className)}>{nodes}</div>;
+  return <div className={cn('flex min-w-0 flex-col gap-6 [overflow-wrap:anywhere] [&_*]:max-w-full [&_pre]:whitespace-pre-wrap [&_pre]:[overflow-wrap:anywhere] [&_code]:whitespace-pre-wrap [&_code]:[overflow-wrap:anywhere]', className)}>{nodes}</div>;
 }
