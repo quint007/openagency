@@ -40,8 +40,10 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     },
     description: post.seoDescription,
     openGraph: {
+      authors: post.authors.length > 0 ? post.authors : undefined,
       description: post.seoDescription,
       images: [ogImage],
+      publishedTime: post.publishedAtIso ?? undefined,
       title: post.seoTitle,
       type: 'article',
       url: post.canonicalUrl,
@@ -64,8 +66,33 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.seoTitle,
+    description: post.seoDescription,
+    image: post.ogImageUrl ?? undefined,
+    datePublished: post.publishedAtIso,
+    author: post.authors.length > 0
+      ? post.authors.map((name) => ({ '@type': 'Person' as const, name }))
+      : undefined,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Open Agency',
+      url: toAbsoluteUrl('/'),
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': post.canonicalUrl,
+    },
+  };
+
   return (
     <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="px-4 pt-8 sm:px-6 lg:px-8 lg:pt-14">
         <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-5 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-6 sm:gap-8 sm:rounded-[2rem] sm:px-8 sm:py-10 lg:px-10 lg:py-12`}>
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.14em] text-[var(--on-surface-variant)] transition-colors hover:text-[var(--on-surface)]">

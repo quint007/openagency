@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { ArrowRight } from 'pixelarticons/react/ArrowRight';
 
 import { MarketingPageFrame } from '../components/MarketingPageFrame';
+import { toAbsoluteUrl } from '../../lib/site';
 import { getFilteredBlogCards, getBlogFilterOptions } from './blog-data';
 import { BlogFilters } from './BlogFilters';
 import styles from './blog.module.css';
@@ -22,8 +23,18 @@ function readSingleParam(value: string | string[] | undefined): string | null {
 export const metadata: Metadata = {
   alternates: {
     canonical: '/blog',
+    types: {
+      'application/rss+xml': toAbsoluteUrl('/feed.xml'),
+    },
   },
   description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+  openGraph: {
+    description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+    siteName: 'Open Agency',
+    title: 'Blog · Open Agency',
+    type: 'website',
+    url: toAbsoluteUrl('/blog'),
+  },
   title: 'Blog · Open Agency',
 };
 
@@ -38,8 +49,33 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
     getFilteredBlogCards({ category: selectedCategory, tag: selectedTag }),
   ]);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Open Agency Blog',
+    description: 'Practical AI systems guides from the Open Agency team.',
+    url: toAbsoluteUrl('/blog'),
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting' as const,
+      headline: post.title,
+      description: post.excerpt,
+      url: toAbsoluteUrl(post.href),
+      datePublished: post.publishedAtIso,
+      image: post.thumbnailUrl ?? undefined,
+    })),
+    publisher: {
+      '@type': 'Organization',
+      name: 'Open Agency',
+      url: toAbsoluteUrl('/'),
+    },
+  };
+
   return (
     <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="px-4 pt-8 sm:px-6 lg:px-8 lg:pt-14">
         <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-6 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-6 sm:gap-8 sm:rounded-[2rem] sm:px-8 sm:py-10 lg:px-10 lg:py-12`}>
           <div className="flex max-w-[56rem] flex-col gap-3 sm:gap-5">
