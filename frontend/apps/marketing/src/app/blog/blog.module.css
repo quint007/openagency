@@ -22,7 +22,7 @@
 }
 
 .pageTitle {
-  font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
+  font-size: clamp(var(--font-size-4xl), 5.5vw, var(--font-size-7xl));
   line-height: 0.95;
   letter-spacing: -0.06em;
   text-wrap: balance;
