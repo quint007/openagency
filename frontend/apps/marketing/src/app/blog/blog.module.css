@@ -71,6 +71,16 @@
   text-transform: uppercase;
 }
 
+.articleContent :global(pre) {
+  font-size: 0.82rem;
+}
+
+@media (min-width: 640px) {
+  .articleContent :global(pre) {
+    font-size: 0.9rem;
+  }
+}
+
 .chip {
   background: color-mix(in srgb, var(--surface-container-high) 88%, transparent);
   color: var(--on-surface);
