@@ -7,11 +7,14 @@ type BlogTag = NonNullable<BlogPost['tags']>[number];
 type BlogAuthor = NonNullable<BlogPost['authors']>[number];
 type RelatedBlogPost = NonNullable<BlogPost['relatedBlogPosts']>[number];
 
+export type BlogLevel = 'beginner' | 'intermediate' | 'expert';
+
 export type BlogCard = {
   category: string;
   excerpt: string;
   href: `/blog/${string}`;
   id: string;
+  level: BlogLevel | null;
   publishedAtIso: string | null;
   publishedLabel: string;
   readingTime: string;
@@ -135,6 +138,7 @@ export function mapBlogPostToCard(post: BlogPost): BlogCard | null {
     excerpt: getExcerpt(post),
     href: `/blog/${slug}`,
     id: String(post.id),
+    level: post.level ?? null,
     publishedAtIso: publishedDate?.toISOString() ?? null,
     publishedLabel: formatPublishedDate(publishedDate),
     readingTime: calculateReadingTimeFromLexicalContent(post.content),

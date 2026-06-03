@@ -53,6 +53,8 @@ export function BlogFilters({ categories, selectedCategory, selectedTag, tags }:
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
   }
 
+  const hasActiveFilter = Boolean(selectedCategory || selectedTag);
+
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-3" aria-labelledby="blog-filter-categories">
@@ -88,6 +90,18 @@ export function BlogFilters({ categories, selectedCategory, selectedTag, tags }:
           ))}
         </div>
       </section>
+
+      {hasActiveFilter ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => router.push(pathname, { scroll: false })}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-4 py-2 text-sm text-[var(--on-surface-variant)] transition-colors hover:border-[color:color-mix(in_srgb,var(--outline)_60%,transparent)] hover:text-[var(--on-surface)]"
+          >
+            Clear all filters
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

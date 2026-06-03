@@ -3,7 +3,8 @@ import Image from 'next/image';
 import { ArrowRight } from 'pixelarticons/react/ArrowRight';
 
 import { MarketingPageFrame } from '../components/MarketingPageFrame';
-import { getFilteredBlogCards, getBlogFilterOptions } from './blog-data';
+import { toAbsoluteUrl } from '../../lib/site';
+import { getFilteredBlogCards, getBlogFilterOptions, type BlogLevel } from './blog-data';
 import { BlogFilters } from './BlogFilters';
 import styles from './blog.module.css';
 
@@ -19,11 +20,29 @@ function readSingleParam(value: string | string[] | undefined): string | null {
   return value ?? null;
 }
 
+function levelBadgeClassName(level: BlogLevel): string {
+  return level === 'beginner'
+    ? styles.levelBeginner
+    : level === 'intermediate'
+      ? styles.levelIntermediate
+      : styles.levelExpert;
+}
+
 export const metadata: Metadata = {
   alternates: {
     canonical: '/blog',
+    types: {
+      'application/rss+xml': toAbsoluteUrl('/feed.xml'),
+    },
   },
   description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+  openGraph: {
+    description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+    siteName: 'Open Agency',
+    title: 'Blog · Open Agency',
+    type: 'website',
+    url: toAbsoluteUrl('/blog'),
+  },
   title: 'Blog · Open Agency',
 };
 
@@ -38,15 +57,40 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
     getFilteredBlogCards({ category: selectedCategory, tag: selectedTag }),
   ]);
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Open Agency Blog',
+    description: 'Practical AI systems guides from the Open Agency team.',
+    url: toAbsoluteUrl('/blog'),
+    blogPost: posts.map((post) => ({
+      '@type': 'BlogPosting' as const,
+      headline: post.title,
+      description: post.excerpt,
+      url: toAbsoluteUrl(post.href),
+      datePublished: post.publishedAtIso,
+      image: post.thumbnailUrl ?? undefined,
+    })),
+    publisher: {
+      '@type': 'Organization',
+      name: 'Open Agency',
+      url: toAbsoluteUrl('/'),
+    },
+  };
+
   return (
     <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
-      <section className="px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14">
-        <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-8 rounded-[2rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12`}>
-          <div className="flex max-w-[56rem] flex-col gap-5">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <section className="px-4 pt-8 sm:px-6 lg:px-8 lg:pt-14">
+        <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-6 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-6 sm:gap-8 sm:rounded-[2rem] sm:px-8 sm:py-10 lg:px-10 lg:py-12`}>
+          <div className="flex max-w-[56rem] flex-col gap-3 sm:gap-5">
             <span className={`${styles.eyebrow} inline-flex self-start rounded-full px-3 py-2`}>Open Agency guides</span>
             <h1 className={`${styles.pageTitle} max-w-[12ch] text-[var(--on-surface)]`}>The blog for practical AI systems</h1>
             <p className={`${styles.pageDescription} max-w-[44rem]`}>
-              Published notes from the Open Agency CMS, styled with the same sharp homepage language and filterable by the topics teams actually browse for.
+              Browse every published guide, filter by category and tag, and go deeper into practical AI workflows.
             </p>
           </div>
 
@@ -92,12 +136,18 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover"
+                        loading="lazy"
                       />
                     </div>
                   ) : null}
 
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`${styles.eyebrow} rounded-full px-3 py-2`}>{post.category}</span>
+                    {post.level ? (
+                      <span className={`${styles.levelBadge} ${levelBadgeClassName(post.level)} rounded-full px-3 py-2`}>
+                        {post.level}
+                      </span>
+                    ) : null}
                     <span className={styles.metaText}>{post.publishedLabel}</span>
                     <span className={styles.metaText}>{post.readingTime}</span>
                   </div>
@@ -126,7 +176,10 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
                       </div>
                     ) : null}
 
-                    <a href={post.href} className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-[0.14em] text-[var(--brand-primary-light)] transition-colors hover:text-[var(--on-surface)]">
+                    <a
+                      href={post.href}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_32%,transparent)] px-4 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[var(--brand-primary-light)] transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_60%,transparent)] hover:text-[var(--on-surface)] sm:inline-flex sm:w-auto sm:border-0 sm:px-0 sm:py-0 sm:transition-colors sm:hover:text-[var(--on-surface)]"
+                    >
                       Read guide
                       <ArrowRight className="size-5" />
                     </a>
