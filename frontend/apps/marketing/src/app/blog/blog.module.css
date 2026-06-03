@@ -91,3 +91,26 @@
   color: var(--on-surface);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand-primary) 38%, transparent) inset;
 }
+
+.levelBadge {
+  font-family: var(--brand-font-body);
+  font-size: 0.72rem;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.levelBeginner {
+  background: color-mix(in srgb, var(--brand-success) 16%, var(--surface-container-low) 84%);
+  color: var(--brand-success);
+}
+
+.levelIntermediate {
+  background: color-mix(in srgb, var(--brand-warning) 16%, var(--surface-container-low) 84%);
+  color: var(--brand-warning);
+}
+
+.levelExpert {
+  background: color-mix(in srgb, var(--brand-danger) 16%, var(--surface-container-low) 84%);
+  color: var(--brand-danger);
+}

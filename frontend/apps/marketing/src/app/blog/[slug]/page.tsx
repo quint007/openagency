@@ -10,7 +10,7 @@ import { notFound } from 'next/navigation';
 
 import { MarketingPageFrame } from '../../components/MarketingPageFrame';
 import { toAbsoluteUrl } from '../../../lib/site';
-import { getBlogDetail } from '../blog-data';
+import { getBlogDetail, type BlogLevel } from '../blog-data';
 import styles from '../blog.module.css';
 
 type BlogDetailPageProps = {
@@ -18,6 +18,14 @@ type BlogDetailPageProps = {
 };
 
 export const dynamic = 'force-dynamic';
+
+function levelBadgeClassName(level: BlogLevel): string {
+  return level === 'beginner'
+    ? styles.levelBeginner
+    : level === 'intermediate'
+      ? styles.levelIntermediate
+      : styles.levelExpert;
+}
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -117,6 +125,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           <div className="flex max-w-[58rem] flex-col gap-5">
             <div className="flex flex-wrap items-center gap-3">
               <span className={`${styles.eyebrow} rounded-full px-3 py-2`}>{post.category}</span>
+              {post.level ? (
+                <span className={`${styles.levelBadge} ${levelBadgeClassName(post.level)} rounded-full px-3 py-2`}>
+                  {post.level}
+                </span>
+              ) : null}
               {post.tags.map((tag) => (
                 <a
                   key={tag}

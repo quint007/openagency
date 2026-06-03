@@ -4,7 +4,7 @@ import { ArrowRight } from 'pixelarticons/react/ArrowRight';
 
 import { MarketingPageFrame } from '../components/MarketingPageFrame';
 import { toAbsoluteUrl } from '../../lib/site';
-import { getFilteredBlogCards, getBlogFilterOptions } from './blog-data';
+import { getFilteredBlogCards, getBlogFilterOptions, type BlogLevel } from './blog-data';
 import { BlogFilters } from './BlogFilters';
 import styles from './blog.module.css';
 
@@ -18,6 +18,14 @@ function readSingleParam(value: string | string[] | undefined): string | null {
   }
 
   return value ?? null;
+}
+
+function levelBadgeClassName(level: BlogLevel): string {
+  return level === 'beginner'
+    ? styles.levelBeginner
+    : level === 'intermediate'
+      ? styles.levelIntermediate
+      : styles.levelExpert;
 }
 
 export const metadata: Metadata = {
@@ -135,6 +143,11 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
 
                   <div className="flex flex-wrap items-center gap-3">
                     <span className={`${styles.eyebrow} rounded-full px-3 py-2`}>{post.category}</span>
+                    {post.level ? (
+                      <span className={`${styles.levelBadge} ${levelBadgeClassName(post.level)} rounded-full px-3 py-2`}>
+                        {post.level}
+                      </span>
+                    ) : null}
                     <span className={styles.metaText}>{post.publishedLabel}</span>
                     <span className={styles.metaText}>{post.readingTime}</span>
                   </div>
@@ -165,7 +178,7 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
 
                     <a
                       href={post.href}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_32%,transparent)] px-4 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[var(--brand-primary-light)] transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_60%,transparent)] hover:text-[var(--on-surface)] sm:inline-flex sm:w-auto sm:border-0 sm:px-0 sm:py-0 sm:hover:border-b"
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[color:color-mix(in_srgb,var(--brand-primary)_32%,transparent)] px-4 py-3 text-sm font-medium uppercase tracking-[0.14em] text-[var(--brand-primary-light)] transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_60%,transparent)] hover:text-[var(--on-surface)] sm:inline-flex sm:w-auto sm:border-0 sm:px-0 sm:py-0 sm:transition-colors sm:hover:text-[var(--on-surface)]"
                     >
                       Read guide
                       <ArrowRight className="size-5" />

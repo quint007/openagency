@@ -7,11 +7,14 @@ type BlogTag = NonNullable<BlogPost['tags']>[number];
 type BlogAuthor = NonNullable<BlogPost['authors']>[number];
 type RelatedBlogPost = NonNullable<BlogPost['relatedBlogPosts']>[number];
 
+export type BlogLevel = 'beginner' | 'intermediate' | 'expert';
+
 export type BlogCard = {
   category: string;
   excerpt: string;
   href: `/blog/${string}`;
   id: string;
+  level: BlogLevel | null;
   publishedAtIso: string | null;
   publishedLabel: string;
   readingTime: string;
@@ -112,6 +115,16 @@ function slugifyFilterValue(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function extractBlogLevel(slug: string): BlogLevel | null {
+  const lower = slug.toLowerCase();
+
+  if (/expert|advanced/.test(lower)) return 'expert';
+  if (/intermediate|mid-level/.test(lower)) return 'intermediate';
+  if (/beginner|intro|basics|starter/.test(lower)) return 'beginner';
+
+  return null;
+}
+
 function mapRelatedPost(post: RelatedBlogPost): BlogCard | null {
   if (!post || typeof post !== 'object' || !('slug' in post) || typeof post.slug !== 'string') {
     return null;
@@ -135,6 +148,7 @@ export function mapBlogPostToCard(post: BlogPost): BlogCard | null {
     excerpt: getExcerpt(post),
     href: `/blog/${slug}`,
     id: String(post.id),
+    level: extractBlogLevel(slug),
     publishedAtIso: publishedDate?.toISOString() ?? null,
     publishedLabel: formatPublishedDate(publishedDate),
     readingTime: calculateReadingTimeFromLexicalContent(post.content),
