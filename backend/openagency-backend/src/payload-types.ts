@@ -859,6 +859,7 @@ export interface BlogPost {
   };
   authors: (number | Author)[];
   category?: (number | null) | Category;
+  level?: ('beginner' | 'intermediate' | 'expert') | null;
   tags?:
     | {
         tag: string;
@@ -1585,6 +1586,7 @@ export interface BlogPostsSelect<T extends boolean = true> {
   content?: T;
   authors?: T;
   category?: T;
+  level?: T;
   tags?:
     | T
     | {

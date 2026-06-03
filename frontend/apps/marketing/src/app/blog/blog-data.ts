@@ -115,16 +115,6 @@ function slugifyFilterValue(value: string): string {
   return value.trim().toLowerCase();
 }
 
-function extractBlogLevel(slug: string): BlogLevel | null {
-  const lower = slug.toLowerCase();
-
-  if (/expert|advanced/.test(lower)) return 'expert';
-  if (/intermediate|mid-level/.test(lower)) return 'intermediate';
-  if (/beginner|intro|basics|starter/.test(lower)) return 'beginner';
-
-  return null;
-}
-
 function mapRelatedPost(post: RelatedBlogPost): BlogCard | null {
   if (!post || typeof post !== 'object' || !('slug' in post) || typeof post.slug !== 'string') {
     return null;
@@ -148,7 +138,7 @@ export function mapBlogPostToCard(post: BlogPost): BlogCard | null {
     excerpt: getExcerpt(post),
     href: `/blog/${slug}`,
     id: String(post.id),
-    level: extractBlogLevel(slug),
+    level: post.level ?? null,
     publishedAtIso: publishedDate?.toISOString() ?? null,
     publishedLabel: formatPublishedDate(publishedDate),
     readingTime: calculateReadingTimeFromLexicalContent(post.content),

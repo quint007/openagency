@@ -70,6 +70,18 @@ export const BlogPosts: CollectionConfig<'blog-posts'> = {
       relationTo: 'categories',
     },
     {
+      name: 'level',
+      type: 'select',
+      options: [
+        { label: 'Beginner', value: 'beginner' },
+        { label: 'Intermediate', value: 'intermediate' },
+        { label: 'Expert', value: 'expert' },
+      ],
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'tags',
       type: 'array',
       fields: [
