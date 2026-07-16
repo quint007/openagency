@@ -74,3 +74,12 @@ coverage/
 frontend/.turbo/
 */.turbo
 brand/
+
+# Agent / session output
+.omo/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Business documents (not product code)
+docs/business/
