@@ -12,9 +12,9 @@ const PUBLIC_BASE_URL_ENV_BY_APP = {
   marketing: 'MARKETING_APP_BASE_URL',
 } as const
 
-type RevalidateCollectionSlug = 'authors' | 'blog-posts' | 'courses' | 'lessons'
+type RevalidateCollectionSlug = 'authors' | 'blog-posts' | 'courses' | 'legal-documents' | 'lessons'
 type RevalidateApp = 'courses' | 'marketing'
-type RevalidateContentType = 'author' | 'blog-post' | 'course' | 'lesson'
+type RevalidateContentType = 'author' | 'blog-post' | 'course' | 'legal-document' | 'lesson'
 type RevalidateEventType = 'delete' | 'publish' | 'slug-change' | 'unpublish'
 type RevalidateDocument = {
   _status?: 'draft' | 'published' | null
@@ -55,6 +55,10 @@ const revalidateTargets: Record<RevalidateCollectionSlug, RevalidateTarget> = {
   courses: {
     app: 'courses',
     contentType: 'course',
+  },
+  'legal-documents': {
+    app: 'marketing',
+    contentType: 'legal-document',
   },
   lessons: {
     app: 'courses',

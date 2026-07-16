@@ -75,6 +75,7 @@ export interface Config {
     courses: Course;
     modules: Module;
     lessons: Lesson;
+    'legal-documents': LegalDocument;
     authors: Author;
     media: Media;
     categories: Category;
@@ -104,6 +105,7 @@ export interface Config {
     courses: CoursesSelect<false> | CoursesSelect<true>;
     modules: ModulesSelect<false> | ModulesSelect<true>;
     lessons: LessonsSelect<false> | LessonsSelect<true>;
+    'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
@@ -472,6 +474,7 @@ export interface Category {
 export interface User {
   id: number;
   name?: string | null;
+  roles?: ('admin' | 'editor')[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1033,6 +1036,44 @@ export interface Lesson {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Only users with the admin role can publish or delete legal documents.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents".
+ */
+export interface LegalDocument {
+  id: number;
+  type: 'privacy' | 'terms';
+  slug: string;
+  title: string;
+  introduction?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  effectiveAt: string;
+  versionLabel: string;
+  changeSummary?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "api-clients".
  */
@@ -1304,6 +1345,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'lessons';
         value: number | Lesson;
+      } | null)
+    | ({
+        relationTo: 'legal-documents';
+        value: number | LegalDocument;
       } | null)
     | ({
         relationTo: 'authors';
@@ -1676,6 +1721,29 @@ export interface LessonsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents_select".
+ */
+export interface LegalDocumentsSelect<T extends boolean = true> {
+  type?: T;
+  slug?: T;
+  title?: T;
+  introduction?: T;
+  content?: T;
+  effectiveAt?: T;
+  versionLabel?: T;
+  changeSummary?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "authors_select".
  */
 export interface AuthorsSelect<T extends boolean = true> {
@@ -1829,6 +1897,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -2301,6 +2370,10 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'lessons';
           value: number | Lesson;
+        } | null)
+      | ({
+          relationTo: 'legal-documents';
+          value: number | LegalDocument;
         } | null)
       | ({
           relationTo: 'authors';
