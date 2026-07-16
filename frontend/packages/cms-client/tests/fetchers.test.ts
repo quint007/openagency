@@ -15,11 +15,15 @@ import {
   getCourseListTag,
   getCourseSlugTag,
   getCourses,
+  getLegalDocument,
+  getLegalDocumentListTag,
+  getLegalDocumentTag,
   getLesson,
   getLessonSlugTag,
   type Author,
   type BlogPost,
   type Course,
+  type LegalDocument,
   type Lesson,
 } from '../src/index';
 
@@ -55,6 +59,29 @@ function createAuthor(slug = 'jane-doe'): Author {
     id: 11,
     slug,
   } as Author;
+}
+
+function createLegalDocument(type: LegalDocument['type'] = 'privacy'): LegalDocument {
+  return {
+    content: {
+      root: {
+        children: [],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        type: 'root',
+        version: 1,
+      },
+    },
+    createdAt: '2026-04-01T12:00:00.000Z',
+    effectiveAt: '2026-04-01T12:00:00.000Z',
+    id: 21,
+    slug: type,
+    title: type === 'privacy' ? 'Privacy policy' : 'Terms of use',
+    type,
+    updatedAt: '2026-04-02T12:00:00.000Z',
+    versionLabel: '1.0',
+  };
 }
 
 function readFetchCall(): { init: RequestInit & { next?: { revalidate?: number; tags?: string[] } }; url: URL } {
@@ -93,6 +120,30 @@ describe('cms-client typed Payload fetchers', () => {
     expectTypeOf<Awaited<ReturnType<typeof getBlogPost>>>().toEqualTypeOf<BlogPost | null>();
     expectTypeOf<Awaited<ReturnType<typeof getBlogPosts>>>().toEqualTypeOf<BlogPost[]>();
     expectTypeOf<Awaited<ReturnType<typeof getAuthor>>>().toEqualTypeOf<Author | null>();
+    expectTypeOf<Awaited<ReturnType<typeof getLegalDocument>>>().toEqualTypeOf<LegalDocument | null>();
+  });
+
+  test('builds legal document requests with published filtering and document cache tags', async () => {
+    process.env.PAYLOAD_API_URL = 'https://cms.example.com/api';
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(createJsonResponse({ docs: [createLegalDocument()] })));
+
+    await expect(getLegalDocument('privacy')).resolves.toEqual(createLegalDocument());
+
+    const { init, url } = readFetchCall();
+
+    expect(url.pathname).toBe('/api/legal-documents');
+    expect(url.searchParams.get('depth')).toBe('2');
+    expect(url.searchParams.get('limit')).toBe('1');
+    expect(url.searchParams.get('where[_status][equals]')).toBe('published');
+    expect(url.searchParams.get('where[type][equals]')).toBe('privacy');
+    expect(init.next).toEqual({ tags: [getLegalDocumentTag('privacy')] });
+  });
+
+  test('exposes stable legal document list and document cache tags', () => {
+    expect(getLegalDocumentTag('privacy')).toBe('legal:document:privacy');
+    expect(getLegalDocumentTag('terms')).toBe('legal:document:terms');
+    expect(getLegalDocumentListTag()).toBe('legal:document:list');
   });
 
   test('builds the blog post request with the canonical ISR tag contract', async () => {

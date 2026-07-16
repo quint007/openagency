@@ -11,7 +11,7 @@ const DEFAULT_PAYLOAD_DEPTH = '2';
 const BLOG_REVALIDATE_SECONDS = 3600;
 
 type PayloadCollections = Config['collections'];
-type CmsCollectionSlug = 'authors' | 'blog-posts' | 'courses' | 'lessons';
+export type CmsCollectionSlug = 'authors' | 'blog-posts' | 'courses' | 'lessons' | 'legal-documents';
 type CollectionDocument<TSlug extends CmsCollectionSlug> = PayloadCollections[TSlug];
 type PayloadListResponse<TDocument> = Readonly<{
   docs: TDocument[];
@@ -24,7 +24,7 @@ type CmsFetchOptions = RequestInit & {
   next?: NextFetchOptions;
 };
 
-const REVALIDATE_CONTENT_TYPES = ['author', 'blog-post', 'course', 'lesson'] as const;
+const REVALIDATE_CONTENT_TYPES = ['author', 'blog-post', 'course', 'legal-document', 'lesson'] as const;
 const REVALIDATE_EVENT_TYPES = ['delete', 'publish', 'slug-change', 'unpublish'] as const;
 
 export const REVALIDATE_SECRET_HEADER = 'x-revalidate-secret';
@@ -75,6 +75,7 @@ export type Author = CollectionDocument<'authors'>;
 export type BlogPost = CollectionDocument<'blog-posts'>;
 export type Course = CollectionDocument<'courses'>;
 export type Lesson = CollectionDocument<'lessons'>;
+export type LegalDocument = CollectionDocument<'legal-documents'>;
 
 function assertServerOnlyContext(): void {
   if (typeof window !== 'undefined') {
@@ -133,6 +134,14 @@ export function getLessonSlugTag(slug: string): `lesson:slug:${string}` {
 
 export function getAuthorSlugTag(slug: string): `author:slug:${string}` {
   return `author:slug:${assertSlug(slug, 'author')}`;
+}
+
+export function getLegalDocumentTag(type: 'privacy' | 'terms'): `legal:document:${'privacy' | 'terms'}` {
+  return `legal:document:${type}`;
+}
+
+export function getLegalDocumentListTag(): 'legal:document:list' {
+  return 'legal:document:list';
 }
 
 export function getPayloadApiUrl(): string {
@@ -238,7 +247,10 @@ export async function validateRevalidateRequest(request: Request): Promise<Reval
   if (!isRevalidateContentType(payloadContentType)) {
     return {
       ok: false,
-      response: createRevalidateErrorResponse('invalid_payload', 'contentType must be one of: author, blog-post, course, lesson.'),
+      response: createRevalidateErrorResponse(
+        'invalid_payload',
+        'contentType must be one of: author, blog-post, course, legal-document, lesson.',
+      ),
       status: 400,
     };
   }
@@ -386,6 +398,7 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     next: NextFetchOptions;
     slug?: string;
     sort?: string;
+    type?: 'privacy' | 'terms';
   },
 ): Promise<Array<CollectionDocument<TSlug>>> {
   const apiKey = getPayloadApiKey();
@@ -403,10 +416,14 @@ async function fetchCollectionDocuments<TSlug extends CmsCollectionSlug>(
     next: options.next,
   };
 
-  const response = await fetch(
-    buildCollectionUrl(collection, createPublishedCollectionQuery(collection, options.slug, options.sort)),
-    requestOptions as RequestInit,
-  );
+  const searchParams = createPublishedCollectionQuery(collection, options.slug, options.sort);
+
+  if (options.type) {
+    searchParams.set('limit', '1');
+    searchParams.set('where[type][equals]', options.type);
+  }
+
+  const response = await fetch(buildCollectionUrl(collection, searchParams), requestOptions as RequestInit);
 
   const payload = await parseJsonResponse(response, context);
   assertListResponse<CollectionDocument<TSlug>>(payload, context);
@@ -476,4 +493,15 @@ export async function getAuthor(slug: string): Promise<Author | null> {
   return fetchCollectionDocument('authors', 'author', slug, {
     tags: [getAuthorSlugTag(slug)],
   }, 'name');
+}
+
+export async function getLegalDocument(type: 'privacy' | 'terms'): Promise<LegalDocument | null> {
+  const documents = await fetchCollectionDocuments('legal-documents', 'legal document', {
+    next: {
+      tags: [getLegalDocumentTag(type)],
+    },
+    type,
+  });
+
+  return documents[0] ?? null;
 }
