@@ -160,7 +160,7 @@ export async function getAllBlogCards(): Promise<BlogCard[]> {
 
   return posts
     .map((post) => mapBlogPostToCard(post))
-    .filter((post): post is BlogCard => Boolean(post));
+    .filter((post: BlogCard | null): post is BlogCard => Boolean(post));
 }
 
 export async function getBlogFilterOptions(): Promise<BlogFilterOptions> {
@@ -215,7 +215,7 @@ export async function getBlogDetail(slug: string): Promise<BlogDetail | null> {
     ogImageUrl,
     relatedPosts: (post.relatedBlogPosts ?? [])
       .map((relatedPost: RelatedBlogPost) => mapRelatedPost(relatedPost))
-      .filter((relatedPost): relatedPost is BlogCard => Boolean(relatedPost)),
+      .filter((relatedPost: BlogCard | null): relatedPost is BlogCard => Boolean(relatedPost)),
     seoDescription,
     seoTitle,
   };
