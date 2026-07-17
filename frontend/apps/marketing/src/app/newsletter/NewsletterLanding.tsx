@@ -1,153 +1,77 @@
 "use client";
 
-import { useActionState, useEffect, useId, useMemo, useState } from "react";
-
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Input,
-} from "@open-agency/ui";
+import { Alert, AlertDescription, AlertTitle, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input } from "@open-agency/ui";
 import { ArrowRight } from "pixelarticons/react/ArrowRight";
-
-import { newsletterSignup, type NewsletterSignupResult } from "./actions";
+import { useActionState, useEffect, useId, useRef, useState } from "react";
 import type { HomepageContent } from "../homepage-content";
+import { type NewsletterSignupResult, newsletterSignup } from "./actions";
 import styles from "./page.module.css";
 
 type NewsletterLandingProps = {
   content: HomepageContent["newsletter"];
 };
 
-type CountdownParts = {
-  days: number;
-  hours: number;
-  minutes: number;
-};
-
-const launchAt = new Date("2026-05-23T12:00:00Z");
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  hour: "numeric",
-  hour12: true,
-  minute: "2-digit",
-  month: "long",
-  timeZone: "UTC",
-  timeZoneName: "short",
-  year: "numeric",
-});
-
-const minuteInMs = 60_000;
-const hourInMs = 60 * minuteInMs;
-const dayInMs = 24 * hourInMs;
-
-function getCountdownParts(now: number): CountdownParts {
-  const totalMs = Math.max(launchAt.getTime() - now, 0);
-  const days = Math.floor(totalMs / dayInMs);
-  const hours = Math.floor((totalMs % dayInMs) / hourInMs);
-  const minutes = Math.floor((totalMs % hourInMs) / minuteInMs);
-
-  return { days, hours, minutes };
-}
-
-function formatCountdownValue(value: number) {
-  return value.toString().padStart(2, "0");
-}
-
-function CountdownStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div
-      className={`${styles.countdownStat} flex flex-col items-center justify-center gap-2 rounded-[1.25rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_35%,transparent)] px-4 py-1 text-center`}
-    >
-      <span className={styles.countdownValue}>
-        {formatCountdownValue(value)}
-      </span>
-      <span className={styles.countdownLabel}>{label}</span>
-    </div>
-  );
-}
-
 export function NewsletterLanding({ content }: NewsletterLandingProps) {
+  const [email, setEmail] = useState("");
   const emailId = useId();
-  const [now, setNow] = useState(() => Date.now());
-  const countdown = getCountdownParts(now);
-  const launchLabel = useMemo(() => dateFormatter.format(launchAt), []);
+  const messageId = `${emailId}-message`;
+  const privacyId = `${emailId}-privacy`;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
 
   const initialState: NewsletterSignupResult = { status: "idle" };
-  const [state, formAction, pending] = useActionState(
-    newsletterSignup,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(newsletterSignup, initialState);
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setNow(Date.now());
-    }, 30_000);
+    if (state.status === "error") {
+      inputRef.current?.focus();
+    }
 
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, []);
+    if (state.status === "success") {
+      successRef.current?.focus();
+    }
+  }, [state.status]);
+
+  const errorState = state.status === "error" ? state : null;
+  const describedBy = errorState ? `${privacyId} ${messageId}` : privacyId;
 
   return (
-    <section
-      className="px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14"
-      aria-labelledby="newsletter-title"
-    >
+    <section className="px-4 pt-10 sm:px-6 lg:px-8 lg:pt-14" aria-labelledby="newsletter-title">
       <div
         className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-8 rounded-[2rem] px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12`}
       >
         <div className="flex max-w-[52rem] flex-col gap-4">
           <Badge variant="outline" className={styles.eyebrow}>
-            Launch countdown
+            Newsletter
           </Badge>
-          <h1
-            id="newsletter-title"
-            className={`${styles.pageTitle} max-w-[11ch]`}
-          >
+          <h1 id="newsletter-title" className={`${styles.pageTitle} max-w-[11ch]`}>
             {content.title}
           </h1>
-          <p className={`${styles.pageDescription} max-w-[44rem]`}>
-            {content.description}
-          </p>
+          <p className={`${styles.pageDescription} max-w-[44rem]`}>{content.description}</p>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <Card
-            variant="elevated"
-            className={`${styles.panelSurface} overflow-hidden rounded-[1.75rem]`}
-          >
+          <Card variant="elevated" className={`${styles.panelSurface} overflow-hidden rounded-[1.75rem]`}>
             <CardHeader className="gap-3">
               <Badge variant="outline" className={styles.eyebrow}>
-                Countdown
+                What to expect
               </Badge>
               <CardTitle className="max-w-[12ch] text-[clamp(1.6rem,1.25rem+1vw,2.3rem)] leading-[0.95] tracking-[-0.05em] text-on-surface">
-                Launch window opens in
+                Practical notes when they are useful
               </CardTitle>
               <CardDescription className="max-w-[38rem] text-base leading-8 text-on-surface-variant">
-                We’re keeping the list closed until launch day so the first
-                issue lands right when the countdown reaches zero.
+                Get concise updates when new guides, tools, and workflow patterns are published. No artificial launch
+                timer, no daily drip campaign.
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="flex flex-col gap-6">
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                <CountdownStat label="Days" value={countdown.days} />
-                <CountdownStat label="Hours" value={countdown.hours} />
-                <CountdownStat label="Minutes" value={countdown.minutes} />
-              </div>
-
-              <p className={styles.metaText}>Launching {launchLabel}</p>
+            <CardContent className="flex flex-col gap-4 text-base leading-8 text-on-surface-variant">
+              <p>Every issue points to something you can read, copy, or try immediately.</p>
+              <p>Unsubscribe links are included in every email.</p>
             </CardContent>
           </Card>
 
-          <Card
-            variant="elevated"
-            className={`${styles.panelSurface} overflow-hidden rounded-[1.75rem]`}
-          >
+          <Card variant="elevated" className={`${styles.panelSurface} overflow-hidden rounded-[1.75rem]`}>
             <CardHeader className="gap-3">
               <Badge variant="outline" className={styles.eyebrow}>
                 Signup
@@ -155,41 +79,52 @@ export function NewsletterLanding({ content }: NewsletterLandingProps) {
               <CardTitle className="max-w-[11ch] text-[clamp(1.6rem,1.25rem+1vw,2.3rem)] leading-[0.95] tracking-[-0.05em] text-on-surface">
                 Be first on the list
               </CardTitle>
-              <CardDescription className="max-w-[34rem] text-base leading-8 text-on-surface-variant">
-                {content.privacyNote}
-              </CardDescription>
+              <div className="flex max-w-[34rem] flex-col gap-2 text-base leading-8 text-on-surface-variant">
+                <CardDescription id={privacyId}>{content.privacyNote}</CardDescription>
+                <a
+                  className="text-sm text-brand-primary underline-offset-4 hover:text-brand-primary-light hover:underline"
+                  href="/privacy"
+                >
+                  {content.privacyLinkLabel}
+                </a>
+              </div>
             </CardHeader>
 
             <CardContent className="flex flex-col gap-5">
               {state.status === "success" && (
-                <p className="text-base text-on-surface-variant">
-                  Thanks for subscribing! Check your inbox.
-                </p>
+                <div ref={successRef} tabIndex={-1} aria-live="polite">
+                  <p className="text-base text-on-surface-variant">Thanks for subscribing! Check your inbox.</p>
+                </div>
               )}
-              {state.status === "error" && (
-                <p className="text-base text-error">{state.error}</p>
-              )}
+              {errorState ? (
+                <Alert id={messageId} variant="destructive" role="alert">
+                  <AlertTitle>{content.errors[errorState.code].title}</AlertTitle>
+                  <AlertDescription>{content.errors[errorState.code].description}</AlertDescription>
+                </Alert>
+              ) : null}
               {(state.status === "idle" || state.status === "error") && (
-                <form action={formAction} className="flex flex-col gap-4">
+                <form action={formAction} className="flex flex-col gap-4" noValidate>
                   <div className="flex flex-col gap-3">
                     <label className={styles.fieldLabel} htmlFor={emailId}>
                       {content.fieldLabel}
                     </label>
                     <Input
+                      ref={inputRef}
                       id={emailId}
                       name="email"
                       type="email"
                       autoComplete="email"
                       inputMode="email"
                       placeholder={content.placeholder}
+                      value={email}
+                      aria-describedby={describedBy}
+                      aria-errormessage={errorState ? messageId : undefined}
+                      aria-invalid={errorState ? true : undefined}
+                      onChange={(event) => setEmail(event.target.value)}
                     />
                   </div>
 
-                  <Button
-                    className="min-h-12 px-6"
-                    type="submit"
-                    disabled={pending}
-                  >
+                  <Button className="min-h-12 px-6" type="submit" disabled={pending}>
                     {pending ? "Subscribing..." : content.submitLabel}
                     {!pending && <ArrowRight data-icon="inline-end" />}
                   </Button>

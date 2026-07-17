@@ -114,6 +114,7 @@ export type HomepageContent = {
     placeholder: string;
     submitLabel: string;
     privacyNote: string;
+    privacyLinkLabel: string;
     retryLabel: string;
     errors: {
       required: {
@@ -121,6 +122,14 @@ export type HomepageContent = {
         description: string;
       };
       invalid: {
+        title: string;
+        description: string;
+      };
+      generic: {
+        title: string;
+        description: string;
+      };
+      configuration: {
         title: string;
         description: string;
       };
@@ -162,8 +171,7 @@ export const homepageContent = {
     body: "open-agency is a free, open-source platform for creators and builders who want practical AI in their workflows. Guides, tools, templates, and courses — all built in public, all usable today.",
     primaryCta: { label: "Browse the guides", href: "/blog" },
     secondaryCta: { label: "See the tools", href: "/tools" },
-    supportingLine:
-      "Everything free. No paywall. No account required to get started.",
+    supportingLine: "Everything free. No paywall. No account required to get started.",
   },
   trustBar: {
     ariaLabel: "Trust bar",
@@ -175,8 +183,7 @@ export const homepageContent = {
   },
   startHere: {
     title: "The fastest way to level up your AI workflow",
-    description:
-      "Pick a category. Everything below is free, practical, and ships with something you can use today.",
+    description: "Pick a category. Everything below is free, practical, and ships with something you can use today.",
     cards: [
       {
         label: "coding",
@@ -218,26 +225,22 @@ export const homepageContent = {
   },
   awesomeLists: {
     title: "The open-agency awesome lists",
-    description:
-      "Curated references for teams building repeatable AI-assisted workflows.",
+    description: "Curated references for teams building repeatable AI-assisted workflows.",
     previews: [
       {
         label: "Agents worth studying",
         href: "/awesome/agents",
-        description:
-          "Examples of operator-friendly agents, prompts, and review loops.",
+        description: "Examples of operator-friendly agents, prompts, and review loops.",
       },
       {
         label: "Workflow systems",
         href: "/awesome/workflows",
-        description:
-          "Operating models, approval systems, and launch checklists to remix.",
+        description: "Operating models, approval systems, and launch checklists to remix.",
       },
       {
         label: "Prompt libraries",
         href: "/awesome/prompts",
-        description:
-          "Reusable prompt structures for briefs, reviews, and distribution planning.",
+        description: "Reusable prompt structures for briefs, reviews, and distribution planning.",
       },
     ],
   },
@@ -267,37 +270,33 @@ export const homepageContent = {
   },
   toolsTeaser: {
     title: "Free tools. No account needed.",
-    description:
-      "Fast helpers for turning scattered AI output into cleaner work before it reaches your team.",
+    description: "Fast helpers for turning scattered AI output into cleaner work before it reaches your team.",
     cards: [
       {
         label: "Prompt brief template",
         href: "/tools/prompt-brief",
-        description:
-          "Structure a request before it goes into the model or back to your team.",
+        description: "Structure a request before it goes into the model or back to your team.",
       },
       {
         label: "Launch checklist",
         href: "/tools/launch-checklist",
-        description:
-          "Pressure-test content, approvals, and distribution steps before shipping.",
+        description: "Pressure-test content, approvals, and distribution steps before shipping.",
       },
       {
         label: "Review rubric",
         href: "/tools/review-rubric",
-        description:
-          "Keep human review criteria visible across drafts and revisions.",
+        description: "Keep human review criteria visible across drafts and revisions.",
       },
     ],
   },
   newsletter: {
     title: "Get the good stuff in your inbox",
-    description:
-      "A focused newsletter on open-source workflow patterns, guides, and tools for AI users.",
+    description: "A focused newsletter on open-source workflow patterns, guides, and tools for AI users.",
     fieldLabel: "Your email address",
     placeholder: "name@example.com",
     submitLabel: "Subscribe — it's free",
     privacyNote: "No spam. No selling your email. Unsubscribe any time.",
+    privacyLinkLabel: "Read our Privacy policy.",
     retryLabel: "Try again",
     errors: {
       required: {
@@ -308,11 +307,18 @@ export const homepageContent = {
         title: "Use a valid email address",
         description: "Check the format and try again.",
       },
+      generic: {
+        title: "We could not subscribe you",
+        description: "Please try again in a moment.",
+      },
+      configuration: {
+        title: "Newsletter signup is unavailable",
+        description: "Please try again later.",
+      },
     },
     success: {
       title: "You’re on the list.",
-      description:
-        "We’ll confirm your spot when the waitlist opens and send the first issue when launch day arrives.",
+      description: "We’ll confirm your spot when the waitlist opens and send the first issue when launch day arrives.",
     },
   },
   footer: {

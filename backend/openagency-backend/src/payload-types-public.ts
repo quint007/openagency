@@ -124,12 +124,46 @@ export interface Lesson {
   [key: string]: unknown;
 }
 
+export interface LegalDocument {
+  id: number;
+  type: 'privacy' | 'terms';
+  slug: string;
+  title: string;
+  introduction?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [key: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [key: string]: unknown;
+  };
+  effectiveAt: string;
+  versionLabel: string;
+  changeSummary?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: 'draft' | 'published' | null;
+}
+
 export interface Config {
   collections: {
     authors: Author;
     'blog-posts': BlogPost;
     courses: Course;
     lessons: Lesson;
+    'legal-documents': LegalDocument;
   };
 }
 

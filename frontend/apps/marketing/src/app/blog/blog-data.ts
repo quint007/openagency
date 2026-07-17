@@ -9,6 +9,12 @@ type RelatedBlogPost = NonNullable<BlogPost['relatedBlogPosts']>[number];
 
 export type BlogLevel = 'beginner' | 'intermediate' | 'expert';
 
+const BLOG_LEVELS: readonly BlogLevel[] = ['beginner', 'intermediate', 'expert'];
+
+function parseBlogLevel(value: unknown): BlogLevel | null {
+  return BLOG_LEVELS.includes(value as BlogLevel) ? (value as BlogLevel) : null;
+}
+
 export type BlogCard = {
   category: string;
   excerpt: string;
@@ -138,7 +144,7 @@ export function mapBlogPostToCard(post: BlogPost): BlogCard | null {
     excerpt: getExcerpt(post),
     href: `/blog/${slug}`,
     id: String(post.id),
-    level: post.level ?? null,
+    level: parseBlogLevel(post.level),
     publishedAtIso: publishedDate?.toISOString() ?? null,
     publishedLabel: formatPublishedDate(publishedDate),
     readingTime: calculateReadingTimeFromLexicalContent(post.content),

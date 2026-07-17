@@ -82,9 +82,10 @@ test("marketing homepage renders the approved homepage sections and footer contr
     expect(screen.getByText(homepageContent.hero.eyebrow)).toBeTruthy();
   }
 
-  expect(screen.getByText("Work")).toBeTruthy();
   expect(
-    screen.getByRole("heading", { name: "with AI — not harder with hype." }),
+    screen.getByRole("heading", {
+      name: homepageContent.hero.title,
+    }),
   ).toBeTruthy();
   expect(screen.getByText(homepageContent.hero.body)).toBeTruthy();
   expect(screen.getByText(homepageContent.hero.supportingLine)).toBeTruthy();
@@ -289,7 +290,7 @@ test("homepage content contract keeps the approved teaser copy and footer href c
     {
       title: "Navigation",
       links: [
-        { label: "Guides", href: "/guides" },
+        { label: "Guides", href: "/blog" },
         { label: "Awesome lists", href: "/awesome" },
         { label: "Tools", href: "/tools" },
       ],

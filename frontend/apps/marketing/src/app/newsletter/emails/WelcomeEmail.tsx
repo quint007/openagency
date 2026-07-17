@@ -1,24 +1,26 @@
-import { Html, Head, Body, Container, Heading, Text, Link, Section } from "@react-email/components";
+import { Body, Container, Head, Heading, Html, Link, Section, Text } from "@react-email/components";
 
 type WelcomeEmailProps = {
-  email: string;
-  baseUrl: string;
+  unsubscribeUrl: string;
 };
 
-export function WelcomeEmail({ email, baseUrl }: WelcomeEmailProps) {
-  const unsubscribeUrl = `${baseUrl}/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
-
+export function WelcomeEmail({ unsubscribeUrl }: WelcomeEmailProps) {
   return (
     <Html>
       <Head />
       <Body style={{ backgroundColor: "#f5f5f5", fontFamily: "sans-serif" }}>
         <Container style={{ margin: "0 auto", padding: "20px", maxWidth: "600px" }}>
-          <Section style={{ backgroundColor: "#ffffff", padding: "30px", borderRadius: "8px" }}>
-            <Heading style={{ fontSize: "24px", marginBottom: "16px" }}>
-              Welcome to Open Agency
-            </Heading>
+          <Section
+            style={{
+              backgroundColor: "#ffffff",
+              padding: "30px",
+              borderRadius: "8px",
+            }}
+          >
+            <Heading style={{ fontSize: "24px", marginBottom: "16px" }}>Welcome to Open Agency</Heading>
             <Text style={{ fontSize: "16px", lineHeight: "1.5" }}>
-              You are now subscribed to the Open Agency newsletter. Expect focused emails on AI workflow patterns, guides, and tools.
+              You are now subscribed to the Open Agency newsletter. Expect focused emails on AI workflow patterns,
+              guides, and tools.
             </Text>
             <Text style={{ fontSize: "14px", color: "#666666", marginTop: "16px" }}>
               No spam. No selling your email. Unsubscribe any time.

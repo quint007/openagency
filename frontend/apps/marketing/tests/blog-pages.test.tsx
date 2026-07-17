@@ -75,8 +75,8 @@ function createBlogPost(overrides: Partial<BlogPost> = {}): BlogPost {
     excerpt: 'Practical workflow notes for AI-native teams.',
     id: 101,
     meta: {
-      seoDescription: 'Practical workflow notes for AI-native teams.',
-      seoTitle: 'Automation systems',
+      description: 'Practical workflow notes for AI-native teams.',
+      title: 'Automation systems',
     },
     publishedAt: '2026-04-01T12:00:00.000Z',
     relatedBlogPosts: [],

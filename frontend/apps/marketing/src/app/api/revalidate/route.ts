@@ -7,6 +7,7 @@ import {
   getAuthorSlugTag,
   getBlogListTag,
   getBlogSlugTag,
+  getLegalDocumentTag,
   type RevalidateRequestBody,
   validateRevalidateRequest,
 } from '@open-agency/cms-client';
@@ -49,6 +50,19 @@ function buildInvalidation(body: RevalidateRequestBody): { paths: string[]; tags
 
       return {
         paths: ['/'],
+        tags,
+      };
+    }
+    case 'legal-document': {
+      const tags = [getLegalDocumentTag('privacy'), getLegalDocumentTag('terms')];
+      const paths = ['/privacy', '/terms', '/sitemap.xml', '/'];
+
+      if (body.eventType === 'slug-change' && body.previousSlug) {
+        paths.push(body.previousSlug.startsWith('/') ? body.previousSlug : `/${body.previousSlug}`);
+      }
+
+      return {
+        paths,
         tags,
       };
     }

@@ -11,6 +11,11 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/robots\.txt$/i,
   /^\/sitemap(?:.*)?\.xml$/i,
   /^\/feed\.xml$/i,
+  /^\/blog(?:\/.*)?$/i,
+  /^\/awesome(?:\/.*)?$/i,
+  /^\/tools(?:\/.*)?$/i,
+  /^\/privacy$/i,
+  /^\/terms$/i,
   /^\/newsletter(?:\/.*)?$/i,
   /^\/api\/revalidate(?:\/.*)?$/i,
 ];

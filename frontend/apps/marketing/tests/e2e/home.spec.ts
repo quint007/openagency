@@ -154,7 +154,7 @@ test('marketing homepage covers full desktop layout and primary navigation', asy
   const desktopHeaderCta = page.locator('header').getByRole('button', {
     name: homepageContent.header.primaryCta.label,
   }).first()
-  const mobileMenuToggle = page.locator('summary', { hasText: homepageContent.header.menuLabel })
+  const mobileMenuToggle = page.getByRole('button', { name: homepageContent.header.menuLabel })
 
   await expect(desktopNav).toBeVisible()
   for (const item of homepageContent.header.links) {
@@ -175,24 +175,23 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   const desktopNav = page.getByRole('navigation', {
     name: homepageContent.header.navigationLabel,
   })
-  const mobileMenu = page.locator('details').filter({ has: page.locator('summary') })
-  const mobileMenuToggle = page.locator('summary', { hasText: homepageContent.header.menuLabel })
+  const mobileMenuToggle = page.getByRole('button', { name: homepageContent.header.menuLabel })
   const mobileNav = page.getByRole('navigation', {
     name: homepageContent.header.mobileNavigationLabel,
   })
 
   await expect(desktopNav).not.toBeVisible()
   await expect(mobileMenuToggle).toBeVisible()
-  await expect(mobileMenu).not.toHaveAttribute('open', '')
+  await expect(mobileMenuToggle).toHaveAttribute('aria-expanded', 'false')
 
   await mobileMenuToggle.click()
 
-  await expect(mobileMenu).toHaveAttribute('open', '')
+  await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true')
   await expect(mobileNav).toBeVisible()
   for (const item of homepageContent.header.links) {
     await expect(mobileNav.getByRole('link', { name: item.label })).toHaveAttribute('href', item.href)
   }
-  await expect(mobileNav.getByRole('button', { name: homepageContent.header.primaryCta.label })).toHaveAttribute(
+  await expect(page.locator('header').getByRole('button', { name: homepageContent.header.primaryCta.label })).toHaveAttribute(
     'href',
     homepageContent.header.primaryCta.href,
   )

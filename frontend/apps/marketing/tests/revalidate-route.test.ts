@@ -33,6 +33,7 @@ vi.mock('@open-agency/cms-client', () => ({
   getAuthorSlugTag: (slug: string) => `author:slug:${slug}`,
   getBlogListTag: () => 'blog:list',
   getBlogSlugTag: (slug: string) => `blog:slug:${slug}`,
+  getLegalDocumentTag: (type: string) => `legal:document:${type}`,
   validateRevalidateRequest: validateRevalidateRequestMock,
 }));
 
@@ -178,6 +179,41 @@ describe('marketing /api/revalidate', () => {
       },
       ok: true,
     });
+  });
+
+  test('revalidates legal documents, sitemap, homepage, and previous slug paths', async () => {
+    validateRevalidateRequestMock.mockResolvedValue({
+      body: {
+        contentType: 'legal-document',
+        eventType: 'slug-change',
+        previousSlug: 'privacy-archive',
+        slug: 'privacy',
+      },
+      ok: true,
+    });
+
+    const { POST } = await loadRouteModule();
+    const response = await POST(
+      createRequest({
+        contentType: 'legal-document',
+        eventType: 'slug-change',
+        previousSlug: 'privacy-archive',
+        slug: 'privacy',
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      contentType: 'legal-document',
+      eventType: 'slug-change',
+      invalidated: {
+        paths: ['/privacy', '/terms', '/sitemap.xml', '/', '/privacy-archive'],
+        tags: ['legal:document:privacy', 'legal:document:terms'],
+      },
+      ok: true,
+    });
+    expect(revalidateTagMock).toHaveBeenNthCalledWith(1, 'legal:document:privacy', 'max');
+    expect(revalidateTagMock).toHaveBeenNthCalledWith(2, 'legal:document:terms', 'max');
   });
 
   test('rejects invalid secrets', async () => {

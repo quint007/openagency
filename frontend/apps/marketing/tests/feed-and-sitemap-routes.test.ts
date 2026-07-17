@@ -7,13 +7,15 @@ import type { BlogPost } from '@open-agency/cms-client';
 import { GET as feedGet } from '../src/app/feed.xml/route';
 import { GET as sitemapGet } from '../src/app/sitemap.xml/route';
 
-const { getBlogPostsMock, getServerSideSitemapMock } = vi.hoisted(() => ({
+const { getBlogPostsMock, getLegalDocumentMock, getServerSideSitemapMock } = vi.hoisted(() => ({
   getBlogPostsMock: vi.fn(),
+  getLegalDocumentMock: vi.fn(),
   getServerSideSitemapMock: vi.fn((entries: unknown) => Response.json(entries)),
 }));
 
 vi.mock('@open-agency/cms-client', () => ({
   getBlogPosts: getBlogPostsMock,
+  getLegalDocument: getLegalDocumentMock,
 }));
 
 vi.mock('next-sitemap', () => ({
@@ -71,6 +73,7 @@ test('feed route returns valid-looking RSS XML with blog items', async () => {
 
 test('sitemap route includes blog index and published post URLs', async () => {
   getBlogPostsMock.mockResolvedValue([createBlogPost(), createBlogPost({ id: 202, slug: 'writing-with-ai', title: 'Writing with AI' })]);
+  getLegalDocumentMock.mockResolvedValue(null);
 
   const response = await sitemapGet();
   const entries = await response.json();
@@ -80,8 +83,30 @@ test('sitemap route includes blog index and published post URLs', async () => {
     expect.arrayContaining([
       expect.objectContaining({ loc: 'http://localhost:3000/' }),
       expect.objectContaining({ loc: 'http://localhost:3000/blog' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/awesome' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/awesome/agents' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/tools' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/tools/prompt-brief' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/newsletter' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/privacy' }),
+      expect.objectContaining({ loc: 'http://localhost:3000/terms' }),
       expect.objectContaining({ loc: 'http://localhost:3000/blog/automation-systems' }),
       expect.objectContaining({ loc: 'http://localhost:3000/blog/writing-with-ai' }),
     ]),
   );
+});
+
+test('sitemap route uses legal document updatedAt values and falls back for missing documents', async () => {
+  getBlogPostsMock.mockResolvedValue([]);
+  getLegalDocumentMock.mockImplementation((type: 'privacy' | 'terms') =>
+    Promise.resolve(type === 'privacy' ? { updatedAt: '2026-06-15T12:00:00.000Z' } : null),
+  );
+
+  const response = await sitemapGet();
+  const entries = await response.json();
+  const privacyEntry = entries.find((entry: { loc: string }) => entry.loc.endsWith('/privacy'));
+  const termsEntry = entries.find((entry: { loc: string }) => entry.loc.endsWith('/terms'));
+
+  expect(privacyEntry.lastmod).toBe('2026-06-15T12:00:00.000Z');
+  expect(termsEntry.lastmod).toEqual(expect.any(String));
 });

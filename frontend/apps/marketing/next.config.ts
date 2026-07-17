@@ -42,15 +42,6 @@ const nextConfig: NextConfig = {
     }),
   },
   transpilePackages: ["@open-agency/ui"],
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  telemetry: {
-    disable: true,
-  },
 };
 
 export default nextConfig;
