@@ -5,6 +5,6 @@
     "outDir": "./dist",
     "rootDir": "../../.."
   },
-  "include": ["src/**/*", "tests/**/*", "../../../backend/openagency-backend/src/payload-types-public.ts"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }

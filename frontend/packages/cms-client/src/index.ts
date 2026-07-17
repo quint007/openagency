@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { Config } from '../../../../backend/openagency-backend/src/public-cms-types';
+import type { Config } from './payload-types-public';
 
 const PACKAGE_NAME = '@open-agency/cms-client';
 const PAYLOAD_API_URL_ENV = 'PAYLOAD_API_URL';
