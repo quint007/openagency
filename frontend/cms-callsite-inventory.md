@@ -8,5 +8,6 @@
 
 ## Generated type boundary
 
-- Use `backend/openagency-backend/src/payload-types-public.ts` as the backend-owned import surface for generated Payload types.
+- Use `frontend/packages/cms-client/src/payload-types-public.ts` as the frontend import surface for generated Payload types.
+- The cms-client package mirrors the backend-owned `backend/openagency-backend/src/payload-types-public.ts` so the frontend build is self-contained.
 - Do not deep import `backend/openagency-backend/src/payload-types.ts` from frontend apps or packages.

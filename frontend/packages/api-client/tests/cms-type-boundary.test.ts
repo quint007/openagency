@@ -5,7 +5,7 @@ import { expect, test } from 'vitest'
 const frontendRoot = process.cwd()
 const repoRoot = path.dirname(frontendRoot)
 
-const sanctionedBoundaryFile = path.join(repoRoot, 'backend/openagency-backend/src/payload-types-public.ts')
+const sanctionedBoundaryFile = path.join(frontendRoot, 'packages/cms-client/src/payload-types-public.ts')
 const generatedPayloadTypesPath = 'backend/openagency-backend/src/payload-types'
 
 function listSourceFiles(directory: string): string[] {
