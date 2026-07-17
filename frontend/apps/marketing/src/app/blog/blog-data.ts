@@ -70,7 +70,7 @@ function getCategoryTitle(post: BlogPost): string {
 function getTagLabels(post: BlogPost): string[] {
   return (post.tags ?? [])
     .map((tag: BlogTag) => cleanText(tag?.tag))
-    .filter((tag): tag is string => Boolean(tag));
+    .filter((tag: string | null): tag is string => Boolean(tag));
 }
 
 function getAuthorNames(post: BlogPost): string[] {
