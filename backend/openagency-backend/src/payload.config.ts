@@ -16,6 +16,7 @@ import { Media } from './collections/Media'
 import { Modules } from './collections/Modules'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { ToolSubmissions } from './collections/ToolSubmissions'
 import { Users } from './collections/Users'
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 import { Footer } from './Footer/config'
@@ -105,6 +106,7 @@ export default buildConfig({
     Categories,
     Users,
     ApiClients,
+    ToolSubmissions,
   ],
   cors: [getAdminURL(), getPublicSiteURL()].filter(Boolean),
   globals: [Header, Footer],
