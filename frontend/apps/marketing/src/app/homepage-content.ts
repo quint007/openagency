@@ -17,6 +17,7 @@ export type HomepageRouteHref =
   | "/tools/prompt-brief"
   | "/tools/launch-checklist"
   | "/tools/review-rubric"
+  | "/tools/local-model-calculator"
   | "/newsletter"
   | "/about"
   | "/privacy"
@@ -287,6 +288,12 @@ export const homepageContent = {
         href: "/tools/review-rubric",
         description:
           "Keep human review criteria visible across drafts and revisions.",
+      },
+      {
+        label: "Local model calculator",
+        href: "/tools/local-model-calculator",
+        description:
+          "Find the best local AI model for your device specs and workflow goals.",
       },
     ],
   },
