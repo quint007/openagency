@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 import { getSiteUrl } from '../lib/site';
@@ -42,6 +43,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ? (
+        <Script
+          async
+          crossOrigin="anonymous"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+          strategy="lazyOnload"
+        />
+      ) : null}
       <body>
         <CookieConsent>
           <FeedbackProvider>
