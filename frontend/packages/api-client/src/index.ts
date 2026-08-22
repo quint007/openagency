@@ -43,6 +43,35 @@ export type LatestGuideCard = {
   title: string;
 };
 
+export type ToolSubmissionInput = Record<string, unknown>;
+
+export type ToolSubmissionResult = Record<string, unknown>;
+
+export type ToolSubmissionViewModel = {
+  createdAt: string;
+  id: string;
+  inputs: ToolSubmissionInput;
+  result: ToolSubmissionResult;
+  toolSlug: string;
+};
+
+type PayloadToolSubmission = {
+  id?: string | number | null;
+  toolSlug?: string | null;
+  email?: string | null;
+  inputs?: ToolSubmissionInput | null;
+  result?: ToolSubmissionResult | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+};
+
+export type CreateToolSubmissionRequest = {
+  toolSlug: string;
+  email: string;
+  inputs: ToolSubmissionInput;
+  result: ToolSubmissionResult;
+};
+
 function cleanText(value?: string | null): string | null {
   if (typeof value !== 'string') {
     return null;
@@ -150,6 +179,25 @@ export function mapPostToLatestGuideCard(post: PayloadPost): LatestGuideCard | n
   };
 }
 
+export function mapToolSubmissionToViewModel(
+  submission: PayloadToolSubmission,
+): ToolSubmissionViewModel | null {
+  const id = submission.id;
+  const toolSlug = cleanText(submission.toolSlug);
+
+  if (!id || !toolSlug) {
+    return null;
+  }
+
+  return {
+    id: String(id),
+    toolSlug,
+    inputs: submission.inputs ?? {},
+    result: submission.result ?? {},
+    createdAt: submission.createdAt ?? new Date().toISOString(),
+  };
+}
+
 class ApiClient {
   private baseUrl?: string;
 
@@ -228,6 +276,33 @@ class ApiClient {
       .map((post) => mapPostToLatestGuideCard(post))
       .filter((card): card is LatestGuideCard => Boolean(card))
       .slice(0, limit);
+  }
+
+  async createToolSubmission(
+    request: CreateToolSubmissionRequest,
+  ): Promise<ToolSubmissionViewModel> {
+    const response = await this.post<PayloadToolSubmission>('/tool-submissions', {
+      toolSlug: request.toolSlug,
+      email: request.email,
+      inputs: request.inputs,
+      result: request.result,
+    });
+
+    const viewModel = mapToolSubmissionToViewModel(response);
+
+    if (!viewModel) {
+      throw new Error('Failed to create tool submission: invalid response from API');
+    }
+
+    return viewModel;
+  }
+
+  async getToolSubmission(id: string): Promise<ToolSubmissionViewModel | null> {
+    const response = await this.get<PayloadToolSubmission>(`/tool-submissions/${encodeURIComponent(id)}`, {
+      cache: 'no-store',
+    });
+
+    return mapToolSubmissionToViewModel(response);
   }
 }
 
