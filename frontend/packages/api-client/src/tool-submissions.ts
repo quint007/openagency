@@ -1,114 +1,122 @@
-export type ToolSubmissionInput = Record<string, unknown>;
+export const localModelCalculatorToolSlug = 'local-model-calculator'
 
-export type ToolSubmissionResult = Record<string, unknown>;
+const operatingSystems = ['macos', 'windows', 'linux'] as const
+const useCases = ['coding', 'writing', 'multimodal', 'privacy', 'general'] as const
+
+type OperatingSystem = (typeof operatingSystems)[number]
+type UseCase = (typeof useCases)[number]
+
+export type ToolSubmissionInput = {
+  readonly os: OperatingSystem
+  readonly ramGb: number
+  readonly useCase: UseCase
+  readonly vramGb: number
+}
+
+export type ToolSubmissionResult = Record<string, never>
 
 export type ToolSubmissionViewModel = {
-  createdAt: string;
-  id: string;
-  inputs: ToolSubmissionInput;
-  result: ToolSubmissionResult;
-  toolSlug: string;
-};
+  readonly createdAt: string
+  readonly id: string
+  readonly inputs: ToolSubmissionInput
+  readonly result: ToolSubmissionResult
+  readonly toolSlug: typeof localModelCalculatorToolSlug
+}
 
 export type PayloadToolSubmission = {
-  id?: string | number | null;
-  toolSlug?: string | null;
-  email?: string | null;
-  inputs?: ToolSubmissionInput | null;
-  result?: ToolSubmissionResult | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-};
+  readonly createdAt?: string | null
+  readonly email?: string | null
+  readonly id?: string | number | null
+  readonly inputs?: unknown
+  readonly result?: unknown
+  readonly toolSlug?: string | null
+  readonly updatedAt?: string | null
+}
 
 type PayloadToolSubmissionCreateResponse = {
-  doc: PayloadToolSubmission;
-};
+  readonly doc: PayloadToolSubmission
+}
 
 export type CreateToolSubmissionRequest = {
-  toolSlug: string;
-  email: string;
-  inputs: ToolSubmissionInput;
-  result: ToolSubmissionResult;
-};
+  readonly email: string
+  readonly inputs: ToolSubmissionInput
+  readonly toolSlug: typeof localModelCalculatorToolSlug
+}
 
 type ToolSubmissionRequestClient = {
-  post<T>(endpoint: string, data?: unknown): Promise<T>;
-};
-
-function sanitizeUnknownToolSubmissionValue(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.map((entry) => sanitizeUnknownToolSubmissionValue(entry));
-  }
-
-  if (value === null || typeof value !== 'object') {
-    return value;
-  }
-
-  return Object.fromEntries(
-    Object.entries(value)
-      .filter(([key]) => key !== 'email')
-      .map(([key, nestedValue]) => [key, sanitizeUnknownToolSubmissionValue(nestedValue)] as const),
-  );
+  post<T>(endpoint: string, data?: unknown): Promise<T>
 }
 
-function sanitizeToolSubmissionInputs(inputs: ToolSubmissionInput): ToolSubmissionInput {
-  return Object.fromEntries(
-    Object.entries(inputs)
-      .filter(([key]) => key !== 'email')
-      .map(([key, value]) => [key, sanitizeUnknownToolSubmissionValue(value)] as const),
-  );
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
+
+const isOperatingSystem = (value: unknown): value is OperatingSystem =>
+  typeof value === 'string' && operatingSystems.some((operatingSystem) => operatingSystem === value)
+
+const isUseCase = (value: unknown): value is UseCase =>
+  typeof value === 'string' && useCases.some((useCase) => useCase === value)
+
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
+
+const parseToolSubmissionInput = (value: unknown): ToolSubmissionInput | null => {
+  if (!isRecord(value)) return null
+
+  const { os, ramGb, useCase, vramGb } = value
+
+  if (!isOperatingSystem(os) || !isFiniteNumber(ramGb) || !isUseCase(useCase) || !isFiniteNumber(vramGb)) {
+    return null
+  }
+
+  return { os, ramGb, useCase, vramGb }
 }
 
-function isPayloadToolSubmissionCreateResponse(
+const isPayloadToolSubmissionCreateResponse = (
   response: PayloadToolSubmission | PayloadToolSubmissionCreateResponse,
-): response is PayloadToolSubmissionCreateResponse {
-  return 'doc' in response;
+): response is PayloadToolSubmissionCreateResponse => 'doc' in response
+
+const cleanText = (value?: string | null): string | null => {
+  if (typeof value !== 'string') return null
+
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  return normalized.length > 0 ? normalized : null
 }
 
-function cleanText(value?: string | null): string | null {
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  return normalized.length > 0 ? normalized : null;
-}
-
-export function mapToolSubmissionToViewModel(
+export const mapToolSubmissionToViewModel = (
   submission: PayloadToolSubmission,
-): ToolSubmissionViewModel | null {
-  const id = submission.id;
-  const toolSlug = cleanText(submission.toolSlug);
+): ToolSubmissionViewModel | null => {
+  const id = submission.id
+  const inputs = parseToolSubmissionInput(submission.inputs)
 
-  if (!id || !toolSlug) {
-    return null;
-  }
+  if (!id || submission.toolSlug !== localModelCalculatorToolSlug || !inputs) return null
 
   return {
-    id: String(id),
-    toolSlug,
-    inputs: sanitizeToolSubmissionInputs(submission.inputs ?? {}),
-    result: submission.result ?? {},
     createdAt: submission.createdAt ?? new Date().toISOString(),
-  };
+    id: String(id),
+    inputs,
+    result: {},
+    toolSlug: localModelCalculatorToolSlug,
+  }
 }
 
-export async function createToolSubmission(
+export const createToolSubmission = async (
   client: ToolSubmissionRequestClient,
   request: CreateToolSubmissionRequest,
-): Promise<ToolSubmissionViewModel> {
-  const response = await client.post<PayloadToolSubmission | PayloadToolSubmissionCreateResponse>('/tool-submissions', {
-    toolSlug: request.toolSlug,
-    email: request.email,
-    inputs: request.inputs,
-    result: request.result,
-  });
-  const submission = isPayloadToolSubmissionCreateResponse(response) ? response.doc : response;
-  const viewModel = mapToolSubmissionToViewModel(submission);
+): Promise<ToolSubmissionViewModel> => {
+  const response = await client.post<PayloadToolSubmission | PayloadToolSubmissionCreateResponse>(
+    '/tool-submissions',
+    {
+      email: request.email,
+      inputs: request.inputs,
+      toolSlug: request.toolSlug,
+    },
+  )
+  const submission = isPayloadToolSubmissionCreateResponse(response) ? response.doc : response
+  const viewModel = mapToolSubmissionToViewModel(submission)
 
   if (!viewModel) {
-    throw new TypeError('Failed to create tool submission: invalid response from API');
+    throw new TypeError('Failed to create tool submission: invalid response from API')
   }
 
-  return viewModel;
+  return viewModel
 }

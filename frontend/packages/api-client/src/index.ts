@@ -5,7 +5,7 @@ import type {
   ToolSubmissionViewModel,
 } from './tool-submissions';
 
-export { mapToolSubmissionToViewModel } from './tool-submissions';
+export { localModelCalculatorToolSlug, mapToolSubmissionToViewModel } from './tool-submissions';
 export type {
   CreateToolSubmissionRequest,
   ToolSubmissionInput,

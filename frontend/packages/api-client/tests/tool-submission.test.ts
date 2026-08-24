@@ -2,8 +2,8 @@ import { expect, test } from 'vitest'
 
 import { mapToolSubmissionToViewModel } from '../src'
 
-test('removes nested email values when mapping a public tool submission response', () => {
-  // Given: a public response that contains crafted email fields inside machine inputs
+test('maps only the supported calculator profile and canonical result envelope from a public response', () => {
+  // Given: a public response with submitted-email canaries in aliases, nested data, and result strings
   const topLevelEmail = 'top-level@tool-submissions.test'
   const nestedEmail = 'nested@tool-submissions.test'
 
@@ -13,32 +13,41 @@ test('removes nested email values when mapping a public tool submission response
     email: topLevelEmail,
     id: 'submission-1',
     inputs: {
+      Email: nestedEmail,
+      alias: topLevelEmail,
       email: nestedEmail,
       machine: {
         email: nestedEmail,
         ramGb: 16,
       },
       os: 'macos',
+      ramGb: 16,
+      useCase: 'general',
+      vramGb: 0,
     },
     result: {
-      recommended: 'llama-3.1-8b',
+      recommended: {
+        model: {
+          name: topLevelEmail,
+          tags: [nestedEmail],
+        },
+        reasons: [nestedEmail],
+      },
     },
     toolSlug: 'local-model-calculator',
   })
 
-  // Then: no mapped public data contains an email key or either submitted email value
+  // Then: the mapper exposes only the calculator contract and no submitted values
   expect(submission).toEqual({
     createdAt: '2026-08-23T00:00:00.000Z',
     id: 'submission-1',
     inputs: {
-      machine: {
-        ramGb: 16,
-      },
       os: 'macos',
+      ramGb: 16,
+      useCase: 'general',
+      vramGb: 0,
     },
-    result: {
-      recommended: 'llama-3.1-8b',
-    },
+    result: {},
     toolSlug: 'local-model-calculator',
   })
   expect(JSON.stringify(submission)).not.toContain(topLevelEmail)

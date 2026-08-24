@@ -26,9 +26,7 @@ test('maps Payload create envelopes when a public tool submission is created', a
             useCase: 'general',
             vramGb: 0,
           },
-          result: {
-            recommended: 'llama-3.1-8b',
-          },
+          result: {},
           toolSlug: 'local-model-calculator',
         },
       }),
@@ -50,15 +48,24 @@ test('maps Payload create envelopes when a public tool submission is created', a
       useCase: 'general',
       vramGb: 0,
     },
-    result: {
-      recommended: 'llama-3.1-8b',
-    },
     toolSlug: 'local-model-calculator',
   })
 
   // Then: the client returns the id required for the share URL
   expect(created).toMatchObject({
     id: '4',
+    toolSlug: 'local-model-calculator',
+  })
+  const [, request] = fetchMock.mock.calls[0] ?? []
+
+  expect(JSON.parse(String(request?.body))).toEqual({
+    email: 'submitter@tool-submissions.test',
+    inputs: {
+      os: 'macos',
+      ramGb: 16,
+      useCase: 'general',
+      vramGb: 0,
+    },
     toolSlug: 'local-model-calculator',
   })
 })
