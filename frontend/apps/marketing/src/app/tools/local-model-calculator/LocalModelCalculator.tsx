@@ -1,6 +1,6 @@
 "use client";
 
-import { apiClient } from "@open-agency/api-client";
+import { apiClient, localModelCalculatorToolSlug } from "@open-agency/api-client";
 import { Alert, Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@open-agency/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -71,27 +71,28 @@ export function LocalModelCalculator() {
       const { email, ...machineProfile } = inputs;
       const calculated = calculateBestModel(machineProfile);
       const submission = await apiClient.createToolSubmission({
-        toolSlug: "local-model-calculator",
+        toolSlug: localModelCalculatorToolSlug,
         email: email.trim(),
         inputs: machineProfile,
-        result: { ...calculated },
       });
 
       setResult(calculated);
       setSubmissionId(submission.id);
 
-      const nextUrl = new URL(window.location.href);
-      nextUrl.searchParams.set("id", submission.id);
-      router.replace(nextUrl.pathname + nextUrl.search);
-    } catch {
-      setError("We could not save your result. Please check your connection and try again.");
+      router.replace(`/tools/local-model-calculator?id=${encodeURIComponent(submission.id)}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError("We could not save your result. Please check your connection and try again.");
+      } else {
+        throw error;
+      }
     } finally {
       setIsSubmitting(false);
     }
   }
 
   const shareUrl = submissionId
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/tools/local-model-calculator?id=${submissionId}`
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/tools/local-model-calculator?id=${encodeURIComponent(submissionId)}`
     : "";
 
   if (result && submissionId) {
