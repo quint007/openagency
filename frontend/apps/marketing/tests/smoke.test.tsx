@@ -193,6 +193,11 @@ test("marketing homepage renders the approved homepage sections and footer contr
     expect(within(toolsSection).getByText(card.description)).toBeTruthy();
   }
 
+  expect(main.textContent).not.toMatch(/coming soon|in progress/i);
+  expect(
+    within(toolsSection).getByRole("link", { name: "Local model calculator" }),
+  ).toBeTruthy();
+
   const newsletterSection = within(main).getByRole("region", {
     name: homepageContent.newsletter.title,
   });

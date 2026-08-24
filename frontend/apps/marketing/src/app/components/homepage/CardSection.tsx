@@ -3,7 +3,6 @@ import { ArrowRight } from "pixelarticons/react/ArrowRight";
 import { Bookmark } from "pixelarticons/react/Bookmark";
 import type { HomepageCardLink } from "../../homepage-content";
 import styles from "../../page.module.css";
-import { ComingSoonBadge } from "../ComingSoon";
 
 type CardSectionProps = {
   cards: readonly HomepageCardLink[];
@@ -35,8 +34,6 @@ export function CardSection({
         <ul className="flex flex-wrap gap-5">
           {cards.map((card, index) => {
             const cardTitleId = `${sectionId}-card-${index + 1}-title`;
-            // Temporary content signal: remove this conditional when these resources ship.
-            const isComingSoon = card.href.startsWith("/tools/") || card.href.startsWith("/awesome/");
 
             return (
               <li key={card.label} className="flex min-w-[18rem] flex-1 basis-[22rem]">
@@ -49,7 +46,6 @@ export function CardSection({
                       <span className="inline-flex size-11 items-center justify-center rounded-2xl border border-[color:color-mix(in_srgb,var(--brand-primary)_25%,transparent)] bg-[color:color-mix(in_srgb,var(--surface)_76%,transparent)] text-[var(--brand-primary)]">
                         <Bookmark className="size-5" />
                       </span>
-                      {isComingSoon ? <ComingSoonBadge /> : null}
                     </div>
 
                     <CardTitle>
