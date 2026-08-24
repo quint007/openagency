@@ -13,7 +13,7 @@ type NewsletterSectionProps = {
 
 export function NewsletterSection({ content }: NewsletterSectionProps) {
   const [email, setEmail] = useState("");
-  const [errorDismissed, setErrorDismissed] = useState(false);
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
   const [state, formAction, pending] = useActionState<NewsletterSignupResult, FormData>(newsletterSignup, {
     status: "idle",
   });
@@ -25,7 +25,6 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
 
   useEffect(() => {
     if (state.status === "error") {
-      setErrorDismissed(false);
       inputRef.current?.focus();
     }
 
@@ -35,7 +34,7 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
   }, [state]);
 
   function handleRetry() {
-    setErrorDismissed(false);
+    setDismissedError(null);
     inputRef.current?.focus();
   }
 
@@ -43,11 +42,11 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
     setEmail(nextValue);
 
     if (state.status === "error") {
-      setErrorDismissed(true);
+      setDismissedError(state.error);
     }
   }
 
-  const errorState = state.status === "error" && !errorDismissed ? state : null;
+  const errorState = state.status === "error" && state.error !== dismissedError ? state : null;
   const describedBy = [privacyId];
 
   if (errorState) {
