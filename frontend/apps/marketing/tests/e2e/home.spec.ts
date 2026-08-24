@@ -140,6 +140,58 @@ test('marketing homepage covers full desktop layout and primary navigation', asy
   await expect(mobileMenuToggle).not.toBeVisible()
 })
 
+test('first visit keeps the mobile hero usable while consent is open', async ({ page }) => {
+  await page.setViewportSize(mobileViewport)
+  await page.goto('/')
+  await page.waitForLoadState('networkidle')
+
+  const consentBanner = page.locator('[data-cookie-banner]')
+  const heroHeading = page.locator('#homepage-hero-title')
+  const feedbackButton = page.locator('button[aria-label="Share feedback"]')
+
+  await expect(consentBanner).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Accept all' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Essential only' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Manage preferences' })).toBeVisible()
+  await expect(feedbackButton).toBeHidden()
+
+  const [banner, heading, viewport] = await Promise.all([
+    consentBanner.evaluate((element) => {
+      const rect = element.getBoundingClientRect()
+      return {
+        bottom: rect.bottom,
+        height: rect.height,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+      }
+    }),
+    heroHeading.evaluate((element) => {
+      const rect = element.getBoundingClientRect()
+      return {
+        bottom: rect.bottom,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+      }
+    }),
+    page.evaluate(() => ({
+      documentWidth: document.documentElement.scrollWidth,
+      height: window.innerHeight,
+      width: window.innerWidth,
+    })),
+  ])
+
+  expect(viewport.documentWidth).toBeLessThanOrEqual(viewport.width)
+  expect(banner.height).toBeLessThan(viewport.height * 0.5)
+  expect(banner.left).toBeGreaterThanOrEqual(0)
+  expect(banner.right).toBeLessThanOrEqual(viewport.width)
+  expect(banner.bottom).toBeLessThanOrEqual(viewport.height)
+  expect(heading.top).toBeGreaterThanOrEqual(0)
+  expect(heading.bottom).toBeLessThanOrEqual(viewport.height)
+  expect(heading.bottom).toBeLessThanOrEqual(banner.top)
+})
+
 test('marketing homepage covers mobile layout and menu navigation', async ({ page }) => {
   await gotoHomepage(page, mobileViewport)
 
@@ -172,6 +224,12 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
     'href',
     homepageContent.header.primaryCta.href,
   )
+  const mobileHeaderCta = page.locator('header').getByRole('button', {
+    name: homepageContent.header.primaryCta.label,
+  })
+  await mobileHeaderCta.focus()
+  await expect(mobileHeaderCta).toBeFocused()
+  await page.getByRole('button', { name: 'Close menu' }).focus()
   await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused()
 
   await page.getByRole('button', { name: 'Close menu' }).click()
