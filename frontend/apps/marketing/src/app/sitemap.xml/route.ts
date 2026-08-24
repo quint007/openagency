@@ -17,15 +17,8 @@ export async function GET() {
   const staticPaths = [
     '/',
     '/blog',
-    '/awesome',
-    '/awesome/agents',
-    '/awesome/workflows',
-    '/awesome/prompts',
     '/tools',
-    '/tools/prompt-brief',
-    '/tools/launch-checklist',
-    '/tools/review-rubric',
-    '/newsletter',
+    '/tools/local-model-calculator',
   ];
 
   return getServerSideSitemap([

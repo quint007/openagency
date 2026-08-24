@@ -12,7 +12,6 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/sitemap(?:.*)?\.xml$/i,
   /^\/feed\.xml$/i,
   /^\/blog(?:\/.*)?$/i,
-  /^\/awesome(?:\/.*)?$/i,
   /^\/tools(?:\/.*)?$/i,
   /^\/privacy$/i,
   /^\/terms$/i,

@@ -14,9 +14,6 @@ export type HomepageRouteHref =
   | "/awesome/workflows"
   | "/awesome/prompts"
   | "/tools"
-  | "/tools/prompt-brief"
-  | "/tools/launch-checklist"
-  | "/tools/review-rubric"
   | "/tools/local-model-calculator"
   | "/newsletter"
   | "/about"
@@ -273,21 +270,6 @@ export const homepageContent = {
     title: "Free tools. No account needed.",
     description: "Fast helpers for turning scattered AI output into cleaner work before it reaches your team.",
     cards: [
-      {
-        label: "Prompt brief template",
-        href: "/tools/prompt-brief",
-        description: "Structure a request before it goes into the model or back to your team.",
-      },
-      {
-        label: "Launch checklist",
-        href: "/tools/launch-checklist",
-        description: "Pressure-test content, approvals, and distribution steps before shipping.",
-      },
-      {
-        label: "Review rubric",
-        href: "/tools/review-rubric",
-        description: "Keep human review criteria visible across drafts and revisions.",
-      },
       {
         label: "Local model calculator",
         href: "/tools/local-model-calculator",

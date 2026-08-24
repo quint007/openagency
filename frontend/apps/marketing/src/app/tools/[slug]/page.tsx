@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 
-import { ComingSoonBanner } from "../../components/ComingSoon";
 import { ResourceIndexPage } from "../../(resources)/ResourceIndexPage";
 import { homepageContent } from "../../homepage-content";
 import { LocalModelCalculator } from "../local-model-calculator/LocalModelCalculator";
@@ -118,14 +117,5 @@ export default async function ToolDetailPage({ params, searchParams }: ToolDetai
     );
   }
 
-  // Temporary: remove this banner when the tools content is ready.
-  return (
-    <ResourceIndexPage
-      cards={tools.filter((item) => item.slug !== slug)}
-      banner={<ComingSoonBanner />}
-      eyebrow="Tool"
-      intro={tool.description}
-      title={tool.title}
-    />
-  );
+  notFound();
 }
