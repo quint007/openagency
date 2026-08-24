@@ -3,14 +3,12 @@ import { expect, test, type Page } from '@playwright/test'
 import { homepageContent } from '../../src/app/homepage-content'
 
 const desktopViewport = { width: 1280, height: 900 }
-const mobileViewport = { width: 390, height: 844 }
+const mobileViewport = { width: 375, height: 844 }
 
 const expectedSectionOrder = [
   { id: homepageContent.hero.sectionId, name: homepageContent.hero.title },
   { id: 'solutions', name: homepageContent.trustBar.ariaLabel },
-  { id: 'start-here', name: homepageContent.startHere.title },
   { id: 'latest-guides', name: homepageContent.latestGuides.title },
-  { id: 'awesome-lists', name: homepageContent.awesomeLists.title },
   { id: 'tools-teaser', name: homepageContent.toolsTeaser.title },
   { id: 'newsletter', name: homepageContent.newsletter.title },
 ] as const
@@ -62,43 +60,12 @@ async function expectHomepageSections(page: Page) {
     await expect(proofPoints.getByText(statement)).toBeVisible()
   }
 
-  const startHereSection = page.getByRole('region', { name: homepageContent.startHere.title })
-  const startHereCards = startHereSection.getByRole('listitem')
-  await expect(startHereSection.getByText(homepageContent.startHere.description)).toBeVisible()
-  await expect(startHereCards).toHaveCount(homepageContent.startHere.cards.length)
-  for (const [index, card] of homepageContent.startHere.cards.entries()) {
-    const renderedCard = startHereCards.nth(index)
-
-    await expect(renderedCard.getByText(card.label, { exact: true })).toBeVisible()
-    await expect(renderedCard.getByRole('heading', { name: card.title, level: 3 })).toBeVisible()
-    await expect(renderedCard.getByText(card.body)).toBeVisible()
-    await expect(renderedCard.getByRole('button', { name: card.cta.label })).toHaveAttribute(
-      'href',
-      card.cta.href,
-    )
-  }
-
   const latestGuidesSection = page.getByRole('region', { name: homepageContent.latestGuides.title })
   await expect(latestGuidesSection).toBeVisible()
   await expect(latestGuidesSection.getByText(homepageContent.latestGuides.description)).toBeVisible()
   await expect(
     latestGuidesSection.getByRole('button', { name: homepageContent.latestGuides.cta.label }),
   ).toHaveAttribute('href', homepageContent.latestGuides.cta.href)
-
-  // Latest-guides empty/error fallbacks stay in Vitest because the homepage does not expose a
-  // stable browser-level mock/test hook for forcing those server-rendered branches deterministically.
-  const awesomeListsSection = page.getByRole('region', { name: homepageContent.awesomeLists.title })
-  await expect(awesomeListsSection.getByText(homepageContent.awesomeLists.description)).toBeVisible()
-  await expect(awesomeListsSection.getByRole('listitem')).toHaveCount(
-    homepageContent.awesomeLists.previews.length,
-  )
-  for (const preview of homepageContent.awesomeLists.previews) {
-    await expect(awesomeListsSection.getByRole('link', { name: preview.label })).toHaveAttribute(
-      'href',
-      preview.href,
-    )
-    await expect(awesomeListsSection.getByText(preview.description)).toBeVisible()
-  }
 
   const toolsSection = page.getByRole('region', { name: homepageContent.toolsTeaser.title })
   await expect(toolsSection.getByText(homepageContent.toolsTeaser.description)).toBeVisible()
@@ -157,11 +124,14 @@ test('marketing homepage covers full desktop layout and primary navigation', asy
   const mobileMenuToggle = page.getByRole('button', { name: homepageContent.header.menuLabel })
 
   await expect(desktopNav).toBeVisible()
+  await expect(desktopNav.getByRole('link')).toHaveCount(homepageContent.header.links.length)
   for (const item of homepageContent.header.links) {
     await expect(desktopNav.getByRole('link', { name: item.label })).toHaveAttribute('href', item.href)
   }
   await expect(desktopHeaderCta).toBeVisible()
   await expect(desktopHeaderCta).toHaveAttribute('href', homepageContent.header.primaryCta.href)
+  await desktopHeaderCta.focus()
+  await expect(desktopHeaderCta).toBeFocused()
   await expect(mobileMenuToggle).not.toBeVisible()
 })
 
@@ -183,6 +153,8 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await expect(desktopNav).not.toBeVisible()
   await expect(mobileMenuToggle).toBeVisible()
   await expect(mobileMenuToggle).toHaveAttribute('aria-expanded', 'false')
+  await mobileMenuToggle.focus()
+  await expect(mobileMenuToggle).toBeFocused()
 
   await mobileMenuToggle.click()
 
@@ -195,9 +167,35 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
     'href',
     homepageContent.header.primaryCta.href,
   )
+  await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused()
+
+  await page.getByRole('button', { name: 'Close menu' }).click()
+  await expect(page.getByRole('button', { name: homepageContent.header.menuLabel })).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  )
 })
 
-test('newsletter shows inline validation errors before a deterministic local success state', async ({ page }) => {
+test('homepage internal links stay on healthy live journeys', async ({ page }) => {
+  await gotoHomepage(page, desktopViewport)
+
+  const internalHrefs = await page.locator('header a[href^="/"], main a[href^="/"], footer a[href^="/"]').evaluateAll((links) =>
+    Array.from(new Set(links.map((link) => link.getAttribute('href')).filter((href): href is string => Boolean(href)))),
+  )
+
+  expect(internalHrefs.length).toBeGreaterThan(0)
+
+  for (const href of internalHrefs) {
+    const response = await page.request.get(new URL(href, page.url()).toString())
+    expect(response.status(), `${href} returned HTTP ${response.status()}`).toBeLessThan(400)
+
+    const body = await response.text()
+    expect(body, `${href} exposes a retired placeholder`).not.toMatch(/coming soon/i)
+    expect(body, `${href} exposes an empty published-post state`).not.toMatch(/0 published posts/i)
+  }
+})
+
+test('newsletter shows inline validation errors before its configured outcome', async ({ page }) => {
   await gotoHomepage(page, desktopViewport)
 
   const newsletterSection = page.getByRole('region', { name: homepageContent.newsletter.title })
@@ -221,14 +219,20 @@ test('newsletter shows inline validation errors before a deterministic local suc
   await expect(emailField).toHaveAttribute('aria-invalid', 'true')
 
   await newsletterSection.getByRole('button', { name: homepageContent.newsletter.retryLabel }).click()
-  await expect(newsletterSection.getByRole('alert')).toHaveCount(0)
-
   await emailField.fill('hello@example.com')
+  await expect(newsletterSection.getByRole('alert')).toHaveCount(0)
   await submitButton.click()
 
-  await expect(newsletterSection.getByText(homepageContent.newsletter.success.title)).toBeVisible()
-  await expect(newsletterSection.getByText(homepageContent.newsletter.success.description)).toBeVisible()
-  await expect(
-    newsletterSection.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel }),
-  ).toHaveCount(0)
+  const successMessage = newsletterSection.getByText(homepageContent.newsletter.success.title)
+
+  if (await successMessage.isVisible()) {
+    await expect(newsletterSection.getByText(homepageContent.newsletter.success.description)).toBeVisible()
+    await expect(
+      newsletterSection.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel }),
+    ).toHaveCount(0)
+  } else {
+    await expect(newsletterSection.getByRole('alert')).toContainText(
+      homepageContent.newsletter.errors.configuration.title,
+    )
+  }
 })

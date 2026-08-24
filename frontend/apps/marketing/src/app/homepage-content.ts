@@ -6,13 +6,6 @@ export type HomepageRouteHref =
   | HomepageAnchorHref
   | "/blog"
   | `/blog/${string}`
-  | "/blog/opencode-starter"
-  | "/blog?category=writing"
-  | "/blog?category=automation"
-  | "/awesome"
-  | "/awesome/agents"
-  | "/awesome/workflows"
-  | "/awesome/prompts"
   | "/tools"
   | "/tools/local-model-calculator"
   | "/newsletter"
@@ -40,7 +33,6 @@ export type HomepageFeatureCard = {
 
 export const allowedFooterLinkHrefs = [
   "/blog",
-  "/awesome",
   "/tools",
   "https://github.com/Open-Agency-io",
   "/privacy",
@@ -74,16 +66,6 @@ export type HomepageContent = {
   trustBar: {
     ariaLabel: string;
     statements: readonly string[];
-  };
-  startHere: {
-    title: string;
-    description: string;
-    cards: readonly HomepageFeatureCard[];
-  };
-  awesomeLists: {
-    title: string;
-    description: string;
-    previews: readonly HomepageCardLink[];
   };
   latestGuides: {
     title: string;
@@ -160,86 +142,23 @@ export const homepageContent = {
     mobileNavigationLabel: "Mobile primary",
     menuLabel: "Menu",
     links: [{ label: "Guides", href: "/blog" }],
-    primaryCta: { label: "View the guides", href: "/blog" },
+    primaryCta: { label: "Try the calculator", href: "/tools/local-model-calculator" },
   },
   hero: {
     sectionId: "platform",
     eyebrow: "",
     title: "Work smarter with AI — not harder with hype.",
-    body: "open-agency is a free, open-source platform for creators and builders who want practical AI in their workflows. Guides, tools, templates, and courses — all built in public, all usable today.",
+    body: "open-agency is a free, open-source site for people building with AI. Read practical guides and use the local model calculator to choose a model for your device.",
     primaryCta: { label: "Browse the guides", href: "/blog" },
     secondaryCta: { label: "See the tools", href: "/tools" },
-    supportingLine: "Everything free. No paywall. No account required to get started.",
+    supportingLine: "Free, open-source, and practical — no account required to get started.",
   },
   trustBar: {
     ariaLabel: "Trust bar",
     statements: [
-      "Open source — every template and tool is on GitHub",
+      "Open source — practical guides and tools are built in public",
       "No fluff — guides ship with working code, not slides",
       "Built by practitioners — platform engineers and creators, not influencers",
-    ],
-  },
-  startHere: {
-    title: "The fastest way to level up your AI workflow",
-    description: "Pick a category. Everything below is free, practical, and ships with something you can use today.",
-    cards: [
-      {
-        label: "coding",
-        title: "Set up your AI-optimised coding repo",
-        body: "CLAUDE.md, opencode config, MCP servers, and context management — everything you need to make AI a real part of your dev workflow.",
-        cta: {
-          label: "Read the guide →",
-          href: "/blog/opencode-starter",
-        },
-      },
-      {
-        label: "curated",
-        title: "The best free AI tools, curated",
-        body: "No subscriptions. No trials. Hand-picked open-source and free-tier tools across coding, writing, marketing, and automation — updated regularly.",
-        cta: {
-          label: "Browse the lists →",
-          href: "/awesome",
-        },
-      },
-      {
-        label: "writing",
-        title: "Write faster without sounding like AI",
-        body: "Prompt patterns, editing workflows, and voice-preservation techniques for writers who use AI as a tool, not a ghostwriter.",
-        cta: {
-          label: "Read the guide →",
-          href: "/blog?category=writing",
-        },
-      },
-      {
-        label: "automation",
-        title: "Automate the repetitive stuff — for free",
-        body: "n8n, Make, native webhooks. A practical map of what to automate and exactly how to do it without spending a cent.",
-        cta: {
-          label: "Read the guide →",
-          href: "/blog?category=automation",
-        },
-      },
-    ],
-  },
-  awesomeLists: {
-    title: "The open-agency awesome lists",
-    description: "Curated references for teams building repeatable AI-assisted workflows.",
-    previews: [
-      {
-        label: "Agents worth studying",
-        href: "/awesome/agents",
-        description: "Examples of operator-friendly agents, prompts, and review loops.",
-      },
-      {
-        label: "Workflow systems",
-        href: "/awesome/workflows",
-        description: "Operating models, approval systems, and launch checklists to remix.",
-      },
-      {
-        label: "Prompt libraries",
-        href: "/awesome/prompts",
-        description: "Reusable prompt structures for briefs, reviews, and distribution planning.",
-      },
     ],
   },
   latestGuides: {
@@ -268,7 +187,7 @@ export const homepageContent = {
   },
   toolsTeaser: {
     title: "Free tools. No account needed.",
-    description: "Fast helpers for turning scattered AI output into cleaner work before it reaches your team.",
+    description: "Choose a local AI model for your device and workflow goals.",
     cards: [
       {
         label: "Local model calculator",
@@ -317,7 +236,6 @@ export const homepageContent = {
         title: "Navigation",
         links: [
           { label: "Guides", href: "/blog" },
-          { label: "Awesome lists", href: "/awesome" },
           { label: "Tools", href: "/tools" },
         ],
       },

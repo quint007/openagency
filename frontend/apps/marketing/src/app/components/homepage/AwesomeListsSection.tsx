@@ -1,9 +1,13 @@
-import type { HomepageContent } from "../../homepage-content";
+import type { HomepageCardLink } from "../../homepage-content";
 import styles from "../../page.module.css";
 import { CardSection } from "./CardSection";
 
 type AwesomeListsSectionProps = {
-  content: HomepageContent["awesomeLists"];
+  content: {
+    title: string;
+    description: string;
+    previews: readonly HomepageCardLink[];
+  };
 };
 
 export function AwesomeListsSection({ content }: AwesomeListsSectionProps) {

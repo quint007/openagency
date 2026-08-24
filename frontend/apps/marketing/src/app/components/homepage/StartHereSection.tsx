@@ -4,11 +4,15 @@ import { Search } from "pixelarticons/react/Search";
 import { Home } from "pixelarticons/react/Home";
 import { Mail } from "pixelarticons/react/Mail";
 import { Analytics } from "pixelarticons/react/Analytics";
-import type { HomepageContent } from "../../homepage-content";
+import type { HomepageFeatureCard } from "../../homepage-content";
 import styles from "../../page.module.css";
 
 type StartHereSectionProps = {
-  content: HomepageContent["startHere"];
+  content: {
+    title: string;
+    description: string;
+    cards: readonly HomepageFeatureCard[];
+  };
 };
 
 const startHereIcons = [Home, Search, Mail, Analytics] as const;
