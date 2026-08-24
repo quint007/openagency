@@ -1,40 +1,106 @@
-import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
+import type { CollectionAfterReadHook, CollectionBeforeValidateHook, CollectionConfig } from 'payload'
+import { ValidationError } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { usersOnly } from '../access/usersOnly'
+
+export const localModelCalculatorToolSlug = 'local-model-calculator'
+
+const operatingSystems = ['macos', 'windows', 'linux'] as const
+const useCases = ['coding', 'writing', 'multimodal', 'privacy', 'general'] as const
+
+type OperatingSystem = (typeof operatingSystems)[number]
+type UseCase = (typeof useCases)[number]
+
+export type CalculatorMachineProfile = {
+  readonly os: OperatingSystem
+  readonly ramGb: number
+  readonly useCase: UseCase
+  readonly vramGb: number
+}
 
 type ToolSubmissionData = {
   readonly email?: string
   readonly id: number | string
   readonly inputs?: unknown
   readonly result?: unknown
-  readonly toolSlug?: string
+  readonly toolSlug?: unknown
 }
 
-const sanitizeInputValue = (value: unknown): unknown => {
-  if (Array.isArray(value)) {
-    return value.map(sanitizeInputValue)
-  }
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  value !== null && typeof value === 'object' && !Array.isArray(value)
 
-  if (value === null || typeof value !== 'object') {
-    return value
-  }
+const isOperatingSystem = (value: unknown): value is OperatingSystem =>
+  typeof value === 'string' && operatingSystems.some((operatingSystem) => operatingSystem === value)
 
-  return Object.fromEntries(
-    Object.entries(value)
-      .filter(([key]) => key !== 'email')
-      .map(([key, nestedValue]) => [key, sanitizeInputValue(nestedValue)] as const),
-  )
+const isUseCase = (value: unknown): value is UseCase =>
+  typeof value === 'string' && useCases.some((useCase) => useCase === value)
+
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value)
+
+const invalidSubmission = (path: 'inputs' | 'toolSlug', message: string): never => {
+  throw new ValidationError({
+    collection: 'tool-submissions',
+    errors: [{ message, path }],
+  })
 }
 
-export const sanitizeToolSubmissionInputs: CollectionBeforeValidateHook<ToolSubmissionData> = ({ data }) => {
-  if (!data || data.inputs === undefined) {
-    return data
+export const parseCalculatorMachineProfile = (value: unknown): CalculatorMachineProfile | null => {
+  if (!isRecord(value)) return null
+
+  const { os, ramGb, useCase, vramGb } = value
+
+  if (!isOperatingSystem(os) || !isFiniteNumber(ramGb) || !isUseCase(useCase) || !isFiniteNumber(vramGb)) {
+    return null
+  }
+
+  return { os, ramGb, useCase, vramGb }
+}
+
+const isAdmin = (user: unknown): boolean =>
+  isRecord(user) &&
+  user.collection === 'users' &&
+  Array.isArray(user.roles) &&
+  user.roles.includes('admin')
+
+export const canonicalizeToolSubmission: CollectionBeforeValidateHook<ToolSubmissionData> = ({
+  data,
+  originalDoc,
+}) => {
+  if (!data) return data
+
+  const toolSlug = data.toolSlug === undefined ? originalDoc?.toolSlug : data.toolSlug
+
+  if (toolSlug !== localModelCalculatorToolSlug) {
+    return invalidSubmission('toolSlug', 'Only the local model calculator supports public submissions.')
+  }
+
+  const rawInputs = data.inputs === undefined ? originalDoc?.inputs : data.inputs
+  const inputs = parseCalculatorMachineProfile(rawInputs)
+
+  if (!inputs) {
+    return invalidSubmission('inputs', 'A local model calculator submission requires a valid machine profile.')
   }
 
   return {
     ...data,
-    inputs: sanitizeInputValue(data.inputs),
+    inputs,
+    result: {},
+    toolSlug: localModelCalculatorToolSlug,
+  }
+}
+
+export const redactPublicToolSubmission: CollectionAfterReadHook<ToolSubmissionData> = ({ doc, req }) => {
+  if (isAdmin(req.user)) return doc
+
+  const { email: _email, ...publicDocument } = doc
+  const inputs = parseCalculatorMachineProfile(doc.inputs)
+
+  return {
+    ...publicDocument,
+    inputs: inputs ?? {},
+    result: {},
   }
 }
 
@@ -44,14 +110,15 @@ export const ToolSubmissions: CollectionConfig = {
     create: anyone,
     delete: usersOnly,
     read: ({ req: { user }, id }) => {
-      // Admins can list and read every submission.
-      if (user?.collection === 'users') {
-        return true
-      }
+      if (isAdmin(user)) return true
 
-      // Public visitors can only read a specific submission by ID. This powers
-      // shareable result links without exposing the full collection.
-      return Boolean(id)
+      return id
+        ? {
+            toolSlug: {
+              equals: localModelCalculatorToolSlug,
+            },
+          }
+        : false
     },
     update: usersOnly,
   },
@@ -60,7 +127,8 @@ export const ToolSubmissions: CollectionConfig = {
     useAsTitle: 'toolSlug',
   },
   hooks: {
-    beforeValidate: [sanitizeToolSubmissionInputs],
+    afterRead: [redactPublicToolSubmission],
+    beforeValidate: [canonicalizeToolSubmission],
   },
   fields: [
     {
@@ -73,7 +141,7 @@ export const ToolSubmissions: CollectionConfig = {
       type: 'email',
       required: true,
       access: {
-        read: ({ req: { user } }) => user?.collection === 'users',
+        read: ({ req: { user } }) => isAdmin(user),
       },
     },
     {
