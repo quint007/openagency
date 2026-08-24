@@ -20,7 +20,7 @@ export function CookieBanner() {
 
   return (
     <section
-      className="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-[72rem] flex-col gap-5 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-highest)_96%,transparent)] p-5 pb-24 shadow-[0_18px_48px_color-mix(in_srgb,var(--brand-primary)_12%,transparent)] backdrop-blur-xl sm:inset-x-6 sm:p-6 sm:pr-44 sm:pb-6 lg:flex-row lg:items-center lg:justify-between"
+      className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-[72rem] flex-col gap-4 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-highest)_96%,transparent)] p-4 shadow-[0_18px_48px_color-mix(in_srgb,var(--brand-primary)_12%,transparent)] backdrop-blur-xl sm:inset-x-6 sm:bottom-4 sm:gap-5 sm:p-6 sm:pr-44 lg:flex-row lg:items-center lg:justify-between"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-description"
       data-cookie-banner="true"
@@ -34,14 +34,14 @@ export function CookieBanner() {
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
+      <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end">
         <Button className="min-h-11 px-5" onClick={acceptAll}>
           Accept all
         </Button>
         <Button className="min-h-11 px-5" variant="outline" onClick={acceptEssentialOnly}>
           Essential only
         </Button>
-        <Button className="min-h-11 px-5" variant="ghost" onClick={openPreferences}>
+        <Button className="col-span-2 min-h-11 px-5 sm:col-span-1" variant="ghost" onClick={openPreferences}>
           Manage preferences
         </Button>
       </div>
