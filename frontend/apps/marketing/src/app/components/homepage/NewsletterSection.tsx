@@ -38,6 +38,10 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
     inputRef.current?.focus();
   }
 
+  function handleSubmit() {
+    setDismissedError(null);
+  }
+
   function handleEmailChange(nextValue: string) {
     setEmail(nextValue);
 
@@ -97,7 +101,7 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
                 </Alert>
               </div>
             ) : (
-              <form className="flex w-full flex-col gap-5" action={formAction} noValidate>
+              <form className="flex w-full flex-col gap-5" action={formAction} onSubmit={handleSubmit} noValidate>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                   <div className="flex flex-1 flex-col gap-4">
                     <label className={styles.newsletterLabel} htmlFor={emailId}>

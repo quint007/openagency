@@ -232,11 +232,79 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await page.getByRole('button', { name: 'Close menu' }).focus()
   await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused()
 
+  const cookieSettings = page.locator('[data-cookie-settings]')
+  await expect(cookieSettings).toBeHidden()
   await page.getByRole('button', { name: 'Close menu' }).click()
+  await expect(cookieSettings).toBeVisible()
+
+  const actionIntersections = await page.evaluate(() => {
+    const cookieSettingsElement = document.querySelector<HTMLElement>('[data-cookie-settings]')
+    if (!cookieSettingsElement) {
+      throw new Error('Expected cookie settings trigger')
+    }
+
+    const cookieRect = cookieSettingsElement.getBoundingClientRect()
+    const viewport = { height: window.innerHeight, width: window.innerWidth }
+    const intersects = (first: DOMRect, second: DOMRect) =>
+      first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top
+
+    const actions = Array.from(document.querySelectorAll<HTMLElement>('a, button'))
+      .filter((element) => element !== cookieSettingsElement)
+      .map((element) => ({
+        element,
+        name: element.getAttribute('aria-label') ?? element.textContent?.trim() ?? '',
+        rect: element.getBoundingClientRect(),
+      }))
+      .filter(({ element, rect }) => {
+        const styles = window.getComputedStyle(element)
+        return styles.visibility !== 'hidden' && styles.display !== 'none' && rect.bottom > 0 && rect.top < viewport.height
+      })
+      .filter(({ rect }) => intersects(cookieRect, rect))
+      .map(({ name, rect }) => ({
+        bottom: rect.bottom,
+        left: rect.left,
+        name,
+        right: rect.right,
+        top: rect.top,
+      }))
+
+    return {
+      cookieSettings: {
+        bottom: cookieRect.bottom,
+        left: cookieRect.left,
+        right: cookieRect.right,
+        top: cookieRect.top,
+      },
+      intersections: actions,
+    }
+  })
+
+  expect(actionIntersections.intersections).toEqual([])
+  await cookieSettings.click()
+  await expect(page.getByRole('dialog', { name: 'Manage your preferences' })).toBeVisible()
+  await page.getByRole('button', { name: 'Cancel' }).click()
+
   await expect(page.getByRole('button', { name: homepageContent.header.menuLabel })).toHaveAttribute(
     'aria-expanded',
     'false',
   )
+})
+
+test('newsletter repeats an identical error after editing and resubmitting', async ({ page }) => {
+  await gotoHomepage(page, desktopViewport)
+
+  const newsletterSection = page.getByRole('region', { name: homepageContent.newsletter.title })
+  const emailField = newsletterSection.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel })
+  const submitButton = newsletterSection.getByRole('button', { name: homepageContent.newsletter.submitLabel })
+
+  await emailField.fill('first@example')
+  await submitButton.click()
+  await expect(newsletterSection.getByRole('alert')).toContainText(homepageContent.newsletter.errors.invalid.title)
+
+  await emailField.fill('second@example')
+  await expect(newsletterSection.getByRole('alert')).toHaveCount(0)
+  await submitButton.click()
+  await expect(newsletterSection.getByRole('alert')).toContainText(homepageContent.newsletter.errors.invalid.title)
 })
 
 test('homepage internal links stay on healthy live journeys', async ({ page }) => {
