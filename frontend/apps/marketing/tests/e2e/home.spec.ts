@@ -17,6 +17,11 @@ async function gotoHomepage(page: Page, viewport: { width: number; height: numbe
   await page.setViewportSize(viewport)
   await page.goto('/')
   await page.waitForLoadState('networkidle')
+
+  const essentialOnlyButton = page.getByRole('button', { name: 'Essential only' })
+  if (await essentialOnlyButton.isVisible()) {
+    await essentialOnlyButton.click()
+  }
 }
 
 async function expectHomepageSections(page: Page) {
@@ -223,16 +228,9 @@ test('newsletter shows inline validation errors before its configured outcome', 
   await expect(newsletterSection.getByRole('alert')).toHaveCount(0)
   await submitButton.click()
 
-  const successMessage = newsletterSection.getByText(homepageContent.newsletter.success.title)
-
-  if (await successMessage.isVisible()) {
-    await expect(newsletterSection.getByText(homepageContent.newsletter.success.description)).toBeVisible()
-    await expect(
-      newsletterSection.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel }),
-    ).toHaveCount(0)
-  } else {
-    await expect(newsletterSection.getByRole('alert')).toContainText(
-      homepageContent.newsletter.errors.configuration.title,
-    )
-  }
+  await expect(newsletterSection.getByText(homepageContent.newsletter.success.title)).toBeVisible()
+  await expect(newsletterSection.getByText(homepageContent.newsletter.success.description)).toBeVisible()
+  await expect(
+    newsletterSection.getByRole('textbox', { name: homepageContent.newsletter.fieldLabel }),
+  ).toHaveCount(0)
 })
