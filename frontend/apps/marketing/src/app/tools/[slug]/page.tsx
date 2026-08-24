@@ -1,4 +1,4 @@
-import { apiClient } from "@open-agency/api-client";
+import { apiClient, localModelCalculatorToolSlug } from "@open-agency/api-client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -8,6 +8,7 @@ import { ResourceIndexPage } from "../../(resources)/ResourceIndexPage";
 import { homepageContent } from "../../homepage-content";
 import { LocalModelCalculator } from "../local-model-calculator/LocalModelCalculator";
 import { LocalModelResult } from "../local-model-calculator/LocalModelResult";
+import { calculateBestModel } from "../local-model-calculator/score";
 import type { CalculatorMachineProfile } from "../local-model-calculator/types";
 
 const tools = homepageContent.toolsTeaser.cards.map((card) => ({
@@ -16,42 +17,13 @@ const tools = homepageContent.toolsTeaser.cards.map((card) => ({
   title: card.label,
 }));
 
-const LOCAL_MODEL_CALCULATOR_SLUG = "local-model-calculator";
+const LOCAL_MODEL_CALCULATOR_SLUG = localModelCalculatorToolSlug;
 
 const calculatorMachineProfileSchema = z.object({
   os: z.enum(["macos", "windows", "linux"]),
   ramGb: z.number().finite(),
   useCase: z.enum(["coding", "writing", "multimodal", "privacy", "general"]),
   vramGb: z.number().finite(),
-});
-
-const localModelSchema = z.object({
-  description: z.string(),
-  id: z.string(),
-  minRamGb: z.number(),
-  minVramGb: z.number().nullable(),
-  name: z.string(),
-  os: z.array(z.enum(["macos", "windows", "linux"])),
-  provider: z.string(),
-  recommendedRamGb: z.number(),
-  strengths: z.array(z.enum(["coding", "writing", "multimodal", "privacy", "general"])),
-  tags: z.array(z.string()),
-  url: z.string(),
-});
-
-const calculatorResultSchema = z.object({
-  alternatives: z.array(
-    z.object({
-      model: localModelSchema,
-      reasons: z.array(z.string()),
-      score: z.number(),
-    }),
-  ),
-  recommended: z.object({
-    model: localModelSchema,
-    reasons: z.array(z.string()),
-    score: z.number(),
-  }),
 });
 
 type ToolDetailPageProps = {
@@ -97,13 +69,11 @@ async function loadSharedResult(submissionId: string | undefined) {
     }
 
     const inputs = parseSubmissionInputs(submission.inputs);
-    const result = calculatorResultSchema.safeParse(submission.result);
-
-    if (!inputs || !result.success) {
+    if (!inputs) {
       return null;
     }
 
-    return { inputs, result: result.data };
+    return { inputs, result: calculateBestModel(inputs) };
   } catch (error) {
     if (error instanceof Error) {
       return null;
@@ -135,7 +105,10 @@ export default async function ToolDetailPage({ params, searchParams }: ToolDetai
         <section className="px-4 sm:px-6 lg:px-8">
           <div className="mx-auto w-full max-w-[100rem]">
             {shared ? (
-              <LocalModelResult result={shared.result} shareUrl={`/tools/local-model-calculator?id=${id}`} />
+              <LocalModelResult
+                result={shared.result}
+                shareUrl={`/tools/local-model-calculator?id=${encodeURIComponent(id ?? "")}`}
+              />
             ) : (
               <LocalModelCalculator />
             )}
