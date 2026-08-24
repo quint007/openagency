@@ -33,7 +33,7 @@
   }
 
   @media (max-width: 639px) {
-    body:has(#marketing-mobile-menu) [data-cookie-settings] {
+    body[data-mobile-menu-open="true"] [data-cookie-settings] {
       display: none;
     }
   }

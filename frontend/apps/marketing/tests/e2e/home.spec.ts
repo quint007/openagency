@@ -216,6 +216,7 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await mobileMenuToggle.click()
 
   await expect(page.getByRole('button', { name: 'Close menu' })).toHaveAttribute('aria-expanded', 'true')
+  await expect(page.locator('body')).toHaveAttribute('data-mobile-menu-open', 'true')
   await expect(mobileNav).toBeVisible()
   for (const item of homepageContent.header.links) {
     await expect(mobileNav.getByRole('link', { name: item.label })).toHaveAttribute('href', item.href)
@@ -235,6 +236,7 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   const cookieSettings = page.locator('[data-cookie-settings]')
   await expect(cookieSettings).toBeHidden()
   await page.getByRole('button', { name: 'Close menu' }).click()
+  await expect(page.locator('body')).not.toHaveAttribute('data-mobile-menu-open')
   await expect(cookieSettings).toBeVisible()
 
   const actionIntersections = await page.evaluate(() => {

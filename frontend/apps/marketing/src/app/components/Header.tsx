@@ -33,10 +33,18 @@ export function Header({ brand }: HeaderProps) {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const body = document.body;
+    body.style.overflow = open ? "hidden" : "";
+
+    if (open) {
+      body.dataset.mobileMenuOpen = "true";
+    } else {
+      delete body.dataset.mobileMenuOpen;
+    }
 
     return () => {
-      document.body.style.overflow = "";
+      body.style.overflow = "";
+      delete body.dataset.mobileMenuOpen;
     };
   }, [open]);
 
