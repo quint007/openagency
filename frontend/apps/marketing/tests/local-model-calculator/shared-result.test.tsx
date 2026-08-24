@@ -74,6 +74,22 @@ describe('local model calculator shared results', () => {
     expect(screen.queryByText(nestedEmail)).toBeNull()
   })
 
+  it('falls back to the calculator when a shared submission request rejects with HTTP 404', async () => {
+    // Given: a shared submission request that rejects with a real HTTP not-found error
+    mocks.getToolSubmission.mockRejectedValue(new Error('HTTP 404 Not Found'))
+
+    // When: a visitor opens the unavailable shared calculator URL
+    render(
+      await ToolDetailPage({
+        params: toolParams,
+        searchParams: Promise.resolve({ id: 'missing-submission' }),
+      }),
+    )
+
+    // Then: the catch path returns the normal calculator instead of rejecting the page render
+    expect(screen.getByText('calculator-form')).toBeTruthy()
+  })
+
   it.each([
     ['an unknown submission', null],
     [
