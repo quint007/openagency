@@ -16,12 +16,15 @@ export type LocalModel = {
   url: string;
 };
 
-export type CalculatorInputs = {
-  email: string;
-  os: OperatingSystem;
-  ramGb: number;
-  useCase: UseCase;
-  vramGb: number;
+export type CalculatorMachineProfile = {
+  readonly os: OperatingSystem;
+  readonly ramGb: number;
+  readonly useCase: UseCase;
+  readonly vramGb: number;
+};
+
+export type CalculatorInputs = CalculatorMachineProfile & {
+  readonly email: string;
 };
 
 export type ModelMatch = {

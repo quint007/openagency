@@ -5,7 +5,7 @@ import { Alert, Button, Input, Label, Select, SelectContent, SelectItem, SelectT
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { calculateBestModel } from "./score";
+import { calculateBestModel, normalizeOperatingSystem, normalizeUseCase } from "./score";
 import type { CalculatorInputs, CalculatorResult } from "./types";
 import { LocalModelResult } from "./LocalModelResult";
 
@@ -68,11 +68,12 @@ export function LocalModelCalculator() {
     setIsSubmitting(true);
 
     try {
-      const calculated = calculateBestModel(inputs);
+      const { email, ...machineProfile } = inputs;
+      const calculated = calculateBestModel(machineProfile);
       const submission = await apiClient.createToolSubmission({
         toolSlug: "local-model-calculator",
-        email: inputs.email.trim(),
-        inputs: { ...inputs },
+        email: email.trim(),
+        inputs: machineProfile,
         result: { ...calculated },
       });
 
@@ -94,7 +95,7 @@ export function LocalModelCalculator() {
     : "";
 
   if (result && submissionId) {
-    return <LocalModelResult inputs={inputs} result={result} shareUrl={shareUrl} />;
+    return <LocalModelResult result={result} shareUrl={shareUrl} />;
   }
 
   return (
@@ -108,7 +109,13 @@ export function LocalModelCalculator() {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="flex flex-col gap-3">
           <Label htmlFor="os">Operating system</Label>
-          <Select value={inputs.os} onValueChange={(value) => updateInput("os", value as CalculatorInputs["os"])}>
+          <Select
+            value={inputs.os}
+            onValueChange={(value) => {
+              const os = normalizeOperatingSystem(value);
+              if (os) updateInput("os", os);
+            }}
+          >
             <SelectTrigger id="os" className="w-full">
               <SelectValue placeholder="Select your OS" />
             </SelectTrigger>
@@ -164,7 +171,10 @@ export function LocalModelCalculator() {
           <Label htmlFor="use-case">Primary use case</Label>
           <Select
             value={inputs.useCase}
-            onValueChange={(value) => updateInput("useCase", value as CalculatorInputs["useCase"])}
+            onValueChange={(value) => {
+              const useCase = normalizeUseCase(value);
+              if (useCase) updateInput("useCase", useCase);
+            }}
           >
             <SelectTrigger id="use-case" className="w-full">
               <SelectValue placeholder="Select use case" />

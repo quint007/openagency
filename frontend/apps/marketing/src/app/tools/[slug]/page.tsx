@@ -1,14 +1,14 @@
 import { apiClient } from "@open-agency/api-client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 
 import { ComingSoonBanner } from "../../components/ComingSoon";
 import { ResourceIndexPage } from "../../(resources)/ResourceIndexPage";
 import { homepageContent } from "../../homepage-content";
 import { LocalModelCalculator } from "../local-model-calculator/LocalModelCalculator";
 import { LocalModelResult } from "../local-model-calculator/LocalModelResult";
-import { normalizeOperatingSystem, normalizeUseCase } from "../local-model-calculator/score";
-import type { CalculatorInputs, CalculatorResult } from "../local-model-calculator/types";
+import type { CalculatorMachineProfile } from "../local-model-calculator/types";
 
 const tools = homepageContent.toolsTeaser.cards.map((card) => ({
   ...card,
@@ -17,6 +17,42 @@ const tools = homepageContent.toolsTeaser.cards.map((card) => ({
 }));
 
 const LOCAL_MODEL_CALCULATOR_SLUG = "local-model-calculator";
+
+const calculatorMachineProfileSchema = z.object({
+  os: z.enum(["macos", "windows", "linux"]),
+  ramGb: z.number().finite(),
+  useCase: z.enum(["coding", "writing", "multimodal", "privacy", "general"]),
+  vramGb: z.number().finite(),
+});
+
+const localModelSchema = z.object({
+  description: z.string(),
+  id: z.string(),
+  minRamGb: z.number(),
+  minVramGb: z.number().nullable(),
+  name: z.string(),
+  os: z.array(z.enum(["macos", "windows", "linux"])),
+  provider: z.string(),
+  recommendedRamGb: z.number(),
+  strengths: z.array(z.enum(["coding", "writing", "multimodal", "privacy", "general"])),
+  tags: z.array(z.string()),
+  url: z.string(),
+});
+
+const calculatorResultSchema = z.object({
+  alternatives: z.array(
+    z.object({
+      model: localModelSchema,
+      reasons: z.array(z.string()),
+      score: z.number(),
+    }),
+  ),
+  recommended: z.object({
+    model: localModelSchema,
+    reasons: z.array(z.string()),
+    score: z.number(),
+  }),
+});
 
 type ToolDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -42,23 +78,10 @@ export async function generateMetadata({ params }: ToolDetailPageProps): Promise
   };
 }
 
-function parseSubmissionInputs(raw: unknown): CalculatorInputs | null {
-  if (!raw || typeof raw !== "object") {
-    return null;
-  }
+function parseSubmissionInputs(raw: unknown): CalculatorMachineProfile | null {
+  const parsed = calculatorMachineProfileSchema.safeParse(raw);
 
-  const data = raw as Record<string, unknown>;
-  const os = normalizeOperatingSystem(String(data.os ?? ""));
-  const useCase = normalizeUseCase(String(data.useCase ?? ""));
-  const ramGb = Number(data.ramGb);
-  const vramGb = Number(data.vramGb);
-  const email = String(data.email ?? "");
-
-  if (!os || !useCase || Number.isNaN(ramGb) || Number.isNaN(vramGb)) {
-    return null;
-  }
-
-  return { os, useCase, ramGb, vramGb, email };
+  return parsed.success ? parsed.data : null;
 }
 
 async function loadSharedResult(submissionId: string | undefined) {
@@ -74,18 +97,19 @@ async function loadSharedResult(submissionId: string | undefined) {
     }
 
     const inputs = parseSubmissionInputs(submission.inputs);
-    const result = submission.result as {
-      recommended?: unknown;
-      alternatives?: unknown[];
-    };
+    const result = calculatorResultSchema.safeParse(submission.result);
 
-    if (!inputs || !result?.recommended) {
+    if (!inputs || !result.success) {
       return null;
     }
 
-    return { inputs, result: result as CalculatorResult };
-  } catch {
-    return null;
+    return { inputs, result: result.data };
+  } catch (error) {
+    if (error instanceof Error) {
+      return null;
+    }
+
+    throw error;
   }
 }
 
@@ -111,7 +135,7 @@ export default async function ToolDetailPage({ params, searchParams }: ToolDetai
         <section className="px-4 sm:px-6 lg:px-8">
           <div className="mx-auto w-full max-w-[100rem]">
             {shared ? (
-              <LocalModelResult inputs={shared.inputs} result={shared.result} shareUrl={`/tools/local-model-calculator?id=${id}`} />
+              <LocalModelResult result={shared.result} shareUrl={`/tools/local-model-calculator?id=${id}`} />
             ) : (
               <LocalModelCalculator />
             )}

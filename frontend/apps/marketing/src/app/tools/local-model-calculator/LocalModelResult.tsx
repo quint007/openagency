@@ -4,10 +4,9 @@ import { Alert, Button, Card, CardContent, CardHeader, CardTitle } from "@open-a
 import { Check, Copy, ExternalLink } from "lucide-react";
 import { useState } from "react";
 
-import type { CalculatorInputs, CalculatorResult } from "./types";
+import type { CalculatorResult } from "./types";
 
 type LocalModelResultProps = {
-  inputs: CalculatorInputs;
   result: CalculatorResult;
   shareUrl: string;
 };
@@ -27,14 +26,21 @@ function ReasonList({ reasons }: { reasons: string[] }) {
 
 export function LocalModelResult({ result, shareUrl }: LocalModelResultProps) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
 
   async function handleCopyLink() {
     try {
       await navigator.clipboard.writeText(shareUrl);
+      setCopyError(null);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Ignore copy failures.
+    } catch (error) {
+      if (error instanceof DOMException) {
+        setCopyError("We could not copy the share link. Please copy the URL from your browser.");
+        return;
+      }
+
+      throw error;
     }
   }
 
@@ -109,11 +115,18 @@ export function LocalModelResult({ result, shareUrl }: LocalModelResultProps) {
         </p>
       </Alert>
 
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={handleCopyLink} className="gap-2">
-          {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-          {copied ? "Link copied" : "Copy share link"}
-        </Button>
+      <div className="flex flex-col items-start gap-4">
+        {copyError ? (
+          <Alert className="border-destructive/20 bg-destructive/10 text-destructive-foreground">
+            {copyError}
+          </Alert>
+        ) : null}
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={handleCopyLink} className="gap-2">
+            {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+            {copied ? "Link copied" : "Copy share link"}
+          </Button>
+        </div>
       </div>
     </div>
   );

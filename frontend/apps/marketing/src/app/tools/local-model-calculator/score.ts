@@ -1,12 +1,19 @@
 import { localModels } from "./models";
-import type { CalculatorInputs, CalculatorResult, LocalModel, ModelMatch, OperatingSystem, UseCase } from "./types";
+import type {
+  CalculatorMachineProfile,
+  CalculatorResult,
+  LocalModel,
+  ModelMatch,
+  OperatingSystem,
+  UseCase,
+} from "./types";
 
 const USE_CASE_WEIGHT = 3;
 const RAM_WEIGHT = 2;
 const VRAM_WEIGHT = 1.5;
 const OS_WEIGHT = 0.5;
 
-function buildReasons(match: ModelMatch, inputs: CalculatorInputs): string[] {
+function buildReasons(match: ModelMatch, inputs: CalculatorMachineProfile): string[] {
   const reasons = [...match.reasons];
 
   if (inputs.ramGb >= match.model.recommendedRamGb) {
@@ -26,7 +33,7 @@ function buildReasons(match: ModelMatch, inputs: CalculatorInputs): string[] {
   return reasons;
 }
 
-export function scoreModel(model: LocalModel, inputs: CalculatorInputs): ModelMatch {
+export function scoreModel(model: LocalModel, inputs: CalculatorMachineProfile): ModelMatch {
   let score = 0;
   const reasons: string[] = [];
 
@@ -84,7 +91,7 @@ export function scoreModel(model: LocalModel, inputs: CalculatorInputs): ModelMa
   return { model, score, reasons };
 }
 
-export function calculateBestModel(inputs: CalculatorInputs): CalculatorResult {
+export function calculateBestModel(inputs: CalculatorMachineProfile): CalculatorResult {
   const scored = localModels
     .map((model) => scoreModel(model, inputs))
     .filter((match) => match.score > 0)

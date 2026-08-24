@@ -1,7 +1,42 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
 
 import { anyone } from '../access/anyone'
 import { usersOnly } from '../access/usersOnly'
+
+type ToolSubmissionData = {
+  readonly email?: string
+  readonly id: number | string
+  readonly inputs?: unknown
+  readonly result?: unknown
+  readonly toolSlug?: string
+}
+
+const sanitizeInputValue = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(sanitizeInputValue)
+  }
+
+  if (value === null || typeof value !== 'object') {
+    return value
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(([key]) => key !== 'email')
+      .map(([key, nestedValue]) => [key, sanitizeInputValue(nestedValue)] as const),
+  )
+}
+
+export const sanitizeToolSubmissionInputs: CollectionBeforeValidateHook<ToolSubmissionData> = ({ data }) => {
+  if (!data || data.inputs === undefined) {
+    return data
+  }
+
+  return {
+    ...data,
+    inputs: sanitizeInputValue(data.inputs),
+  }
+}
 
 export const ToolSubmissions: CollectionConfig = {
   slug: 'tool-submissions',
@@ -23,6 +58,9 @@ export const ToolSubmissions: CollectionConfig = {
   admin: {
     defaultColumns: ['toolSlug', 'email', 'createdAt'],
     useAsTitle: 'toolSlug',
+  },
+  hooks: {
+    beforeValidate: [sanitizeToolSubmissionInputs],
   },
   fields: [
     {
