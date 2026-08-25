@@ -6,11 +6,12 @@ import { CookieBanner } from "./CookieBanner";
 import { CookieConsentScripts } from "./CookieConsentScripts";
 import { CookiePreferences } from "./CookiePreferences";
 import { CookieConsentProvider, useCookieConsent } from "./context";
+import { cookieIntegrationConfig } from "./cookie-config";
 
 function CookieSettingsTrigger() {
   const { hasDecided, isHydrated, openPreferences } = useCookieConsent();
 
-  if (!isHydrated || !hasDecided) {
+  if (!isHydrated || !hasDecided || !cookieIntegrationConfig.hasOptionalIntegrations) {
     return null;
   }
 
