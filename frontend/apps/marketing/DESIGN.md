@@ -93,7 +93,7 @@ Spacing follows the existing 4px Tailwind base scale (`gap-2`, `gap-3`, `gap-4`,
 
 ### FeedbackProvider
 
-- **Structure**: Client context around the app tree so the global trigger and footer link share one modal opener.
+- **Structure**: Client context around the app tree so the global trigger owns one modal opener.
 - **Variants**: Closed and open feedback surface.
 - **Spacing**: Existing 4px Tailwind scale; modal uses `gap-4` / `gap-6` and `p-6` / `sm:p-8`.
 - **States**: Closed, open, submitting, success, and validation/API error.
@@ -101,15 +101,15 @@ Spacing follows the existing 4px Tailwind base scale (`gap-2`, `gap-3`, `gap-4`,
 - **Motion**: No decorative animation; existing 200ms control transitions remain intact.
 - **Layout**: Viewport overlay with internally scrolling dialog content.
 
-### FeedbackButton and FooterFeedbackLink
+### FeedbackButton
 
-- **Structure**: Floating global trigger and a footer text-button opener that consume `FeedbackProvider`.
-- **Variants**: Floating action and inline footer link.
-- **Spacing**: Floating trigger uses `bottom-4` / `right-4`; footer link follows the existing Legal column rhythm.
+- **Structure**: Floating global trigger that consumes `FeedbackProvider`.
+- **Variants**: Floating action; hidden on mobile until cookie consent is decided.
+- **Spacing**: Floating trigger uses `bottom-4` / `right-4`.
 - **States**: Rest, hover, active, and focus-visible.
 - **Accessibility**: Real buttons with visible labels and shared focus rings; icons never carry the label alone.
 - **Motion**: Existing color, shadow, and active-press transitions only.
-- **Layout**: Fixed trigger avoids content reflow; footer control stays in the Legal list.
+- **Layout**: Fixed trigger avoids content reflow and remains reachable at mobile sizes after consent.
 
 ## 6. Motion & Interaction
 

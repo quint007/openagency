@@ -111,6 +111,25 @@ async function expectFooterGrouping(page: Page) {
   }
 
   await expect(footer.getByText(homepageContent.footer.copyright)).toBeVisible()
+  await expect(footer.getByRole('button', { name: 'Share feedback' })).toHaveCount(0)
+}
+
+async function expectSingleFeedbackTrigger(page: Page) {
+  const feedbackButton = page.getByRole('button', { name: 'Share feedback' })
+
+  await expect(feedbackButton).toHaveCount(1)
+  await expect(feedbackButton).toBeVisible()
+  await feedbackButton.evaluate((button) => {
+    if (!(button instanceof HTMLButtonElement)) {
+      throw new Error('Expected the feedback trigger to be a button')
+    }
+
+    button.click()
+  })
+  const feedbackDialog = page.getByRole('dialog', { name: 'What should we improve?' })
+  await expect(feedbackDialog).toBeVisible()
+  await feedbackDialog.getByRole('button', { name: 'Close feedback form' }).click()
+  await expect(page.getByRole('dialog', { name: 'What should we improve?' })).toHaveCount(0)
 }
 
 test('marketing homepage covers full desktop layout and primary navigation', async ({ page }) => {
@@ -119,6 +138,7 @@ test('marketing homepage covers full desktop layout and primary navigation', asy
   await expect(page.getByRole('banner')).toBeVisible()
   await expectHomepageSections(page)
   await expectFooterGrouping(page)
+  await expectSingleFeedbackTrigger(page)
 
   const desktopNav = page.getByRole('navigation', {
     name: homepageContent.header.navigationLabel,
@@ -198,6 +218,7 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await expect(page.getByRole('banner')).toBeVisible()
   await expectHomepageSections(page)
   await expectFooterGrouping(page)
+  await page.evaluate(() => window.scrollTo(0, 0))
 
   const desktopNav = page.getByRole('navigation', {
     name: homepageContent.header.navigationLabel,
@@ -212,6 +233,7 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await expect(mobileMenuToggle).toHaveAttribute('aria-expanded', 'false')
   await mobileMenuToggle.focus()
   await expect(mobileMenuToggle).toBeFocused()
+  await page.evaluate(() => window.scrollTo(0, 0))
 
   await mobileMenuToggle.click()
 
@@ -238,6 +260,8 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
   await page.getByRole('button', { name: 'Close menu' }).click()
   await expect(page.locator('body')).not.toHaveAttribute('data-mobile-menu-open')
   await expect(cookieSettings).toBeVisible()
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await expectSingleFeedbackTrigger(page)
 
   const actionIntersections = await page.evaluate(() => {
     const cookieSettingsElement = document.querySelector<HTMLElement>('[data-cookie-settings]')

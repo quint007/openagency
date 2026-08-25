@@ -1,4 +1,10 @@
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+
+import { CookieConsentProvider } from "../src/app/components/CookieConsent";
+import { FeedbackButton, FeedbackProvider } from "../src/app/components/Feedback";
+import { FooterSection } from "../src/app/components/homepage/FooterSection";
+import { homepageContent } from "../src/app/homepage-content";
 
 const fetchMock = vi.hoisted(() =>
   vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(),
@@ -122,4 +128,34 @@ describe("feedback submission", () => {
       code: "generic",
     });
   });
+});
+
+test("keeps one feedback trigger outside the Legal links and opens its modal", async () => {
+  render(
+    <CookieConsentProvider>
+      <FeedbackProvider>
+        <FeedbackButton />
+        <footer>
+          <FooterSection content={homepageContent.footer} />
+        </footer>
+      </FeedbackProvider>
+    </CookieConsentProvider>,
+  );
+
+  expect(screen.getAllByRole("button", { name: "Share feedback" })).toHaveLength(1);
+
+  const legalHeading = screen.getByRole("heading", { name: "Legal" });
+  const legalSection = legalHeading.closest("section");
+
+  if (!legalSection) {
+    throw new Error("Expected the Legal footer column to be a section");
+  }
+
+  expect(within(legalSection).getByRole("link", { name: "Privacy" }).getAttribute("href")).toBe("/privacy");
+  expect(within(legalSection).getByRole("link", { name: "Terms" }).getAttribute("href")).toBe("/terms");
+  expect(within(legalSection).queryByRole("button", { name: "Share feedback" })).toBeNull();
+
+  fireEvent.click(screen.getByRole("button", { name: "Share feedback" }));
+
+  expect(await screen.findByRole("dialog", { name: "What should we improve?" })).toBeTruthy();
 });

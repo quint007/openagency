@@ -2,7 +2,6 @@ import { Logo, Separator } from "@open-agency/ui";
 import { ExternalLink } from "pixelarticons/react/ExternalLink";
 import { allowedFooterLinkHrefs, type HomepageContent, type HomepageFooterLinkHref } from "../../homepage-content";
 import styles from "../../page.module.css";
-import { FooterFeedbackLink } from "../Feedback";
 
 type FooterSectionProps = {
   content: HomepageContent["footer"];
@@ -44,21 +43,16 @@ export function FooterSection({ content }: FooterSectionProps) {
                   {column.title}
                 </h2>
 
-                  <ul className="flex flex-col gap-4">
-                    {column.links.map((link) => (
-                      <li key={link.label}>
+                <ul className="flex flex-col gap-4">
+                  {column.links.map((link) => (
+                    <li key={link.label}>
                       <a className="inline-flex items-center gap-2 text-[var(--on-surface-variant)] transition-colors hover:text-[var(--on-surface)]" href={link.href}>
                         {link.label}
                         {link.href.startsWith("https://") ? <ExternalLink className="size-4 text-[var(--brand-primary)]" /> : null}
-                        </a>
-                      </li>
-                    ))}
-                    {column.title === "Legal" ? (
-                      <li>
-                        <FooterFeedbackLink />
-                      </li>
-                    ) : null}
-                  </ul>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </section>
             );
           })}
