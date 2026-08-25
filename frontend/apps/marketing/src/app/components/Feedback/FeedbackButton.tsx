@@ -52,7 +52,7 @@ export function FeedbackButton() {
       const buttonRect = button?.getBoundingClientRect();
       const buttonHeight = buttonRect?.height ?? 0;
       const spacing = hasDecided ? 16 : 32;
-      let bottomOffset = Math.max(overlayBottomOffset + spacing, 16);
+      let bottomOffset = Math.max(overlayBottomOffset + spacing, hasDecided ? 130 : 16);
 
       if (buttonHeight > 0) {
         const buttonBlockers = Array.from(document.querySelectorAll<HTMLElement>(
