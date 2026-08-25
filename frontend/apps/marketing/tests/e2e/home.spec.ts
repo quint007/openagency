@@ -3,7 +3,9 @@ import { expect, test, type Page } from '@playwright/test'
 import { homepageContent } from '../../src/app/homepage-content'
 
 const desktopViewport = { width: 1280, height: 900 }
+const tabletViewport = { width: 768, height: 900 }
 const mobileViewport = { width: 375, height: 844 }
+const feedbackViewports = [mobileViewport, tabletViewport, desktopViewport] as const
 
 const expectedSectionOrder = [
   { id: homepageContent.hero.sectionId, name: homepageContent.hero.title },
@@ -119,17 +121,87 @@ async function expectSingleFeedbackTrigger(page: Page) {
 
   await expect(feedbackButton).toHaveCount(1)
   await expect(feedbackButton).toBeVisible()
-  await feedbackButton.evaluate((button) => {
-    if (!(button instanceof HTMLButtonElement)) {
-      throw new Error('Expected the feedback trigger to be a button')
-    }
-
-    button.click()
-  })
+  await feedbackButton.click()
   const feedbackDialog = page.getByRole('dialog', { name: 'What should we improve?' })
   await expect(feedbackDialog).toBeVisible()
   await feedbackDialog.getByRole('button', { name: 'Close feedback form' }).click()
   await expect(page.getByRole('dialog', { name: 'What should we improve?' })).toHaveCount(0)
+}
+
+async function getFeedbackGeometry(page: Page) {
+  return page.evaluate(() => {
+    const feedbackButton = document.querySelector<HTMLElement>('button[aria-label="Share feedback"]')
+
+    if (!feedbackButton) {
+      throw new Error('Expected the feedback trigger')
+    }
+
+    const viewport = { height: window.innerHeight, width: window.innerWidth }
+    const feedbackRect = feedbackButton.getBoundingClientRect()
+    const cookieOverlay = document.querySelector<HTMLElement>('[data-cookie-banner], [data-cookie-settings]')
+    const intersects = (first: DOMRect, second: DOMRect) =>
+      first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top
+    const isVisible = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect()
+      const styles = window.getComputedStyle(element)
+
+      return styles.display !== 'none' && styles.visibility !== 'hidden' && styles.pointerEvents !== 'none' &&
+        rect.bottom > 0 && rect.top < viewport.height && rect.right > 0 && rect.left < viewport.width
+    }
+    const blockers = Array.from(document.querySelectorAll<HTMLElement>(
+      'header, #marketing-mobile-menu, [data-cookie-banner], [data-cookie-settings], main a, main button, footer a, footer button',
+    ))
+      .filter((element) => element !== feedbackButton && isVisible(element))
+      .filter((element) => intersects(feedbackRect, element.getBoundingClientRect()))
+      .map((element) => {
+        const rect = element.getBoundingClientRect()
+
+        return {
+          bottom: rect.bottom,
+          left: rect.left,
+          name: element.getAttribute('aria-label') ?? element.textContent?.trim() ?? element.tagName,
+          right: rect.right,
+          top: rect.top,
+        }
+      })
+    const hitTarget = document.elementFromPoint(
+      feedbackRect.left + feedbackRect.width / 2,
+      feedbackRect.top + feedbackRect.height / 2,
+    )
+
+    return {
+      blockers,
+      computedBottom: window.getComputedStyle(feedbackButton).bottom,
+      feedbackHeight: feedbackRect.height,
+      feedback: {
+        bottom: feedbackRect.bottom,
+        left: feedbackRect.left,
+        right: feedbackRect.right,
+        top: feedbackRect.top,
+      },
+      hitTarget: hitTarget?.getAttribute('aria-label') ?? hitTarget?.textContent?.trim() ?? hitTarget?.tagName ?? null,
+      hitTargetIsFeedback: hitTarget === feedbackButton || feedbackButton.contains(hitTarget),
+      cookieOverlay: cookieOverlay
+        ? (() => {
+            const rect = cookieOverlay.getBoundingClientRect()
+
+            return { bottom: rect.bottom, top: rect.top, height: rect.height }
+          })()
+        : null,
+      viewport,
+    }
+  })
+}
+
+async function expectActionableFeedbackGeometry(page: Page) {
+  const geometry = await getFeedbackGeometry(page)
+
+  expect(geometry.feedback.left).toBeGreaterThan(0)
+  expect(geometry.feedback.top).toBeGreaterThan(0)
+  expect(geometry.feedback.right).toBeLessThan(geometry.viewport.width)
+  expect(geometry.feedback.bottom).toBeLessThan(geometry.viewport.height)
+  expect(geometry.blockers, JSON.stringify(geometry)).toEqual([])
+  expect(geometry.hitTargetIsFeedback, JSON.stringify(geometry)).toBe(true)
 }
 
 test('marketing homepage covers full desktop layout and primary navigation', async ({ page }) => {
@@ -314,6 +386,57 @@ test('marketing homepage covers mobile layout and menu navigation', async ({ pag
     'aria-expanded',
     'false',
   )
+})
+
+test('feedback trigger stays actionable across consent, menu, and viewport states', async ({ page }) => {
+  for (const viewport of feedbackViewports) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+
+    const feedbackButton = page.getByRole('button', { name: 'Share feedback' })
+    const isMobile = viewport.width < 640
+
+    if (isMobile) {
+      await expect(feedbackButton).toBeHidden()
+    } else {
+      await expect(feedbackButton).toBeVisible()
+      await expectActionableFeedbackGeometry(page)
+    }
+
+    await page.getByRole('button', { name: 'Essential only' }).click()
+    await expect(feedbackButton).toBeVisible()
+    await expectActionableFeedbackGeometry(page)
+
+    await feedbackButton.focus()
+    await expect(feedbackButton).toBeFocused()
+    await feedbackButton.press('Enter')
+    const feedbackDialog = page.getByRole('dialog', { name: 'What should we improve?' })
+    await expect(feedbackDialog).toBeVisible()
+    await expect(feedbackDialog.getByRole('combobox', { name: 'Category' })).toBeFocused()
+    await feedbackDialog.getByRole('button', { name: 'Close feedback form' }).click()
+    await expect(feedbackDialog).toHaveCount(0)
+    await expect(feedbackButton).toBeFocused()
+
+    await feedbackButton.press('Space')
+    await expect(feedbackDialog).toBeVisible()
+    await feedbackDialog.getByRole('button', { name: 'Close feedback form' }).click()
+    await expect(feedbackDialog).toHaveCount(0)
+
+    if (viewport.width < 1024) {
+      const menuToggle = page.getByRole('button', { name: homepageContent.header.menuLabel })
+      await menuToggle.click()
+      await expect(page.locator('#marketing-mobile-menu')).toBeVisible()
+      await expect(feedbackButton).toBeHidden()
+      await page.getByRole('button', { name: 'Close menu' }).click()
+      await expect(page.locator('#marketing-mobile-menu')).toHaveCount(0)
+      await expect(feedbackButton).toBeVisible()
+      await expectActionableFeedbackGeometry(page)
+    }
+  }
 })
 
 test('newsletter repeats an identical error after editing and resubmitting', async ({ page }) => {
