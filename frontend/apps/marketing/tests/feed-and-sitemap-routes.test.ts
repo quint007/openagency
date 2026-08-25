@@ -85,6 +85,8 @@ test('sitemap route includes blog index and published post URLs', async () => {
         expect.objectContaining({ loc: 'http://localhost:3000/blog' }),
         expect.objectContaining({ loc: 'http://localhost:3000/tools' }),
         expect.objectContaining({ loc: 'http://localhost:3000/tools/local-model-calculator' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/about' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/contact' }),
         expect.objectContaining({ loc: 'http://localhost:3000/privacy' }),
         expect.objectContaining({ loc: 'http://localhost:3000/terms' }),
         expect.objectContaining({ loc: 'http://localhost:3000/blog/automation-systems' }),

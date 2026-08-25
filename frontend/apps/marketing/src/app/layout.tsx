@@ -53,14 +53,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <script
-          async
-          id="google-adsense-script"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4790131778246365"
-          crossOrigin="anonymous"
-        />
-      </head>
       <body>
         <CookieConsent>
           <FeedbackProvider>
