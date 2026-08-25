@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { getSiteUrl } from '../lib/site';
-import { CookieConsent } from './components/CookieConsent';
-import { cookieIntegrationConfig } from './components/CookieConsent/cookie-config';
-import { FeedbackButton, FeedbackProvider } from './components/Feedback';
+import { getSiteUrl } from "../lib/site";
+import { CookieConsent } from "./components/CookieConsent";
+import { cookieIntegrationConfig } from "./components/CookieConsent/cookie-config";
+import { FeedbackButton, FeedbackProvider } from "./components/Feedback";
 
 export const metadata: Metadata = {
   title: {
     default: "Open Agency",
     template: "%s · Open Agency",
   },
-  description: "Practical AI guides, tools, and workflow systems for people who build things.",
+  description:
+    "Practical AI guides, tools, and workflow systems for people who build things.",
   metadataBase: new URL(getSiteUrl()),
   alternates: {
     canonical: "/",
@@ -30,7 +31,8 @@ export const metadata: Metadata = {
       }
     : {}),
   openGraph: {
-    description: "Practical AI guides, tools, and workflow systems for people who build things.",
+    description:
+      "Practical AI guides, tools, and workflow systems for people who build things.",
     siteName: "Open Agency",
     title: "Open Agency",
     type: "website",
@@ -38,7 +40,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    description: "Practical AI guides, tools, and workflow systems for people who build things.",
+    description:
+      "Practical AI guides, tools, and workflow systems for people who build things.",
     title: "Open Agency",
   },
 };
@@ -50,6 +53,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          async
+          id="google-adsense-script"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4790131778246365"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <CookieConsent>
           <FeedbackProvider>
