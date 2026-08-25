@@ -6,16 +6,14 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import styles from './blog.module.css';
 
 type BlogFiltersProps = {
-  categories: string[];
-  selectedCategory?: string | null;
-  selectedTag?: string | null;
-  tags: string[];
+  readonly selectedTag?: string | null;
+  readonly tags: readonly string[];
 };
 
 type FilterChipProps = {
-  active: boolean;
-  label: string;
-  onClick: () => void;
+  readonly active: boolean;
+  readonly label: string;
+  readonly onClick: () => void;
 };
 
 function FilterChip({ active, label, onClick }: FilterChipProps) {
@@ -31,61 +29,45 @@ function FilterChip({ active, label, onClick }: FilterChipProps) {
   );
 }
 
-export function BlogFilters({ categories, selectedCategory, selectedTag, tags }: BlogFiltersProps) {
+export function BlogFilters({ selectedTag, tags }: BlogFiltersProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const query = useMemo(() => new URLSearchParams(searchParams.toString()), [searchParams]);
 
-  function updateParam(name: 'category' | 'tag', value: string | null) {
+  function updateTag(value: string | null) {
     const nextParams = new URLSearchParams(query.toString());
+    nextParams.delete('category');
 
     if (!value) {
-      nextParams.delete(name);
-    } else if (nextParams.get(name) === value) {
-      nextParams.delete(name);
+      nextParams.delete('tag');
+    } else if (nextParams.get('tag') === value) {
+      nextParams.delete('tag');
     } else {
-      nextParams.set(name, value);
+      nextParams.set('tag', value);
     }
 
     const nextQuery = nextParams.toString();
     router.push(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
   }
 
-  const hasActiveFilter = Boolean(selectedCategory || selectedTag);
+  const hasActiveFilter = Boolean(selectedTag);
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-3" aria-labelledby="blog-filter-categories">
-        <h2 id="blog-filter-categories" className={styles.metaText}>
-          Filter by category
-        </h2>
-        <div className="flex flex-wrap gap-3">
-          <FilterChip active={!selectedCategory} label="All categories" onClick={() => updateParam('category', null)} />
-          {categories.map((category) => (
-            <FilterChip
-              key={category}
-              active={selectedCategory === category}
-              label={category}
-              onClick={() => updateParam('category', category)}
-            />
-          ))}
-        </div>
-      </section>
-
       <section className="flex flex-col gap-3" aria-labelledby="blog-filter-tags">
         <h2 id="blog-filter-tags" className={styles.metaText}>
           Filter by tag
         </h2>
         <div className="flex flex-wrap gap-3">
-          <FilterChip active={!selectedTag} label="All tags" onClick={() => updateParam('tag', null)} />
+          <FilterChip active={!selectedTag} label="All tags" onClick={() => updateTag(null)} />
           {tags.map((tag) => (
             <FilterChip
               key={tag}
               active={selectedTag === tag}
               label={`#${tag}`}
-              onClick={() => updateParam('tag', tag)}
+              onClick={() => updateTag(tag)}
             />
           ))}
         </div>

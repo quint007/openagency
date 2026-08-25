@@ -9,15 +9,18 @@ import { BlogFilters } from './BlogFilters';
 import styles from './blog.module.css';
 
 type BlogIndexPageProps = {
-  searchParams: Promise<{ category?: string | string[]; tag?: string | string[] }>;
+  readonly searchParams: Promise<{
+    readonly category?: string | readonly string[];
+    readonly tag?: string | readonly string[];
+  }>;
 };
 
-function readSingleParam(value: string | string[] | undefined): string | null {
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
+function readSingleParam(value: string | readonly string[] | undefined): string | null {
+  if (typeof value === 'string') {
+    return value;
   }
 
-  return value ?? null;
+  return value?.[0] ?? null;
 }
 
 function levelBadgeClassName(level: BlogLevel): string {
@@ -35,9 +38,9 @@ export const metadata: Metadata = {
       'application/rss+xml': toAbsoluteUrl('/feed.xml'),
     },
   },
-  description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+  description: 'Browse every published Open Agency guide, filter by topic tag, and go deeper into practical AI workflows.',
   openGraph: {
-    description: 'Browse every published Open Agency guide, filter by category and tag, and go deeper into practical AI workflows.',
+    description: 'Browse every published Open Agency guide, filter by topic tag, and go deeper into practical AI workflows.',
     siteName: 'Open Agency',
     title: 'Blog · Open Agency',
     type: 'website',
@@ -50,11 +53,10 @@ export const dynamic = 'force-dynamic';
 
 export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps) {
   const resolvedSearchParams = await searchParams;
-  const selectedCategory = readSingleParam(resolvedSearchParams.category);
   const selectedTag = readSingleParam(resolvedSearchParams.tag);
   const [filterOptions, posts] = await Promise.all([
     getBlogFilterOptions(),
-    getFilteredBlogCards({ category: selectedCategory, tag: selectedTag }),
+    getFilteredBlogCards({ tag: selectedTag }),
   ]);
 
   const jsonLd = {
@@ -90,13 +92,11 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
             <span className={`${styles.eyebrow} inline-flex self-start rounded-full px-3 py-2`}>Open Agency guides</span>
             <h1 className={`${styles.pageTitle} max-w-[12ch] text-[var(--on-surface)]`}>The blog for practical AI systems</h1>
             <p className={`${styles.pageDescription} max-w-[44rem]`}>
-              Browse every published guide, filter by category and tag, and go deeper into practical AI workflows.
+              Browse every published guide, filter by topic tag, and go deeper into practical AI workflows.
             </p>
           </div>
 
           <BlogFilters
-            categories={filterOptions.categories}
-            selectedCategory={selectedCategory}
             selectedTag={selectedTag}
             tags={filterOptions.tags}
           />
@@ -110,7 +110,7 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
               {posts.length} published {posts.length === 1 ? 'post' : 'posts'}
             </p>
             <h2 id="blog-index-title" className="text-[1.5rem] tracking-[-0.04em] text-[var(--on-surface)] sm:text-[1.75rem]">
-              {selectedCategory || selectedTag ? 'Filtered guide results' : 'Latest published guides'}
+              {selectedTag ? 'Filtered guide results' : 'Latest published guides'}
             </h2>
           </div>
 
@@ -118,7 +118,7 @@ export default async function BlogIndexPage({ searchParams }: BlogIndexPageProps
             <article className={`${styles.panelSurface} rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-6 py-7 sm:px-8`}>
               <div className="flex max-w-[42rem] flex-col gap-3">
                 <h3 className={`${styles.cardTitle} text-[var(--on-surface)]`}>No posts match this filter yet.</h3>
-                <p className={styles.cardBody}>Try clearing a category or tag to see the full published guide library.</p>
+                <p className={styles.cardBody}>Try clearing the tag to see the full published guide library.</p>
               </div>
             </article>
           ) : (

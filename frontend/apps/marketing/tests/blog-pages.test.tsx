@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import type { BlogPost } from '@open-agency/cms-client';
@@ -6,9 +6,10 @@ import type { BlogPost } from '@open-agency/cms-client';
 import BlogIndexPage from '../src/app/blog/page';
 import { generateMetadata } from '../src/app/blog/[slug]/page';
 
-const { getBlogPostMock, getBlogPostsMock } = vi.hoisted(() => ({
+const { getBlogPostMock, getBlogPostsMock, routerPushMock } = vi.hoisted(() => ({
   getBlogPostMock: vi.fn(),
   getBlogPostsMock: vi.fn(),
+  routerPushMock: vi.fn(),
 }));
 
 vi.mock('@open-agency/cms-client', () => ({
@@ -18,7 +19,7 @@ vi.mock('@open-agency/cms-client', () => ({
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/blog',
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: routerPushMock }),
   useSearchParams: () => new URLSearchParams(''),
 }));
 
@@ -92,7 +93,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-test('blog index renders published posts filtered by URL params', async () => {
+test('blog index ignores stale category params and renders no category controls', async () => {
   getBlogPostsMock.mockResolvedValue([
     createBlogPost(),
     createBlogPost({
@@ -107,7 +108,33 @@ test('blog index renders published posts filtered by URL params', async () => {
   render(await BlogIndexPage({ searchParams: Promise.resolve({ category: 'Writing' }) }));
 
   expect(screen.getByRole('heading', { name: /the blog for practical ai systems/i, level: 1 })).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'All categories' })).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'All categories' })).toBeNull();
+  expect(screen.queryByText('Filter by category')).toBeNull();
+
+  const results = screen.getByRole('heading', { name: 'Latest published guides', level: 2 }).closest('section');
+
+  if (!results) {
+    throw new Error('Expected latest guides section.');
+  }
+
+  expect(within(results).getByRole('link', { name: 'Writing with AI' }).getAttribute('href')).toBe('/blog/writing-with-ai');
+  expect(within(results).getByRole('link', { name: 'Automation systems' }).getAttribute('href')).toBe('/blog/automation-systems');
+});
+
+test('blog index filters published posts by tag URL params', async () => {
+  getBlogPostsMock.mockResolvedValue([
+    createBlogPost(),
+    createBlogPost({
+      id: 202,
+      slug: 'writing-with-ai',
+      tags: [{ id: '2', tag: 'voice' }],
+      title: 'Writing with AI',
+    }),
+  ]);
+
+  render(await BlogIndexPage({ searchParams: Promise.resolve({ tag: 'ops' }) }));
+
+  expect(screen.getByRole('button', { name: '#ops' }).getAttribute('aria-pressed')).toBe('true');
 
   const results = screen.getByRole('heading', { name: 'Filtered guide results', level: 2 }).closest('section');
 
@@ -115,8 +142,21 @@ test('blog index renders published posts filtered by URL params', async () => {
     throw new Error('Expected filtered results section.');
   }
 
-  expect(within(results).getByRole('link', { name: 'Writing with AI' }).getAttribute('href')).toBe('/blog/writing-with-ai');
-  expect(within(results).queryByRole('link', { name: 'Automation systems' })).toBeNull();
+  expect(within(results).getByRole('link', { name: 'Automation systems' }).getAttribute('href')).toBe('/blog/automation-systems');
+  expect(within(results).queryByRole('link', { name: 'Writing with AI' })).toBeNull();
+});
+
+test('unknown blog tags show the tag-only empty state and clear action', async () => {
+  getBlogPostsMock.mockResolvedValue([createBlogPost()]);
+
+  render(await BlogIndexPage({ searchParams: Promise.resolve({ tag: 'does-not-exist' }) }));
+
+  expect(screen.getByRole('heading', { name: 'No posts match this filter yet.', level: 3 })).toBeTruthy();
+  expect(screen.getByText('Try clearing the tag to see the full published guide library.')).toBeTruthy();
+
+  fireEvent.click(screen.getByRole('button', { name: 'Clear all filters' }));
+
+  expect(routerPushMock).toHaveBeenCalledWith('/blog', { scroll: false });
 });
 
 test('blog post metadata sets canonical URL and OG fallback when no CMS image exists', async () => {
