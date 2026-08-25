@@ -16,7 +16,11 @@ export default function CookiePreferencesPage() {
   return (
     <ResourceIndexPage
       eyebrow="Legal"
-      intro="Choose which optional cookies Open Agency may use. Your choice is saved in this browser and can be updated whenever you like."
+       intro={
+         hasOptionalIntegrations
+           ? "Choose which optional cookies Open Agency may use. Your choice is saved in this browser and can be updated whenever you like."
+           : "Open Agency currently uses only essential cookies. Your essential consent choice is saved in this browser."
+       }
       title="Cookie preferences"
     >
       <section className="px-4 sm:px-6 lg:px-8" aria-label="Cookie categories">
