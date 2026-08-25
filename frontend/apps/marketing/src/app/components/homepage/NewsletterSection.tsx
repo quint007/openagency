@@ -13,7 +13,7 @@ type NewsletterSectionProps = {
 
 export function NewsletterSection({ content }: NewsletterSectionProps) {
   const [email, setEmail] = useState("");
-  const [errorDismissed, setErrorDismissed] = useState(false);
+  const [dismissedError, setDismissedError] = useState<string | null>(null);
   const [state, formAction, pending] = useActionState<NewsletterSignupResult, FormData>(newsletterSignup, {
     status: "idle",
   });
@@ -25,7 +25,6 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
 
   useEffect(() => {
     if (state.status === "error") {
-      setErrorDismissed(false);
       inputRef.current?.focus();
     }
 
@@ -35,19 +34,23 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
   }, [state]);
 
   function handleRetry() {
-    setErrorDismissed(false);
+    setDismissedError(null);
     inputRef.current?.focus();
+  }
+
+  function handleSubmit() {
+    setDismissedError(null);
   }
 
   function handleEmailChange(nextValue: string) {
     setEmail(nextValue);
 
     if (state.status === "error") {
-      setErrorDismissed(true);
+      setDismissedError(state.error);
     }
   }
 
-  const errorState = state.status === "error" && !errorDismissed ? state : null;
+  const errorState = state.status === "error" && state.error !== dismissedError ? state : null;
   const describedBy = [privacyId];
 
   if (errorState) {
@@ -98,7 +101,7 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
                 </Alert>
               </div>
             ) : (
-              <form className="flex w-full flex-col gap-5" action={formAction} noValidate>
+              <form className="flex w-full flex-col gap-5" action={formAction} onSubmit={handleSubmit} noValidate>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                   <div className="flex flex-1 flex-col gap-4">
                     <label className={styles.newsletterLabel} htmlFor={emailId}>

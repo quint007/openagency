@@ -41,8 +41,7 @@ export type BlogDetail = BlogCard & {
 };
 
 export type BlogFilterOptions = {
-  categories: string[];
-  tags: string[];
+  readonly tags: readonly string[];
 };
 
 function getMediaUrl(value: unknown): string | null {
@@ -167,27 +166,17 @@ export async function getBlogFilterOptions(): Promise<BlogFilterOptions> {
   const cards = await getAllBlogCards();
 
   return {
-    categories: Array.from(new Set(cards.map((card) => card.category))).sort((a, b) => a.localeCompare(b)),
     tags: Array.from(new Set(cards.flatMap((card) => card.tags))).sort((a, b) => a.localeCompare(b)),
   };
 }
 
-export async function getFilteredBlogCards(filters: { category?: string | null; tag?: string | null }): Promise<BlogCard[]> {
-  const categoryFilter = filters.category ? slugifyFilterValue(filters.category) : null;
+export async function getFilteredBlogCards(filters: { readonly tag?: string | null }): Promise<BlogCard[]> {
   const tagFilter = filters.tag ? slugifyFilterValue(filters.tag) : null;
   const cards = await getAllBlogCards();
 
-  return cards.filter((card) => {
-    if (categoryFilter && slugifyFilterValue(card.category) !== categoryFilter) {
-      return false;
-    }
-
-    if (tagFilter && !card.tags.some((tag) => slugifyFilterValue(tag) === tagFilter)) {
-      return false;
-    }
-
-    return true;
-  });
+  return tagFilter
+    ? cards.filter((card) => card.tags.some((tag) => slugifyFilterValue(tag) === tagFilter))
+    : cards;
 }
 
 export async function getBlogDetail(slug: string): Promise<BlogDetail | null> {

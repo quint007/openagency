@@ -91,6 +91,26 @@ test("marketing homepage renders the approved homepage sections and footer contr
   expect(screen.getByText(homepageContent.hero.supportingLine)).toBeTruthy();
   expect(screen.getByText("Open source systems")).toBeTruthy();
 
+  const renderedSections = Array.from(main.querySelectorAll(":scope > section")).map(
+    (section) => {
+      const labelledBy = section.getAttribute("aria-labelledby");
+      const label = labelledBy ? document.getElementById(labelledBy) : null;
+
+      return {
+        id: section.id,
+        name: label?.textContent?.trim() ?? section.getAttribute("aria-label") ?? "",
+      };
+    },
+  );
+
+  expect(renderedSections).toEqual([
+    { id: homepageContent.hero.sectionId, name: homepageContent.hero.title },
+    { id: "solutions", name: homepageContent.trustBar.ariaLabel },
+    { id: "latest-guides", name: homepageContent.latestGuides.title },
+    { id: "tools-teaser", name: homepageContent.toolsTeaser.title },
+    { id: "newsletter", name: homepageContent.newsletter.title },
+  ]);
+
   const proofRow = screen.getByRole("list", {
     name: homepageContent.trustBar.ariaLabel,
   });
@@ -102,52 +122,6 @@ test("marketing homepage renders the approved homepage sections and footer contr
 
   for (const statement of homepageContent.trustBar.statements) {
     expect(within(proofRow).getByText(statement)).toBeTruthy();
-  }
-
-  const startHereSection = within(main).getByRole("region", {
-    name: homepageContent.startHere.title,
-  });
-  const startHereCards = within(startHereSection).getAllByRole("listitem");
-
-  expect(startHereCards).toHaveLength(homepageContent.startHere.cards.length);
-
-  homepageContent.startHere.cards.forEach((card, index) => {
-    const renderedCard = startHereCards[index];
-
-    expect(within(renderedCard).getByText(card.label)).toBeTruthy();
-    expect(
-      within(renderedCard).getByRole("heading", { name: card.title, level: 3 }),
-    ).toBeTruthy();
-    expect(within(renderedCard).getByText(card.body)).toBeTruthy();
-    expect(
-      within(renderedCard)
-        .getByRole("button", { name: card.cta.label })
-        .getAttribute("href"),
-    ).toBe(card.cta.href);
-  });
-
-  expect(
-    within(startHereSection).getByText(homepageContent.startHere.description),
-  ).toBeTruthy();
-
-  const awesomeListsSection = within(main).getByRole("region", {
-    name: homepageContent.awesomeLists.title,
-  });
-  const awesomeListCards = within(awesomeListsSection).getAllByRole("listitem");
-
-  expect(awesomeListCards).toHaveLength(
-    homepageContent.awesomeLists.previews.length,
-  );
-
-  for (const preview of homepageContent.awesomeLists.previews) {
-    expect(
-      within(awesomeListsSection)
-        .getByRole("link", { name: preview.label })
-        .getAttribute("href"),
-    ).toBe(preview.href);
-    expect(
-      within(awesomeListsSection).getByText(preview.description),
-    ).toBeTruthy();
   }
 
   const latestGuidesSection = within(main).getByRole("region", {
@@ -192,6 +166,11 @@ test("marketing homepage renders the approved homepage sections and footer contr
     ).toBe(card.href);
     expect(within(toolsSection).getByText(card.description)).toBeTruthy();
   }
+
+  expect(main.textContent).not.toMatch(/coming soon|in progress/i);
+  expect(
+    within(toolsSection).getByRole("link", { name: "Local model calculator" }),
+  ).toBeTruthy();
 
   const newsletterSection = within(main).getByRole("region", {
     name: homepageContent.newsletter.title,
@@ -240,6 +219,14 @@ test("marketing homepage renders the approved homepage sections and footer contr
   expect(
     within(footer).getByText(homepageContent.footer.copyright),
   ).toBeTruthy();
+
+  const renderedValueSurface = `${header?.textContent ?? ""} ${main.textContent ?? ""} ${footer.textContent ?? ""}`;
+  expect(renderedValueSurface).not.toMatch(
+    /templates|courses|all usable today|awesome lists|prompt brief|launch checklist|review rubric/i,
+  );
+  expect(
+    within(footer).queryByRole("link", { name: /awesome lists/i }),
+  ).toBeNull();
 }, 10000);
 
 test("homepage content contract keeps the latest guides section copy stable", () => {
@@ -253,30 +240,27 @@ test("homepage content contract keeps the latest guides section copy stable", ()
   );
 });
 
-test("homepage content contract keeps the approved hero and start-here copy", () => {
+test("homepage content contract keeps live-value hero and supporting copy", () => {
   expect(homepageContent.hero.title).toBe(
     "Work smarter with AI — not harder with hype.",
   );
-  expect(homepageContent.startHere.title).toBe(
-    "The fastest way to level up your AI workflow",
+  expect(homepageContent.hero.body).toBe(
+    "open-agency is a free, open-source site for people building with AI. Read practical guides and use the local model calculator to choose a model for your device.",
   );
   expect(homepageContent.hero.supportingLine).toBe(
-    "Everything free. No paywall. No account required to get started.",
+    "Free, open-source, and practical — no account required to get started.",
   );
-  expect(homepageContent.startHere.cards.map((card) => card.cta.href)).toEqual([
-    "/blog/opencode-starter",
-    "/awesome",
-    "/blog?category=writing",
-    "/blog?category=automation",
-  ]);
+  expect(homepageContent.hero.body).not.toMatch(/templates|courses|all usable today/i);
+  expect(homepageContent.trustBar.statements.join(" ")).not.toMatch(/templates|courses/i);
 });
 
-test("homepage content contract keeps the approved teaser copy and footer href contracts", () => {
-  expect(homepageContent.awesomeLists.title).toBe(
-    "The open-agency awesome lists",
-  );
+test("homepage content contract keeps the calculator teaser and footer href contracts", () => {
   expect(homepageContent.toolsTeaser.title).toBe(
     "Free tools. No account needed.",
+  );
+  expect(homepageContent.toolsTeaser.cards).toHaveLength(1);
+  expect(homepageContent.toolsTeaser.cards[0]?.href).toBe(
+    "/tools/local-model-calculator",
   );
   expect(homepageContent.newsletter.fieldLabel).toBe("Your email address");
   expect(homepageContent.newsletter.submitLabel).toBe("Subscribe — it's free");
@@ -291,7 +275,6 @@ test("homepage content contract keeps the approved teaser copy and footer href c
       title: "Navigation",
       links: [
         { label: "Guides", href: "/blog" },
-        { label: "Awesome lists", href: "/awesome" },
         { label: "Tools", href: "/tools" },
       ],
     },
@@ -307,4 +290,14 @@ test("homepage content contract keeps the approved teaser copy and footer href c
       ],
     },
   ]);
+});
+
+test("homepage content contract exposes only healthy navigation and calculator actions", () => {
+  expect(homepageContent.header.links).toEqual([{ label: "Guides", href: "/blog" }]);
+  expect(homepageContent.header.primaryCta).toEqual({
+    label: "Try the calculator",
+    href: "/tools/local-model-calculator",
+  });
+  expect(homepageContent.hero.primaryCta.href).toBe("/blog");
+  expect(homepageContent.hero.secondaryCta.href).toBe("/tools");
 });

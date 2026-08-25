@@ -181,6 +181,11 @@ export async function newsletterSignup(
   }
 
   const validEmail = result.data.email;
+
+  if (process.env.NODE_ENV !== "production" && process.env.E2E_NEWSLETTER_SUCCESS === "true") {
+    return { status: "success" };
+  }
+
   const audienceId = getNewsletterAudienceId();
 
   if (!audienceId) {

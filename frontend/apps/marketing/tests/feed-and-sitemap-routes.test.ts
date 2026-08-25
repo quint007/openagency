@@ -80,21 +80,30 @@ test('sitemap route includes blog index and published post URLs', async () => {
 
   expect(getServerSideSitemapMock).toHaveBeenCalledTimes(1);
   expect(entries).toEqual(
-    expect.arrayContaining([
-      expect.objectContaining({ loc: 'http://localhost:3000/' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/blog' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/awesome' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/awesome/agents' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/tools' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/tools/prompt-brief' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/newsletter' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/privacy' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/terms' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/blog/automation-systems' }),
-      expect.objectContaining({ loc: 'http://localhost:3000/blog/writing-with-ai' }),
-    ]),
-  );
-});
+      expect.arrayContaining([
+        expect.objectContaining({ loc: 'http://localhost:3000/' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/blog' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/tools' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/tools/local-model-calculator' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/privacy' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/terms' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/blog/automation-systems' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/blog/writing-with-ai' }),
+      ]),
+    );
+    expect(entries).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ loc: 'http://localhost:3000/awesome' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/awesome/agents' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/awesome/workflows' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/awesome/prompts' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/tools/prompt-brief' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/tools/launch-checklist' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/tools/review-rubric' }),
+        expect.objectContaining({ loc: 'http://localhost:3000/newsletter' }),
+      ]),
+    );
+  });
 
 test('sitemap route uses legal document updatedAt values and falls back for missing documents', async () => {
   getBlogPostsMock.mockResolvedValue([]);

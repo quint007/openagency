@@ -151,6 +151,27 @@ describe("newsletter subscribe flow", () => {
     expect(sendMock).not.toHaveBeenCalled();
   });
 
+  test("returns a generic error when Resend rejects contact persistence", async () => {
+    contactsCreateMock.mockResolvedValueOnce({
+      data: null,
+      error: {
+        message: "Resend unavailable",
+        name: "internal_server_error",
+        statusCode: 500,
+      },
+    });
+    const { newsletterSignup } = await loadActionsModule();
+
+    const result = await newsletterSignup({ status: "idle" }, createFormData("hello@example.com"));
+
+    expect(result).toEqual({
+      status: "error",
+      error: "Something went wrong. Please try again.",
+      code: "generic",
+    });
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
   test("returns success when contact persistence succeeds but welcome email delivery fails", async () => {
     sendMock.mockRejectedValueOnce(new Error("Resend unavailable"));
     const { newsletterSignup } = await loadActionsModule();

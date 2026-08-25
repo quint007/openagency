@@ -2,6 +2,7 @@
 
 import { Button } from "@open-agency/ui";
 
+import { cookieIntegrationConfig } from "./cookie-config";
 import { useCookieConsent } from "./context";
 
 export function CookieBanner() {
@@ -13,14 +14,23 @@ export function CookieBanner() {
     isPreferencesOpen,
     openPreferences,
   } = useCookieConsent();
+  const optionalActionsAreConfigured = cookieIntegrationConfig.hasOptionalIntegrations;
 
   if (!isHydrated || hasDecided || isPreferencesOpen) {
     return null;
   }
 
+  const optionalDescriptionParts = [
+    cookieIntegrationConfig.hasAnalytics ? "analytics cookies help us understand visits" : null,
+    cookieIntegrationConfig.hasAds ? "advertising cookies support the site" : null,
+  ].filter((description): description is string => description !== null);
+  const optionalDescription = optionalDescriptionParts.length > 0
+    ? `With your permission, ${optionalDescriptionParts.join(" and ")}.`
+    : "This site currently uses only essential cookies to keep Open Agency working.";
+
   return (
     <section
-      className="fixed inset-x-4 bottom-4 z-[60] mx-auto flex max-w-[72rem] flex-col gap-5 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-highest)_96%,transparent)] p-5 pb-24 shadow-[0_18px_48px_color-mix(in_srgb,var(--brand-primary)_12%,transparent)] backdrop-blur-xl sm:inset-x-6 sm:p-6 sm:pr-44 sm:pb-6 lg:flex-row lg:items-center lg:justify-between"
+      className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-[72rem] flex-col gap-4 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--surface-container-highest)_96%,transparent)] p-4 shadow-[0_18px_48px_color-mix(in_srgb,var(--brand-primary)_12%,transparent)] backdrop-blur-xl sm:inset-x-6 sm:bottom-4 sm:gap-5 sm:p-6 sm:pr-44 lg:flex-row lg:items-center lg:justify-between"
       aria-labelledby="cookie-consent-title"
       aria-describedby="cookie-consent-description"
       data-cookie-banner="true"
@@ -30,20 +40,24 @@ export function CookieBanner() {
           Choose your cookie settings
         </h2>
         <p id="cookie-consent-description" className="text-sm leading-7 text-[var(--on-surface-variant)]">
-          Essential cookies keep Open Agency working. With your permission, analytics and advertising cookies help us understand visits and support the site. <a className="text-[var(--brand-primary-light)] underline underline-offset-4 hover:text-[var(--on-surface)]" href="/privacy/cookies">Read the cookie policy</a>.
+          {optionalDescription} <a className="text-[var(--brand-primary-light)] underline underline-offset-4 hover:text-[var(--on-surface)]" href="/privacy/cookies">Read the cookie policy</a>
         </p>
       </div>
 
-      <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
-        <Button className="min-h-11 px-5" onClick={acceptAll}>
-          Accept all
-        </Button>
+      <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end">
+        {optionalActionsAreConfigured ? (
+          <Button className="min-h-11 px-5" onClick={acceptAll}>
+            Accept all
+          </Button>
+        ) : null}
         <Button className="min-h-11 px-5" variant="outline" onClick={acceptEssentialOnly}>
           Essential only
         </Button>
-        <Button className="min-h-11 px-5" variant="ghost" onClick={openPreferences}>
-          Manage preferences
-        </Button>
+        {optionalActionsAreConfigured ? (
+          <Button className="col-span-2 min-h-11 px-5 sm:col-span-1" variant="ghost" onClick={openPreferences}>
+            Manage preferences
+          </Button>
+        ) : null}
       </div>
     </section>
   );

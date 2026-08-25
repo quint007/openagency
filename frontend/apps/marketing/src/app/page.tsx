@@ -1,10 +1,8 @@
 import { Button, Logo } from "@open-agency/ui";
 import { ArrowRight } from "pixelarticons/react/ArrowRight";
 
-import { AwesomeListsSection } from "./components/homepage/AwesomeListsSection";
 import { LatestGuidesSection } from "./components/homepage/LatestGuidesSection";
 import { NewsletterSection } from "./components/homepage/NewsletterSection";
-import { StartHereSection } from "./components/homepage/StartHereSection";
 import { ToolsTeaserSection } from "./components/homepage/ToolsTeaserSection";
 import { TrustBarSection } from "./components/homepage/TrustBarSection";
 import { MarketingPageFrame } from "./components/MarketingPageFrame";
@@ -51,16 +49,14 @@ export default async function Home() {
             <Logo ariaLabel="Open Agency" size="lg" variant="mascot" />
             <div className="flex flex-col gap-3">
               <p className={styles.panelTitle}>Open source systems</p>
-              <p className={styles.panelBody}>Guides, tools, and repeatable workflows for building with AI without hiding the human review loop.</p>
+              <p className={styles.panelBody}>Practical guides and a local model calculator for building with AI without hiding the human review loop.</p>
             </div>
           </div>
         </div>
       </section>
 
       <TrustBarSection content={homepageContent.trustBar} />
-      <StartHereSection content={homepageContent.startHere} />
       <LatestGuidesSection content={homepageContent.latestGuides} state={latestGuidesState} />
-      <AwesomeListsSection content={homepageContent.awesomeLists} />
       <ToolsTeaserSection content={homepageContent.toolsTeaser} />
       <NewsletterSection content={homepageContent.newsletter} />
     </MarketingPageFrame>

@@ -43,11 +43,8 @@ set of product-relevant changes.
 - Review the cookie policy copy at `/privacy/cookies` for accuracy once the
   final third-party integrations are chosen.
 
-## Temporary marketing surfaces
+## Temporary internal surfaces
 
-- `/awesome`, `/awesome/[slug]`, `/tools`, and `/tools/[slug]` are intentionally
-  marked **Coming soon** in `CardSection`. They need real content, copy, and
-  likely dedicated data sources before launch.
 - `/blog/thumbnail-preview` is a temporary internal tool for validating Open
   Graph images. It should be removed or placed behind authentication before a
   public launch.

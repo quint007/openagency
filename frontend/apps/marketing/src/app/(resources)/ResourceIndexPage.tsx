@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { ArrowRight } from "pixelarticons/react/ArrowRight";
 
 import { MarketingPageFrame } from "../components/MarketingPageFrame";
-import { ComingSoonBadge } from "../components/ComingSoon";
 import styles from "../blog/blog.module.css";
 
 export type ResourceCard = {
@@ -13,7 +12,6 @@ export type ResourceCard = {
 };
 
 type ResourceIndexPageProps = {
-  banner?: ReactNode;
   cards?: ResourceCard[];
   children?: ReactNode;
   eyebrow: string;
@@ -21,7 +19,7 @@ type ResourceIndexPageProps = {
   title: string;
 };
 
-export function ResourceIndexPage({ banner, cards = [], children, eyebrow, intro, title }: ResourceIndexPageProps) {
+export function ResourceIndexPage({ cards = [], children, eyebrow, intro, title }: ResourceIndexPageProps) {
   return (
     <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
       <section className="px-4 pt-8 sm:px-6 lg:px-8 lg:pt-14" aria-labelledby="resource-page-title">
@@ -34,9 +32,6 @@ export function ResourceIndexPage({ banner, cards = [], children, eyebrow, intro
         </div>
       </section>
 
-      {/* Temporary resource signal: remove this banner when real content is available. */}
-      {banner}
-
       {cards.length > 0 ? (
         <section className="px-4 sm:px-6 lg:px-8" aria-label={`${title} resources`}>
           <div className="mx-auto grid w-full max-w-[100rem] gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -44,7 +39,6 @@ export function ResourceIndexPage({ banner, cards = [], children, eyebrow, intro
               <article key={card.href} className={`${styles.panelSurface} flex min-h-full flex-col gap-5 rounded-[1.75rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-6 py-6 sm:px-7`}>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className={`${styles.eyebrow} inline-flex self-start rounded-full px-3 py-2`}>{card.label}</span>
-                  {card.href.startsWith("/tools/") || card.href.startsWith("/awesome/") ? <ComingSoonBadge /> : null}
                 </div>
                 <div className="flex flex-1 flex-col gap-4">
                   <h2 className={`${styles.cardTitle} text-[var(--on-surface)]`}>{card.title}</h2>

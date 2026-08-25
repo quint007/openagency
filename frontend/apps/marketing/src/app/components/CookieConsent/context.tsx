@@ -5,26 +5,34 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
 } from "react";
 
-export const COOKIE_CONSENT_STORAGE_KEY = "open-agency-cookie-consent";
+import type { CookieIntegrationConfig } from "./cookie-config";
+import { cookieIntegrationConfig } from "./cookie-config";
+import { reloadPage } from "./browser";
+import {
+  DEFAULT_COOKIE_CONSENT,
+  getServerConsentSnapshot,
+  getStoredConsentSnapshot,
+  parseStoredConsent,
+  persistConsent,
+  serializeConsent,
+  subscribeToConsent,
+  type CookieConsent,
+  type CookieConsentUpdate,
+} from "./storage";
 
-export type CookieConsent = {
-  essential: true;
-  analytics: boolean;
-  ads: boolean;
-};
-
-export type CookieConsentUpdate = Partial<Pick<CookieConsent, "analytics" | "ads">>;
-
-export const DEFAULT_COOKIE_CONSENT: CookieConsent = {
-  essential: true,
-  analytics: false,
-  ads: false,
-};
+export {
+  COOKIE_CONSENT_STORAGE_KEY,
+  COOKIE_CONSENT_STORAGE_VERSION,
+  DEFAULT_COOKIE_CONSENT,
+  type CookieConsent,
+  type CookieConsentUpdate,
+} from "./storage";
 
 type CookieConsentContextValue = {
   acceptAll: () => void;
@@ -39,73 +47,19 @@ type CookieConsentContextValue = {
 };
 
 const CookieConsentContext = createContext<CookieConsentContextValue | undefined>(undefined);
-const consentListeners = new Set<() => void>();
 
-function isCookieConsent(value: unknown): value is CookieConsent {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
+export function normalizeCookieConsent(
+  consent: CookieConsent,
+  config: Pick<CookieIntegrationConfig, "hasAds" | "hasAnalytics"> = cookieIntegrationConfig,
+): CookieConsent {
+  const analyticsForConfiguredIntegrations = config.hasAnalytics && consent.analytics;
+  const adsForConfiguredIntegrations = config.hasAds && consent.ads;
 
-  const candidate = value as Record<string, unknown>;
-
-  return (
-    candidate.essential === true &&
-    typeof candidate.analytics === "boolean" &&
-    typeof candidate.ads === "boolean"
-  );
-}
-
-function parseStoredConsent(storedValue: string | null): CookieConsent | null {
-  try {
-    if (!storedValue) {
-      return null;
-    }
-
-    const parsedValue: unknown = JSON.parse(storedValue);
-    return isCookieConsent(parsedValue) ? parsedValue : null;
-  } catch {
-    return null;
-  }
-}
-
-function getStoredConsentSnapshot() {
-  try {
-    return window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function getServerConsentSnapshot() {
-  return null;
-}
-
-function subscribeToConsent(listener: () => void) {
-  consentListeners.add(listener);
-
-  function handleStorage(event: StorageEvent) {
-    if (event.key === COOKIE_CONSENT_STORAGE_KEY) {
-      listener();
-    }
-  }
-
-  window.addEventListener("storage", handleStorage);
-
-  return () => {
-    consentListeners.delete(listener);
-    window.removeEventListener("storage", handleStorage);
+  return {
+    essential: true,
+    analytics: analyticsForConfiguredIntegrations,
+    ads: adsForConfiguredIntegrations,
   };
-}
-
-function persistConsent(consent: CookieConsent) {
-  try {
-    window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(consent));
-  } catch {
-  }
-
-  for (const listener of consentListeners) {
-    listener();
-  }
 }
 
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
@@ -127,10 +81,32 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const hasDecided = sessionConsent !== null || storedConsent !== null;
 
   const commitConsent = useCallback((nextConsent: CookieConsent) => {
-    setSessionConsent(nextConsent);
+    const normalizedConsent = normalizeCookieConsent(nextConsent);
+    const previousConsent = sessionConsent ?? storedConsent ?? DEFAULT_COOKIE_CONSENT;
+    const optionalConsentWasRevoked =
+      (previousConsent.analytics && !normalizedConsent.analytics) ||
+      (previousConsent.ads && !normalizedConsent.ads);
+
+    setSessionConsent(normalizedConsent);
     setIsPreferencesOpen(false);
-    persistConsent(nextConsent);
-  }, []);
+    const didPersist = persistConsent(normalizedConsent);
+
+    if (didPersist && optionalConsentWasRevoked) {
+      reloadPage();
+    }
+  }, [sessionConsent, storedConsent]);
+
+  useEffect(() => {
+    if (!isHydrated || !storedConsentValue || !storedConsent) {
+      return;
+    }
+
+    const canonicalValue = serializeConsent(storedConsent);
+
+    if (storedConsentValue !== canonicalValue) {
+      persistConsent(storedConsent);
+    }
+  }, [isHydrated, storedConsent, storedConsentValue]);
 
   const acceptAll = useCallback(() => {
     commitConsent({ essential: true, analytics: true, ads: true });

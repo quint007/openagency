@@ -29,6 +29,18 @@ const imageHostUrls = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  async redirects() {
+    return [
+      { source: "/awesome", destination: "/", permanent: true },
+      { source: "/awesome/agents", destination: "/", permanent: true },
+      { source: "/awesome/workflows", destination: "/", permanent: true },
+      { source: "/awesome/prompts", destination: "/", permanent: true },
+      { source: "/tools/prompt-brief", destination: "/tools", permanent: true },
+      { source: "/tools/launch-checklist", destination: "/tools", permanent: true },
+      { source: "/tools/review-rubric", destination: "/tools", permanent: true },
+      { source: "/newsletter", destination: "/#newsletter", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: imageHostUrls.map((item) => {
       const url = new URL(item);

@@ -81,6 +81,7 @@ export interface Config {
     categories: Category;
     users: User;
     'api-clients': ApiClient;
+    'tool-submissions': ToolSubmission;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -111,6 +112,7 @@ export interface Config {
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
+    'tool-submissions': ToolSubmissionsSelect<false> | ToolSubmissionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1089,6 +1091,35 @@ export interface ApiClient {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tool-submissions".
+ */
+export interface ToolSubmission {
+  id: number;
+  toolSlug: string;
+  email: string;
+  inputs:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  result:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1369,6 +1400,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'api-clients';
         value: number | ApiClient;
+      } | null)
+    | ({
+        relationTo: 'tool-submissions';
+        value: number | ToolSubmission;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1926,6 +1961,18 @@ export interface ApiClientsSelect<T extends boolean = true> {
   enableAPIKey?: T;
   apiKey?: T;
   apiKeyIndex?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tool-submissions_select".
+ */
+export interface ToolSubmissionsSelect<T extends boolean = true> {
+  toolSlug?: T;
+  email?: T;
+  inputs?: T;
+  result?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
