@@ -10,9 +10,9 @@ import { cookieIntegrationConfig } from "./cookie-config";
 
 function CookieSettingsTrigger() {
   const { hasDecided, isHydrated, openPreferences } = useCookieConsent();
-  const canReopenOptionalSettings = cookieIntegrationConfig.hasOptionalIntegrations;
+  const optionalSettingsAreAvailable = cookieIntegrationConfig.hasOptionalIntegrations;
 
-  if (!isHydrated || !hasDecided || !canReopenOptionalSettings) {
+  if (!isHydrated || !hasDecided || !optionalSettingsAreAvailable) {
     return null;
   }
 

@@ -102,20 +102,20 @@ export function normalizeCookieConsent(
   consent: CookieConsent,
   config: Pick<CookieIntegrationConfig, "hasAds" | "hasAnalytics"> = cookieIntegrationConfig,
 ): CookieConsent {
-  const configuredAnalytics = config.hasAnalytics && consent.analytics;
-  const configuredAds = config.hasAds && consent.ads;
+  const analyticsForConfiguredIntegrations = config.hasAnalytics && consent.analytics;
+  const adsForConfiguredIntegrations = config.hasAds && consent.ads;
 
   return {
     essential: true,
-    analytics: configuredAnalytics,
-    ads: configuredAds,
+    analytics: analyticsForConfiguredIntegrations,
+    ads: adsForConfiguredIntegrations,
   };
 }
 
 function serializeConsent(consent: CookieConsent): string {
-  const storageVersion = COOKIE_CONSENT_STORAGE_VERSION;
+  const versionedStorageValue = COOKIE_CONSENT_STORAGE_VERSION;
   const storedConsent: StoredCookieConsent = {
-    version: storageVersion,
+    version: versionedStorageValue,
     consent,
   };
 
@@ -183,7 +183,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const commitConsent = useCallback((nextConsent: CookieConsent) => {
     const normalizedConsent = normalizeCookieConsent(nextConsent);
     const previousConsent = sessionConsent ?? storedConsent ?? DEFAULT_COOKIE_CONSENT;
-    const didRevokeOptionalConsent =
+    const optionalConsentWasRevoked =
       (previousConsent.analytics && !normalizedConsent.analytics) ||
       (previousConsent.ads && !normalizedConsent.ads);
 
@@ -191,7 +191,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     setIsPreferencesOpen(false);
     persistConsent(normalizedConsent);
 
-    if (didRevokeOptionalConsent) {
+    if (optionalConsentWasRevoked) {
       reloadPage();
     }
   }, [sessionConsent, storedConsent]);
