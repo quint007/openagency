@@ -102,10 +102,13 @@ export function normalizeCookieConsent(
   consent: CookieConsent,
   config: Pick<CookieIntegrationConfig, "hasAds" | "hasAnalytics"> = cookieIntegrationConfig,
 ): CookieConsent {
+  const analytics = config.hasAnalytics && consent.analytics;
+  const ads = config.hasAds && consent.ads;
+
   return {
     essential: true,
-    analytics: config.hasAnalytics && consent.analytics,
-    ads: config.hasAds && consent.ads,
+    analytics,
+    ads,
   };
 }
 
@@ -180,7 +183,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
   const commitConsent = useCallback((nextConsent: CookieConsent) => {
     const normalizedConsent = normalizeCookieConsent(nextConsent);
     const previousConsent = sessionConsent ?? storedConsent ?? DEFAULT_COOKIE_CONSENT;
-    const revokedOptionalConsent =
+    const trueToFalseOptionalTransition =
       (previousConsent.analytics && !normalizedConsent.analytics) ||
       (previousConsent.ads && !normalizedConsent.ads);
 
@@ -188,7 +191,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     setIsPreferencesOpen(false);
     persistConsent(normalizedConsent);
 
-    if (revokedOptionalConsent) {
+    if (trueToFalseOptionalTransition) {
       reloadPage();
     }
   }, [sessionConsent, storedConsent]);
