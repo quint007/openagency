@@ -194,6 +194,17 @@ async function getFeedbackGeometry(page: Page) {
 }
 
 async function expectActionableFeedbackGeometry(page: Page) {
+  await expect.poll(
+    async () => {
+      const geometry = await getFeedbackGeometry(page)
+
+      return geometry.feedback.left > 0 && geometry.feedback.top > 0 &&
+        geometry.feedback.right < geometry.viewport.width && geometry.feedback.bottom < geometry.viewport.height &&
+        geometry.blockers.length === 0 && geometry.hitTargetIsFeedback
+    },
+    { timeout: 5000 },
+  ).toBe(true)
+
   const geometry = await getFeedbackGeometry(page)
 
   expect(geometry.feedback.left).toBeGreaterThan(0)
@@ -202,6 +213,15 @@ async function expectActionableFeedbackGeometry(page: Page) {
   expect(geometry.feedback.bottom).toBeLessThan(geometry.viewport.height)
   expect(geometry.blockers, JSON.stringify(geometry)).toEqual([])
   expect(geometry.hitTargetIsFeedback, JSON.stringify(geometry)).toBe(true)
+}
+
+async function scrollAndSettle(page: Page, position: number) {
+  await page.evaluate((scrollTop) => {
+    window.scrollTo(0, scrollTop)
+    return new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+  }, position)
 }
 
 test('marketing homepage covers full desktop layout and primary navigation', async ({ page }) => {
@@ -434,6 +454,30 @@ test('feedback trigger stays actionable across consent, menu, and viewport state
       await page.getByRole('button', { name: 'Close menu' }).click()
       await expect(page.locator('#marketing-mobile-menu')).toHaveCount(0)
       await expect(feedbackButton).toBeVisible()
+      await expectActionableFeedbackGeometry(page)
+    }
+  }
+})
+
+test('feedback trigger stays actionable while scrolling the full homepage', async ({ page }) => {
+  for (const viewport of feedbackViewports) {
+    await page.setViewportSize(viewport)
+    await page.goto('/')
+    await page.waitForLoadState('networkidle')
+    await page.evaluate(() => localStorage.clear())
+    await page.reload()
+    await page.waitForLoadState('networkidle')
+    await page.getByRole('button', { name: 'Essential only' }).click()
+
+    const scrollPositions = await page.evaluate(() => {
+      const maximumScroll = document.documentElement.scrollHeight - window.innerHeight
+
+      return [0, 500, Math.round(maximumScroll / 2), maximumScroll]
+        .filter((position, index, positions) => position >= 0 && positions.indexOf(position) === index)
+    })
+
+    for (const scrollPosition of scrollPositions) {
+      await scrollAndSettle(page, scrollPosition)
       await expectActionableFeedbackGeometry(page)
     }
   }

@@ -9,7 +9,7 @@ import { useFeedback } from "./FeedbackProvider";
 export function FeedbackButton() {
   const { openFeedback } = useFeedback();
   const { hasDecided, isHydrated } = useCookieConsent();
-  const [cookieOverlayBottomOffset, setCookieOverlayBottomOffset] = useState(0);
+  const [cookieOverlayBottomOffset, setCookieOverlayBottomOffset] = useState(130);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -29,14 +29,22 @@ export function FeedbackButton() {
       return;
     }
 
-    const initialCookieOverlay = document.querySelector<HTMLElement>(
-      hasDecided ? "[data-cookie-settings]" : "[data-cookie-banner]",
-    );
+    const findCookieOverlay = () => {
+      const visibleOverlays = Array.from(document.querySelectorAll<HTMLElement>(
+        "[data-cookie-banner], [data-cookie-settings]",
+      )).filter((element) => {
+        const styles = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+
+        return styles.display !== "none" && styles.visibility !== "hidden" && rect.height > 0;
+      });
+
+      return visibleOverlays.find((element) => element.hasAttribute("data-cookie-settings")) ?? visibleOverlays[0];
+    };
+    const initialCookieOverlay = findCookieOverlay();
 
     const updateOffset = () => {
-      const cookieOverlay = document.querySelector<HTMLElement>(
-        hasDecided ? "[data-cookie-settings]" : "[data-cookie-banner]",
-      );
+      const cookieOverlay = findCookieOverlay();
       const overlayBottomOffset = cookieOverlay
         ? window.innerHeight - cookieOverlay.getBoundingClientRect().top
         : 0;
@@ -48,7 +56,7 @@ export function FeedbackButton() {
 
       if (buttonHeight > 0) {
         const buttonBlockers = Array.from(document.querySelectorAll<HTMLElement>(
-          "header, main a, main button, footer a, footer button",
+          "header, [data-cookie-banner], [data-cookie-settings], main a, main button, footer a, footer button",
         )).filter((element) => {
           const rect = element.getBoundingClientRect();
           const styles = window.getComputedStyle(element);
@@ -58,28 +66,52 @@ export function FeedbackButton() {
             rect.right > 0 && rect.left < window.innerWidth;
         });
 
-        for (const blocker of buttonBlockers) {
-          const blockerRect = blocker.getBoundingClientRect();
-          const buttonTop = window.innerHeight - bottomOffset - buttonHeight;
-          const buttonBottom = window.innerHeight - bottomOffset;
-          const overlaps =
-            buttonTop < blockerRect.bottom && buttonBottom > blockerRect.top &&
-            buttonRect !== undefined && buttonRect.left < blockerRect.right && buttonRect.right > blockerRect.left;
+        const blockerRects = buttonBlockers.map((blocker) => blocker.getBoundingClientRect());
+        const minTop = 16;
+        const maxTop = window.innerHeight - bottomOffset - buttonHeight;
+        const candidateTops = [
+          maxTop,
+          ...blockerRects.flatMap((rect) => [rect.bottom + spacing, rect.top - spacing - buttonHeight]),
+        ]
+          .map((top) => Math.min(Math.max(top, minTop), maxTop))
+          .filter((top, index, tops) => tops.indexOf(top) === index)
+          .sort((first, second) => second - first);
+        const slotTop = candidateTops.find((top) => {
+          const candidateBottom = top + buttonHeight;
 
-          if (overlaps) {
-            bottomOffset = Math.max(bottomOffset, window.innerHeight - blockerRect.top + spacing);
-          }
+          return blockerRects.every((rect) =>
+            top >= rect.bottom || candidateBottom <= rect.top ||
+            buttonRect === undefined || buttonRect.left >= rect.right || buttonRect.right <= rect.left,
+          );
+        });
+
+        if (slotTop !== undefined) {
+          bottomOffset = window.innerHeight - slotTop - buttonHeight;
         }
       }
 
-      setCookieOverlayBottomOffset(bottomOffset);
+      setCookieOverlayBottomOffset((currentOffset) => currentOffset === bottomOffset ? currentOffset : bottomOffset);
+      if (buttonRect && Math.abs(buttonRect.bottom - (window.innerHeight - bottomOffset)) > 0.5) {
+        scheduleUpdate();
+      }
     };
-    const animationFrame = window.requestAnimationFrame(updateOffset);
-    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(updateOffset);
+    let animationFrame: number | null = null;
+    const scheduleUpdate = () => {
+      if (animationFrame !== null) {
+        return;
+      }
+
+      animationFrame = window.requestAnimationFrame(() => {
+        animationFrame = null;
+        updateOffset();
+      });
+    };
+    scheduleUpdate();
+    const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(scheduleUpdate);
     if (initialCookieOverlay && resizeObserver) {
       resizeObserver.observe(initialCookieOverlay);
     }
-    const domObserver = new MutationObserver(updateOffset);
+    const domObserver = new MutationObserver(scheduleUpdate);
     domObserver.observe(document.body, {
       attributeFilter: ["class", "data-cookie-banner", "data-cookie-settings"],
       attributes: true,
@@ -89,24 +121,27 @@ export function FeedbackButton() {
     let isActive = true;
     document.fonts?.ready.then(() => {
       if (isActive) {
-        updateOffset();
+        scheduleUpdate();
       }
     });
-    window.addEventListener("resize", updateOffset);
-    window.addEventListener("scroll", updateOffset, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
 
     return () => {
       isActive = false;
-      window.cancelAnimationFrame(animationFrame);
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame);
+      }
       resizeObserver?.disconnect();
       domObserver.disconnect();
-      window.removeEventListener("resize", updateOffset);
-      window.removeEventListener("scroll", updateOffset);
+      window.removeEventListener("resize", scheduleUpdate);
+      window.removeEventListener("scroll", scheduleUpdate);
     };
   }, [cookieOverlayBottomOffset, hasDecided, isHydrated]);
 
-  const safeAreaStyle = cookieOverlayBottomOffset > 0 && isHydrated
-    ? { bottom: `${cookieOverlayBottomOffset}px` }
+  const effectiveBottomOffset = hasDecided ? Math.max(cookieOverlayBottomOffset, 130) : cookieOverlayBottomOffset;
+  const safeAreaStyle = effectiveBottomOffset > 0 && isHydrated
+    ? { bottom: `${effectiveBottomOffset}px` }
     : undefined;
   const visibilityClass = isMobileMenuOpen ? "hidden" : !isHydrated || !hasDecided ? "hidden sm:inline-flex" : "inline-flex";
 
