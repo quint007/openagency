@@ -137,7 +137,7 @@ export function FeedbackButton() {
       window.removeEventListener("resize", scheduleUpdate);
       window.removeEventListener("scroll", scheduleUpdate);
     };
-  }, [cookieOverlayBottomOffset, hasDecided, isHydrated]);
+  }, [hasDecided, isHydrated]);
 
   const effectiveBottomOffset = hasDecided ? Math.max(cookieOverlayBottomOffset, 130) : cookieOverlayBottomOffset;
   const safeAreaStyle = effectiveBottomOffset > 0 && isHydrated
