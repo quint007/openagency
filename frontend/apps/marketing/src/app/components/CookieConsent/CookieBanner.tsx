@@ -14,6 +14,7 @@ export function CookieBanner() {
     isPreferencesOpen,
     openPreferences,
   } = useCookieConsent();
+  const showOptionalActions = cookieIntegrationConfig.hasOptionalIntegrations;
 
   if (!isHydrated || hasDecided || isPreferencesOpen) {
     return null;
@@ -44,7 +45,7 @@ export function CookieBanner() {
       </div>
 
       <div className="grid shrink-0 grid-cols-2 gap-2 sm:flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end">
-        {cookieIntegrationConfig.hasOptionalIntegrations ? (
+        {showOptionalActions ? (
           <Button className="min-h-11 px-5" onClick={acceptAll}>
             Accept all
           </Button>
@@ -52,7 +53,7 @@ export function CookieBanner() {
         <Button className="min-h-11 px-5" variant="outline" onClick={acceptEssentialOnly}>
           Essential only
         </Button>
-        {cookieIntegrationConfig.hasOptionalIntegrations ? (
+        {showOptionalActions ? (
           <Button className="col-span-2 min-h-11 px-5 sm:col-span-1" variant="ghost" onClick={openPreferences}>
             Manage preferences
           </Button>

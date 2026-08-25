@@ -110,8 +110,9 @@ export function normalizeCookieConsent(
 }
 
 function serializeConsent(consent: CookieConsent): string {
+  const version = COOKIE_CONSENT_STORAGE_VERSION;
   const storedConsent: StoredCookieConsent = {
-    version: COOKIE_CONSENT_STORAGE_VERSION,
+    version,
     consent,
   };
 

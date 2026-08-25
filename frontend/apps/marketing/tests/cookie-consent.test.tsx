@@ -108,6 +108,19 @@ test("unconfigured consent does not advertise optional categories", () => {
   expect(within(banner).queryByRole("button", { name: "Manage preferences" })).toBeNull();
 });
 
+test("unconfigured consent exposes only the essential action", () => {
+  render(
+    <CookieConsent>
+      <p>Page content</p>
+    </CookieConsent>,
+  );
+
+  const banner = screen.getByRole("region", { name: "Choose your cookie settings" });
+
+  expect(within(banner).getByRole("button", { name: "Essential only" })).toBeTruthy();
+  expect(within(banner).getAllByRole("button")).toHaveLength(1);
+});
+
 test("stale legacy grants are masked and migrated to the versioned storage contract", () => {
   window.localStorage.setItem(
     COOKIE_CONSENT_STORAGE_KEY,
