@@ -49,7 +49,8 @@ test('OA-15 inventory artifact documents app findings and the backend type bound
 
   expect(inventory).toContain('`frontend/apps/marketing`: no direct Payload REST consumers found.')
   expect(inventory).toContain('`frontend/apps/courses`: no direct Payload REST consumers found.')
-  expect(inventory).toContain('`frontend/apps/marketing/src/app/components/homepage/LatestGuidesSection.tsx` remains a static seam, not a live CMS call.')
+  expect(inventory).toContain('`frontend/apps/marketing/src/app/components/homepage/LatestGuidesSection.tsx`')
+  expect(inventory).toContain('`@open-agency/cms-client`')
   expect(inventory).toContain('`backend/openagency-backend/src/payload-types-public.ts`')
   expect(inventory).not.toContain('@open-agency/api-client/payload-types')
 })

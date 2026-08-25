@@ -75,13 +75,6 @@ const isPayloadToolSubmissionCreateResponse = (
   response: PayloadToolSubmission | PayloadToolSubmissionCreateResponse,
 ): response is PayloadToolSubmissionCreateResponse => 'doc' in response
 
-const cleanText = (value?: string | null): string | null => {
-  if (typeof value !== 'string') return null
-
-  const normalized = value.replace(/\s+/g, ' ').trim()
-  return normalized.length > 0 ? normalized : null
-}
-
 export const mapToolSubmissionToViewModel = (
   submission: PayloadToolSubmission,
 ): ToolSubmissionViewModel | null => {

@@ -52,11 +52,12 @@ export function FeedbackButton() {
       const buttonRect = button?.getBoundingClientRect();
       const buttonHeight = buttonRect?.height ?? 0;
       const spacing = hasDecided ? 16 : 32;
-      let bottomOffset = Math.max(overlayBottomOffset + spacing, hasDecided ? 130 : 16);
+      const decidedBaseline = window.innerWidth < 640 ? 16 : 130;
+      let bottomOffset = Math.max(overlayBottomOffset + spacing, hasDecided ? decidedBaseline : 16);
 
       if (buttonHeight > 0) {
         const buttonBlockers = Array.from(document.querySelectorAll<HTMLElement>(
-          "header, [data-cookie-banner], [data-cookie-settings], main a, main button, footer a, footer button",
+          "header, [data-cookie-banner], [data-cookie-settings], main a, main button, main h1, main h2, main h3, main li, main p, footer [aria-label=\"Open Agency\"], footer a, footer button, footer h2, footer p",
         )).filter((element) => {
           const rect = element.getBoundingClientRect();
           const styles = window.getComputedStyle(element);
@@ -139,7 +140,7 @@ export function FeedbackButton() {
     };
   }, [hasDecided, isHydrated]);
 
-  const effectiveBottomOffset = hasDecided ? Math.max(cookieOverlayBottomOffset, 130) : cookieOverlayBottomOffset;
+  const effectiveBottomOffset = cookieOverlayBottomOffset;
   const safeAreaStyle = effectiveBottomOffset > 0 && isHydrated
     ? { bottom: `${effectiveBottomOffset}px` }
     : undefined;

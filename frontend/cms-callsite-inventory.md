@@ -4,7 +4,7 @@
 
 - `frontend/apps/marketing`: no direct Payload REST consumers found.
 - `frontend/apps/courses`: no direct Payload REST consumers found.
-- `frontend/apps/marketing/src/app/components/homepage/LatestGuidesSection.tsx` remains a static seam, not a live CMS call.
+- `frontend/apps/marketing/src/app/components/homepage/LatestGuidesSection.tsx` renders state loaded through `@open-agency/cms-client`; the component does not call Payload directly.
 
 ## Generated type boundary
 

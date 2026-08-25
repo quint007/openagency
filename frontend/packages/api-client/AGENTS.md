@@ -27,5 +27,5 @@ pnpm --dir frontend/packages/api-client typecheck
 ```
 
 ## NOTES
-- Current main consumer is the marketing homepage latest-guides section.
+- Current marketing consumers are the local-model calculator submission and shared-result routes.
 - This package is small today, but it is still a real ownership boundary inside the frontend workspace.

@@ -5,7 +5,8 @@ import { homepageContent } from '../../src/app/homepage-content'
 const desktopViewport = { width: 1280, height: 900 }
 const tabletViewport = { width: 768, height: 900 }
 const mobileViewport = { width: 375, height: 844 }
-const feedbackViewports = [mobileViewport, tabletViewport, desktopViewport] as const
+const compactMobileViewport = { width: 375, height: 812 }
+const feedbackViewports = [compactMobileViewport, mobileViewport, tabletViewport, desktopViewport] as const
 
 const expectedSectionOrder = [
   { id: homepageContent.hero.sectionId, name: homepageContent.hero.title },
@@ -149,7 +150,7 @@ async function getFeedbackGeometry(page: Page) {
         rect.bottom > 0 && rect.top < viewport.height && rect.right > 0 && rect.left < viewport.width
     }
     const blockers = Array.from(document.querySelectorAll<HTMLElement>(
-      'header, #marketing-mobile-menu, [data-cookie-banner], [data-cookie-settings], main a, main button, footer a, footer button',
+      'header, #marketing-mobile-menu, [data-cookie-banner], [data-cookie-settings], main a, main button, main h1, main h2, main h3, main li, main p, footer [aria-label="Open Agency"], footer a, footer button, footer h2, footer p',
     ))
       .filter((element) => element !== feedbackButton && isVisible(element))
       .filter((element) => intersects(feedbackRect, element.getBoundingClientRect()))
@@ -481,6 +482,34 @@ test('feedback trigger stays actionable while scrolling the full homepage', asyn
       await expectActionableFeedbackGeometry(page)
     }
   }
+})
+
+test('feedback trigger stays clear of footer copy on mobile unsubscribe errors', async ({ page }) => {
+  await page.setViewportSize(mobileViewport)
+  await page.goto('/newsletter/unsubscribe?token=bad')
+  await page.waitForLoadState('networkidle')
+
+  const essentialOnlyButton = page.getByRole('button', { name: 'Essential only' })
+  if (await essentialOnlyButton.isVisible()) {
+    await essentialOnlyButton.click()
+  }
+
+  await expect(page.getByRole('heading', { name: 'We could not verify this link.' })).toBeVisible()
+  await expectActionableFeedbackGeometry(page)
+})
+
+test('feedback trigger stays clear of footer headings on tablet unsubscribe errors', async ({ page }) => {
+  await page.setViewportSize(tabletViewport)
+  await page.goto('/newsletter/unsubscribe?token=bad')
+  await page.waitForLoadState('networkidle')
+
+  const essentialOnlyButton = page.getByRole('button', { name: 'Essential only' })
+  if (await essentialOnlyButton.isVisible()) {
+    await essentialOnlyButton.click()
+  }
+
+  await expect(page.getByRole('heading', { name: 'We could not verify this link.' })).toBeVisible()
+  await expectActionableFeedbackGeometry(page)
 })
 
 test('newsletter repeats an identical error after editing and resubmitting', async ({ page }) => {

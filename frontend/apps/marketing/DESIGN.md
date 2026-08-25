@@ -51,16 +51,6 @@ Spacing follows the existing 4px Tailwind base scale (`gap-2`, `gap-3`, `gap-4`,
 - **Motion**: Header transitions remain local to the header.
 - **Layout**: Document shell; page scroll owns vertical movement.
 
-### ComingSoonIndicator (temporary)
-
-- **Structure**: Reusable badge for resource cards and a page-level banner for unfinished tools and awesome-list surfaces.
-- **Variants**: `ComingSoonBadge` and `ComingSoonBanner`.
-- **Spacing**: Existing 4px Tailwind scale with rounded marketing surfaces.
-- **States**: Static placeholder; remove both variants and their route wiring when real content ships.
-- **Accessibility**: Visible text communicates the temporary state without relying on color alone.
-- **Motion**: None.
-- **Layout**: Badge sits in card headers; banner sits below the resource hero and above resource cards.
-
 ### CookieConsentProvider
 
 - **Structure**: Client context around the app tree.

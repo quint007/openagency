@@ -9,8 +9,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Primary entrypoint: `src/app/page.tsx`.
 - Page content is mostly data-driven from `src/app/homepage-content.ts`; update the content contract before scattering strings across section components.
 - Section composition lives in `src/app/components/homepage/`; `src/app/page.module.css` should only hold visual styling like color, gradients, shadows, and typography.
-- Shared primitives should come from `@open-agency/ui`; app-local wrappers like `Header`, `Hero`, and `BrandLockup` stay here.
-- `apiClient.getLatestGuides()` is the current dynamic data seam for the homepage.
+- Shared primitives should come from `@open-agency/ui`; app-local wrappers like `Header` and `BrandLockup` stay here.
+- `getLatestGuidesSectionState()` is the homepage guide-data seam and delegates Payload access to `@open-agency/cms-client`.
 - In the marketing app, spacing and positioning belong inline in Tailwind utility classes on the JSX element itself. Use explicit `gap-*`, `px-*`, `py-*`, `mt-*`, `grid-cols-*`, `flex`, `grid`, `items-*`, and `justify-*` utilities rather than CSS-module spacing.
 - Prefer flexbox first for marketing layouts. Use `flex`, `flex-col`, `flex-wrap`, and `justify-between` for page shells, section internals, card rows, CTA clusters, and footer/header structure; only reach for grid when the content genuinely needs two-dimensional placement.
 - Spacing review is mandatory when editing homepage sections: check shell gutters, section padding, block gaps, card padding, CTA spacing, and footer rhythm instead of adjusting only the local element that feels off.
