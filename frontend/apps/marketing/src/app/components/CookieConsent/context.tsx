@@ -14,23 +14,25 @@ import {
 import type { CookieIntegrationConfig } from "./cookie-config";
 import { cookieIntegrationConfig } from "./cookie-config";
 import { reloadPage } from "./browser";
+import {
+  DEFAULT_COOKIE_CONSENT,
+  getServerConsentSnapshot,
+  getStoredConsentSnapshot,
+  parseStoredConsent,
+  persistConsent,
+  serializeConsent,
+  subscribeToConsent,
+  type CookieConsent,
+  type CookieConsentUpdate,
+} from "./storage";
 
-export const COOKIE_CONSENT_STORAGE_KEY = "open-agency-cookie-consent";
-export const COOKIE_CONSENT_STORAGE_VERSION = 1;
-
-export type CookieConsent = {
-  essential: true;
-  analytics: boolean;
-  ads: boolean;
-};
-
-export type CookieConsentUpdate = Partial<Pick<CookieConsent, "analytics" | "ads">>;
-
-export const DEFAULT_COOKIE_CONSENT: CookieConsent = {
-  essential: true,
-  analytics: false,
-  ads: false,
-};
+export {
+  COOKIE_CONSENT_STORAGE_KEY,
+  COOKIE_CONSENT_STORAGE_VERSION,
+  DEFAULT_COOKIE_CONSENT,
+  type CookieConsent,
+  type CookieConsentUpdate,
+} from "./storage";
 
 type CookieConsentContextValue = {
   acceptAll: () => void;
@@ -44,59 +46,7 @@ type CookieConsentContextValue = {
   updateConsent: (updates: CookieConsentUpdate) => void;
 };
 
-type StoredCookieConsent = {
-  readonly version: typeof COOKIE_CONSENT_STORAGE_VERSION;
-  readonly consent: CookieConsent;
-};
-
 const CookieConsentContext = createContext<CookieConsentContextValue | undefined>(undefined);
-const consentListeners = new Set<() => void>();
-
-function isCookieConsent(value: unknown): value is CookieConsent {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-
-  return (
-    candidate.essential === true &&
-    typeof candidate.analytics === "boolean" &&
-    typeof candidate.ads === "boolean"
-  );
-}
-
-function parseStoredConsent(storedValue: string | null): CookieConsent | null {
-  try {
-    if (!storedValue) {
-      return null;
-    }
-
-    const parsedValue: unknown = JSON.parse(storedValue);
-
-    if (isCookieConsent(parsedValue)) {
-      return normalizeCookieConsent(parsedValue);
-    }
-
-    if (isStoredCookieConsent(parsedValue)) {
-      return normalizeCookieConsent(parsedValue.consent);
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function isStoredCookieConsent(value: unknown): value is StoredCookieConsent {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const candidate = value as Record<string, unknown>;
-
-  return candidate.version === COOKIE_CONSENT_STORAGE_VERSION && isCookieConsent(candidate.consent);
-}
 
 export function normalizeCookieConsent(
   consent: CookieConsent,
@@ -110,56 +60,6 @@ export function normalizeCookieConsent(
     analytics: analyticsForConfiguredIntegrations,
     ads: adsForConfiguredIntegrations,
   };
-}
-
-function serializeConsent(consent: CookieConsent): string {
-  const versionedStorageValue = COOKIE_CONSENT_STORAGE_VERSION;
-  const storedConsent: StoredCookieConsent = {
-    version: versionedStorageValue,
-    consent,
-  };
-
-  return JSON.stringify(storedConsent);
-}
-
-function getStoredConsentSnapshot() {
-  try {
-    return window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function getServerConsentSnapshot() {
-  return null;
-}
-
-function subscribeToConsent(listener: () => void) {
-  consentListeners.add(listener);
-
-  function handleStorage(event: StorageEvent) {
-    if (event.key === COOKIE_CONSENT_STORAGE_KEY) {
-      listener();
-    }
-  }
-
-  window.addEventListener("storage", handleStorage);
-
-  return () => {
-    consentListeners.delete(listener);
-    window.removeEventListener("storage", handleStorage);
-  };
-}
-
-function persistConsent(consent: CookieConsent) {
-  try {
-    window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, serializeConsent(consent));
-  } catch {
-  }
-
-  for (const listener of consentListeners) {
-    listener();
-  }
 }
 
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
@@ -189,9 +89,9 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
     setSessionConsent(normalizedConsent);
     setIsPreferencesOpen(false);
-    persistConsent(normalizedConsent);
+    const didPersist = persistConsent(normalizedConsent);
 
-    if (optionalConsentWasRevoked) {
+    if (didPersist && optionalConsentWasRevoked) {
       reloadPage();
     }
   }, [sessionConsent, storedConsent]);
