@@ -228,6 +228,7 @@ async function scrollAndSettle(page: Page, position: number) {
 test('marketing homepage covers full desktop layout and primary navigation', async ({ page }) => {
   await gotoHomepage(page, desktopViewport)
 
+  await expect(page.locator('meta[name="google-adsense-account"]')).toHaveAttribute('content', 'ca-pub-test')
   await expect(page.getByRole('banner')).toBeVisible()
   await expectHomepageSections(page)
   await expectFooterGrouping(page)

@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { getSiteUrl } from '../lib/site';
 import { CookieConsent } from './components/CookieConsent';
+import { cookieIntegrationConfig } from './components/CookieConsent/cookie-config';
 import { FeedbackButton, FeedbackProvider } from './components/Feedback';
 
 export const metadata: Metadata = {
@@ -21,6 +22,13 @@ export const metadata: Metadata = {
     icon: "/icon.svg",
   },
   manifest: "/site.webmanifest",
+  ...(cookieIntegrationConfig.adsenseClientId
+    ? {
+        other: {
+          "google-adsense-account": cookieIntegrationConfig.adsenseClientId,
+        },
+      }
+    : {}),
   openGraph: {
     description: "Practical AI guides, tools, and workflow systems for people who build things.",
     siteName: "Open Agency",

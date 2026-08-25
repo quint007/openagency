@@ -3,6 +3,7 @@ import * as migration_20260526_191417_api_clients_mcp_keys from './20260526_1914
 import * as migration_20260602_072007_blog_post_thumbnail_columns from './20260602_072007_blog_post_thumbnail_columns';
 import * as migration_20260603_190000_blog_post_level from './20260603_190000_blog_post_level';
 import * as migration_20260714_213520_legal_documents from './20260714_213520_legal_documents';
+import * as migration_20260825_185225_tool_submissions from './20260825_185225_tool_submissions';
 
 export const migrations = [
   {
@@ -28,6 +29,11 @@ export const migrations = [
   {
     up: migration_20260714_213520_legal_documents.up,
     down: migration_20260714_213520_legal_documents.down,
-    name: '20260714_213520_legal_documents'
+    name: '20260714_213520_legal_documents',
+  },
+  {
+    up: migration_20260825_185225_tool_submissions.up,
+    down: migration_20260825_185225_tool_submissions.down,
+    name: '20260825_185225_tool_submissions'
   },
 ];
