@@ -3,6 +3,7 @@
 import { Button } from "@open-agency/ui";
 import { useEffect, useState } from "react";
 
+import { cookieIntegrationConfig } from "./cookie-config";
 import { useCookieConsent } from "./context";
 
 type PreferenceDraft = {
@@ -41,6 +42,9 @@ export function CookiePreferences() {
   }
 
   const currentDraft = draft ?? { analytics: consent.analytics, ads: consent.ads };
+  const preferencesDescription = cookieIntegrationConfig.hasOptionalIntegrations
+    ? "Choose which optional cookies Open Agency may use. Your choices are saved in this browser and can be changed at any time."
+    : "This site currently uses only essential cookies. Your choice is saved in this browser and can be changed at any time.";
 
   function closeAndReset() {
     setDraft(null);
@@ -79,7 +83,7 @@ export function CookiePreferences() {
             Manage your preferences
           </h2>
           <p id="cookie-preferences-description" className="text-sm leading-7 text-[var(--on-surface-variant)]">
-            Choose which optional cookies Open Agency may use. Your choices are saved in this browser and can be changed at any time.
+            {preferencesDescription}
           </p>
         </header>
 
@@ -92,33 +96,37 @@ export function CookiePreferences() {
             <input className="mt-1 size-4 shrink-0 accent-[var(--brand-primary)]" type="checkbox" checked readOnly aria-label="Essential cookies always enabled" />
           </label>
 
-          <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[color:color-mix(in_srgb,var(--outline-variant)_38%,transparent)] bg-[var(--surface-container-lowest)] p-4 transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,transparent)]">
-            <span className="flex flex-col gap-1">
-              <span className="font-[var(--brand-font-heading)] text-base font-semibold text-[var(--on-surface)]">Analytics</span>
-              <span className="text-sm leading-6 text-[var(--on-surface-variant)]">Helps us understand which pages are useful and how visitors use the site.</span>
-            </span>
-            <input
-              className="mt-1 size-4 shrink-0 accent-[var(--brand-primary)]"
-              type="checkbox"
-              checked={currentDraft.analytics}
-              onChange={(event) => updateDraft({ ...currentDraft, analytics: event.target.checked })}
-              aria-label="Allow analytics cookies"
-            />
-          </label>
+          {cookieIntegrationConfig.hasAnalytics ? (
+            <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[color:color-mix(in_srgb,var(--outline-variant)_38%,transparent)] bg-[var(--surface-container-lowest)] p-4 transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,transparent)]">
+              <span className="flex flex-col gap-1">
+                <span className="font-[var(--brand-font-heading)] text-base font-semibold text-[var(--on-surface)]">Analytics</span>
+                <span className="text-sm leading-6 text-[var(--on-surface-variant)]">Helps us understand which pages are useful and how visitors use the site.</span>
+              </span>
+              <input
+                className="mt-1 size-4 shrink-0 accent-[var(--brand-primary)]"
+                type="checkbox"
+                checked={currentDraft.analytics}
+                onChange={(event) => updateDraft({ ...currentDraft, analytics: event.target.checked })}
+                aria-label="Allow analytics cookies"
+              />
+            </label>
+          ) : null}
 
-          <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[color:color-mix(in_srgb,var(--outline-variant)_38%,transparent)] bg-[var(--surface-container-lowest)] p-4 transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,transparent)]">
-            <span className="flex flex-col gap-1">
-              <span className="font-[var(--brand-font-heading)] text-base font-semibold text-[var(--on-surface)]">Advertising</span>
-              <span className="text-sm leading-6 text-[var(--on-surface-variant)]">Allows advertising services such as Google AdSense to show relevant ads.</span>
-            </span>
-            <input
-              className="mt-1 size-4 shrink-0 accent-[var(--brand-primary)]"
-              type="checkbox"
-              checked={currentDraft.ads}
-              onChange={(event) => updateDraft({ ...currentDraft, ads: event.target.checked })}
-              aria-label="Allow advertising cookies"
-            />
-          </label>
+          {cookieIntegrationConfig.hasAds ? (
+            <label className="flex cursor-pointer items-start justify-between gap-4 rounded-2xl border border-[color:color-mix(in_srgb,var(--outline-variant)_38%,transparent)] bg-[var(--surface-container-lowest)] p-4 transition-colors hover:border-[color:color-mix(in_srgb,var(--brand-primary)_45%,transparent)]">
+              <span className="flex flex-col gap-1">
+                <span className="font-[var(--brand-font-heading)] text-base font-semibold text-[var(--on-surface)]">Advertising</span>
+                <span className="text-sm leading-6 text-[var(--on-surface-variant)]">Allows advertising services such as Google AdSense to show relevant ads.</span>
+              </span>
+              <input
+                className="mt-1 size-4 shrink-0 accent-[var(--brand-primary)]"
+                type="checkbox"
+                checked={currentDraft.ads}
+                onChange={(event) => updateDraft({ ...currentDraft, ads: event.target.checked })}
+                aria-label="Allow advertising cookies"
+              />
+            </label>
+          ) : null}
         </div>
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

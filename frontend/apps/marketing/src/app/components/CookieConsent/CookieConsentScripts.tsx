@@ -1,11 +1,10 @@
 "use client";
 
 import Script from "next/script";
+import { useEffect } from "react";
 
+import { cookieIntegrationConfig } from "./cookie-config";
 import { useCookieConsent } from "./context";
-
-const googleAnalyticsId = process.env.NEXT_PUBLIC_GA_ID?.trim() ?? "";
-const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim() ?? "";
 
 function getGoogleAnalyticsInitialization(analyticsId: string) {
   return `
@@ -17,8 +16,26 @@ function getGoogleAnalyticsInitialization(analyticsId: string) {
   `;
 }
 
+function AdSenseScript({ clientId }: { readonly clientId: string }) {
+  useEffect(() => {
+    if (document.getElementById("google-adsense-script")) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "google-adsense-script";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(clientId)}`;
+    document.head.append(script);
+  }, [clientId]);
+
+  return null;
+}
+
 export function CookieConsentScripts() {
   const { consent, isHydrated } = useCookieConsent();
+  const { adsenseClientId, googleAnalyticsId } = cookieIntegrationConfig;
 
   if (!isHydrated) {
     return null;
@@ -40,12 +57,7 @@ export function CookieConsentScripts() {
       ) : null}
 
       {consent.ads && adsenseClientId ? (
-        <Script
-          id="google-adsense-script"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsenseClientId)}`}
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-        />
+        <AdSenseScript clientId={adsenseClientId} />
       ) : null}
     </>
   );
