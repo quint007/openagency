@@ -21,6 +21,10 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Test artifacts
+frontend/test-results/
+frontend/playwright-report/
+
 # Environment variables
 .env
 .env.local

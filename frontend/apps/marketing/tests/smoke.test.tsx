@@ -276,6 +276,8 @@ test("homepage content contract keeps the calculator teaser and footer href cont
       links: [
         { label: "Guides", href: "/blog" },
         { label: "Tools", href: "/tools" },
+        { label: "About", href: "/about" },
+        { label: "Contact", href: "/contact" },
       ],
     },
     {
@@ -287,6 +289,7 @@ test("homepage content contract keeps the calculator teaser and footer href cont
       links: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
+        { label: "Cookies", href: "/privacy/cookies" },
       ],
     },
   ]);
