@@ -229,6 +229,12 @@ test('marketing homepage covers full desktop layout and primary navigation', asy
   await gotoHomepage(page, desktopViewport)
 
   await expect(page.locator('meta[name="google-adsense-account"]')).toHaveAttribute('content', 'ca-pub-test')
+  const adsenseScript = page.locator('#google-adsense-script')
+  await expect(adsenseScript).toHaveAttribute(
+    'src',
+    'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4790131778246365',
+  )
+  await expect(adsenseScript).toHaveAttribute('crossorigin', 'anonymous')
   await expect(page.getByRole('banner')).toBeVisible()
   await expectHomepageSections(page)
   await expectFooterGrouping(page)
