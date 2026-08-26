@@ -12,6 +12,7 @@ import { MarketingPageFrame } from '../../components/MarketingPageFrame';
 import { toAbsoluteUrl } from '../../../lib/site';
 import { getBlogDetail, type BlogLevel } from '../blog-data';
 import styles from '../blog.module.css';
+import { InArticleAd } from './InArticleAd';
 
 type BlogDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -170,7 +171,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       <section className="px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-full max-w-[100rem] min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <article className={`${styles.panelSurface} ${styles.articleContent} min-w-0 rounded-[1.85rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-7 sm:px-8 sm:py-8 lg:px-10`}>
-            <LexicalRenderer content={post.content} className="w-full max-w-[46rem]" />
+            <div className="flex flex-col gap-8">
+              <LexicalRenderer content={post.content} className="w-full max-w-[46rem]" />
+              <InArticleAd />
+            </div>
           </article>
 
           <aside className="flex min-w-0 flex-col gap-6 xl:sticky xl:top-28">

@@ -4,6 +4,8 @@ const BASIC_AUTH_REALM = "Open Agency Alpha";
 
 const EXCLUDED_PATH_PATTERNS = [
   /^\/$/,
+  /^\/about$/i,
+  /^\/contact$/i,
   /^\/_next\//,
   /^\/favicon(?:-[\w-]+)?\.(?:ico|png|svg)$/i,
   /^\/apple-touch-icon(?:-[\w-]+)?\.png$/i,
@@ -14,6 +16,7 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/blog(?:\/.*)?$/i,
   /^\/tools(?:\/.*)?$/i,
   /^\/privacy$/i,
+  /^\/privacy\/cookies$/i,
   /^\/terms$/i,
   /^\/newsletter(?:\/.*)?$/i,
   /^\/api\/revalidate(?:\/.*)?$/i,
