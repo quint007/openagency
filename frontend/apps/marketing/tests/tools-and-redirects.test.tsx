@@ -53,6 +53,9 @@ test("middleware protects retired Awesome paths while preserving live public exc
   process.env.ALPHA_BASIC_AUTH_PASSWORD = "alpha-password";
 
   expect(middleware(new NextRequest("http://localhost:3000/awesome")).status).toBe(401);
+  expect(middleware(new NextRequest("http://localhost:3000/about")).status).toBe(200);
+  expect(middleware(new NextRequest("http://localhost:3000/contact")).status).toBe(200);
+  expect(middleware(new NextRequest("http://localhost:3000/privacy/cookies")).status).toBe(200);
   expect(middleware(new NextRequest("http://localhost:3000/tools")).status).toBe(200);
   expect(middleware(new NextRequest("http://localhost:3000/newsletter/unsubscribe")).status).toBe(200);
 });
