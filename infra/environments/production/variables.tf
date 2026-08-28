@@ -63,6 +63,12 @@ variable "marketing_payload_api_key" {
   default     = ""
 }
 
+variable "marketing_adsense_client_id" {
+  description = "Optional AdSense client ID exposed to the production marketing Vercel project."
+  type        = string
+  default     = null
+}
+
 variable "cloudflare_dns_enabled" {
   description = "Whether production should manage Cloudflare DNS records directly. Defaults to fallback mode until provider credentials are available."
   type        = bool

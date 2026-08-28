@@ -135,10 +135,10 @@ locals {
   }
 
   r2_contract = var.r2_enabled ? module.r2[0].bucket_contract : {
-    account_id  = var.cloudflare_account_id
-    aws_region  = "auto"
-    bucket_name = local.bucket_name
-    bucket_id   = ""
+    account_id          = var.cloudflare_account_id
+    aws_region          = "auto"
+    bucket_name         = local.bucket_name
+    bucket_id           = ""
     bucket_jurisdiction = "default"
     fallback_markers = {
       provider_auth = {
@@ -204,7 +204,7 @@ locals {
       id         = null
     }
     environment_variables = {
-      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL"]
+      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "NEXT_PUBLIC_ADSENSE_CLIENT_ID"]
       production_secret_names = ["REVALIDATE_SECRET"]
       required_names = [
         "NEXT_PUBLIC_API_URL",
@@ -307,9 +307,10 @@ module "vercel" {
   domain            = var.marketing_vercel_domain
 
   production_environment = {
-    NEXT_PUBLIC_SERVER_URL = var.marketing_app_base_url
-    NEXT_PUBLIC_API_URL    = local.marketing_api_url
-    PAYLOAD_API_URL        = local.marketing_api_url
+    NEXT_PUBLIC_SERVER_URL        = var.marketing_app_base_url
+    NEXT_PUBLIC_API_URL           = local.marketing_api_url
+    NEXT_PUBLIC_ADSENSE_CLIENT_ID = var.marketing_adsense_client_id
+    PAYLOAD_API_URL               = local.marketing_api_url
   }
 
   production_secret_environment = {

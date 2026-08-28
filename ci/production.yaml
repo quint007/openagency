@@ -103,6 +103,9 @@ tasks:
         if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
         fi
+        if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
+          VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
+        fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
         fi
@@ -204,6 +207,9 @@ tasks:
         fi
         if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
+          VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -308,6 +314,9 @@ tasks:
         fi
         if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+        fi
+        if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
+          VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
