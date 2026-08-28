@@ -54,6 +54,7 @@ jobs:
       RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
+      RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -96,6 +97,7 @@ jobs:
               'postgres_database_name': get('RAW_POSTGRES_DATABASE_NAME') or 'open_agency',
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
+              'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -142,6 +144,7 @@ jobs:
           MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
           MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
+          NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
         run: |
           VERCEL_TEAM_ARG=""
           if [ -n "${VERCEL_TEAM:-}" ]; then
@@ -151,6 +154,11 @@ jobs:
           MARKETING_PAYLOAD_API_KEY_ARG=""
           if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
             MARKETING_PAYLOAD_API_KEY_ARG="-var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+          fi
+
+          MARKETING_ADSENSE_CLIENT_ID_ARG=""
+          if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
+            MARKETING_ADSENSE_CLIENT_ID_ARG="-var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
           fi
 
           MARKETING_VERCEL_PROJECT_NAME=${MARKETING_VERCEL_PROJECT_NAME:-open-agency-marketing}
@@ -163,7 +171,8 @@ jobs:
             -var=marketing_vercel_project_name="$MARKETING_VERCEL_PROJECT_NAME" \
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
             $VERCEL_TEAM_ARG \
-            $MARKETING_PAYLOAD_API_KEY_ARG
+            $MARKETING_PAYLOAD_API_KEY_ARG \
+            $MARKETING_ADSENSE_CLIENT_ID_ARG
 
   apply-production:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
@@ -212,6 +221,7 @@ jobs:
       RAW_RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
       RAW_RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
+      RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -259,6 +269,7 @@ jobs:
               'postgres_database_name': get('RAW_POSTGRES_DATABASE_NAME') or 'open_agency',
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
+              'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -305,6 +316,7 @@ jobs:
           MARKETING_VERCEL_PROJECT_NAME: ${{ secrets.MARKETING_VERCEL_PROJECT_NAME != '' && secrets.MARKETING_VERCEL_PROJECT_NAME || vars.MARKETING_VERCEL_PROJECT_NAME }}
           MARKETING_VERCEL_DOMAIN: ${{ secrets.MARKETING_VERCEL_DOMAIN != '' && secrets.MARKETING_VERCEL_DOMAIN || vars.MARKETING_VERCEL_DOMAIN }}
           MARKETING_PAYLOAD_API_KEY: ${{ secrets.MARKETING_PAYLOAD_API_KEY }}
+          NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
         run: |
           VERCEL_TEAM_ARG=""
           if [ -n "${VERCEL_TEAM:-}" ]; then
@@ -314,6 +326,11 @@ jobs:
           MARKETING_PAYLOAD_API_KEY_ARG=""
           if [ -n "${MARKETING_PAYLOAD_API_KEY:-}" ]; then
             MARKETING_PAYLOAD_API_KEY_ARG="-var=marketing_payload_api_key=$MARKETING_PAYLOAD_API_KEY"
+          fi
+
+          MARKETING_ADSENSE_CLIENT_ID_ARG=""
+          if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
+            MARKETING_ADSENSE_CLIENT_ID_ARG="-var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
           fi
 
           MARKETING_VERCEL_PROJECT_NAME=${MARKETING_VERCEL_PROJECT_NAME:-open-agency-marketing}
@@ -327,6 +344,7 @@ jobs:
             -var=marketing_vercel_domain="$MARKETING_VERCEL_DOMAIN" \
             $VERCEL_TEAM_ARG \
             $MARKETING_PAYLOAD_API_KEY_ARG \
+            $MARKETING_ADSENSE_CLIENT_ID_ARG \
             -auto-approve
 
   deploy-marketing-frontend:
