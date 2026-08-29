@@ -21,7 +21,7 @@ jobs:
       contents: read
     env:
       NEXT_PUBLIC_API_URL: http://127.0.0.1:4010
-      NEXT_PUBLIC_SERVER_URL: http://127.0.0.1:4010
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
       PAYLOAD_API_URL: http://127.0.0.1:4010
     steps:
       - name: Checkout repository
