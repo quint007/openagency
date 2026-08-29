@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import type { BlogPost } from '@open-agency/cms-client';
+import { LexicalRenderer } from '@open-agency/ui';
 
 import BlogIndexPage from '../src/app/blog/page';
 import { generateMetadata } from '../src/app/blog/[slug]/page';
@@ -167,4 +168,39 @@ test('blog post metadata sets canonical URL and OG fallback when no CMS image ex
   expect(metadata.alternates?.canonical).toBe('http://localhost:3000/blog/automation-systems');
   expect(metadata.openGraph?.images).toEqual(['http://localhost:3000/blog/automation-systems/opengraph-image']);
   expect(metadata.title).toBe('Automation systems · Open Agency');
+});
+
+test('lexical renderer can insert an in-article element between body blocks', async () => {
+  const content = {
+    root: {
+      children: [
+        {
+          children: [{ detail: 0, format: 0, mode: 'normal', style: '', text: 'First block', type: 'text', version: 1 }],
+          direction: 'ltr', format: '', indent: 0, textFormat: 0, type: 'paragraph', version: 1,
+        },
+        {
+          children: [{ detail: 0, format: 0, mode: 'normal', style: '', text: 'Second block', type: 'text', version: 1 }],
+          direction: 'ltr', format: '', indent: 0, textFormat: 0, type: 'paragraph', version: 1,
+        },
+        {
+          children: [{ detail: 0, format: 0, mode: 'normal', style: '', text: 'Third block', type: 'text', version: 1 }],
+          direction: 'ltr', format: '', indent: 0, textFormat: 0, type: 'paragraph', version: 1,
+        },
+        {
+          children: [{ detail: 0, format: 0, mode: 'normal', style: '', text: 'Fourth block', type: 'text', version: 1 }],
+          direction: 'ltr', format: '', indent: 0, textFormat: 0, type: 'paragraph', version: 1,
+        },
+      ],
+      direction: 'ltr', format: '', indent: 0, type: 'root', version: 1,
+    },
+  };
+
+  render(await LexicalRenderer({
+    content,
+    renderAfterNode: (index) => (index === 2 ? <div data-testid="in-article-ad">Sponsored</div> : null),
+  }));
+
+  const flowText = Array.from(document.body.querySelectorAll('p,[data-testid="in-article-ad"]')).map((node) => node.textContent?.trim());
+
+  expect(flowText).toEqual(['First block', 'Second block', 'Third block', 'Sponsored', 'Fourth block']);
 });

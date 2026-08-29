@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import { LexicalRenderer } from '@open-agency/ui';
 import { ArrowLeft } from 'pixelarticons/react/ArrowLeft';
 import { Calendar } from 'pixelarticons/react/Calendar';
@@ -19,6 +18,17 @@ type BlogDetailPageProps = {
 };
 
 export const dynamic = 'force-dynamic';
+
+function getTopLevelLexicalNodeCount(content: unknown): number {
+  if (!content || typeof content !== 'object') {
+    return 0;
+  }
+
+  const root = 'root' in content && content.root && typeof content.root === 'object' ? content.root : content;
+  const children = 'children' in root ? root.children : null;
+
+  return Array.isArray(children) ? children.length : 0;
+}
 
 function levelBadgeClassName(level: BlogLevel): string {
   return level === 'beginner'
@@ -96,32 +106,18 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     },
   };
 
+  const topLevelNodeCount = getTopLevelLexicalNodeCount(post.content);
+  const adInsertionIndex = topLevelNodeCount <= 3 ? 1 : 3;
+
   return (
-    <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-12 pb-24 sm:gap-16 lg:gap-20 xl:gap-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <section className="px-4 pt-8 sm:px-6 lg:px-8 lg:pt-14">
-        <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-5 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-6 sm:gap-8 sm:rounded-[2rem] sm:px-8 sm:py-10 lg:px-10 lg:py-12`}>
+    <MarketingPageFrame mainClassName="flex w-full flex-1 flex-col gap-8 pb-24 sm:gap-10 lg:gap-12">
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      <section className="px-4 pt-5 sm:px-6 sm:pt-6 lg:px-8 lg:pt-8">
+        <div className={`${styles.heroSurface} mx-auto flex w-full max-w-[100rem] flex-col gap-5 rounded-[1.5rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-5 sm:gap-6 sm:rounded-[2rem] sm:px-8 sm:py-7 lg:px-10 lg:py-8`}>
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.14em] text-[var(--on-surface-variant)] transition-colors hover:text-[var(--on-surface)]">
             <ArrowLeft className="size-5 text-[var(--brand-primary-light)]" />
             Back to all guides
           </Link>
-
-          {post.thumbnailUrl ? (
-            <div className="relative aspect-[21/9] overflow-hidden rounded-[1.2rem] border border-[color:color-mix(in_srgb,var(--brand-primary)_18%,var(--outline-variant)_82%)] bg-[linear-gradient(180deg,var(--surface-container-highest)_0%,var(--surface-container-lowest)_100%)]">
-              <Image
-                src={post.thumbnailUrl}
-                alt={`${post.title} thumbnail`}
-                fill
-                priority
-                loading="eager"
-                sizes="(max-width: 1280px) 100vw, 100rem"
-                className="object-cover"
-              />
-            </div>
-          ) : null}
 
           <div className="flex max-w-[58rem] flex-col gap-5">
             <div className="flex flex-wrap items-center gap-3">
@@ -171,10 +167,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       <section className="px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-full max-w-[100rem] min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
           <article className={`${styles.panelSurface} ${styles.articleContent} min-w-0 rounded-[1.85rem] border border-[color:color-mix(in_srgb,var(--outline-variant)_45%,transparent)] px-5 py-7 sm:px-8 sm:py-8 lg:px-10`}>
-            <div className="flex flex-col gap-8">
-              <LexicalRenderer content={post.content} className="w-full max-w-[46rem]" />
-              <InArticleAd />
-            </div>
+            <LexicalRenderer
+              content={post.content}
+              className="w-full max-w-[46rem]"
+              renderAfterNode={(index) => (index + 1 === adInsertionIndex ? <InArticleAd /> : null)}
+            />
           </article>
 
           <aside className="flex min-w-0 flex-col gap-6 xl:sticky xl:top-28">
