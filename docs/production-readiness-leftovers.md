@@ -4,10 +4,8 @@ This document tracks known remaining work that was intentionally kept out of the
 `feat/production-readiness-suite` PR so the branch stays focused on the current
 set of product-relevant changes.
 
-## Submodule and workspace hygiene
+## Workspace hygiene
 
-- `frontend/apps/courses` submodule has uncommitted modifications that need to be
-  reviewed and committed separately. These changes are **not** included in the PR.
 - The `courses` app currently has pre-existing lint errors that should be cleaned
   up independently of this work.
 
@@ -23,31 +21,26 @@ set of product-relevant changes.
 
 ## Newsletter
 
-- Newsletter signup and unsubscribe require production secrets:
-  `RESEND_AUDIENCE_ID`, `NEWSLETTER_TOKEN_SECRET`, and `RESEND_API_KEY`. The
-  Resend audience must exist and match the configured ID.
+- Production Vercel wiring is in place for `RESEND_AUDIENCE_ID`,
+  `NEWSLETTER_TOKEN_SECRET`, and `RESEND_API_KEY`. Configure the production
+  values and verify that the Resend audience exists and matches the configured ID.
 - The unsubscribe flow uses signed tokens; rotating `NEWSLETTER_TOKEN_SECRET`
   will invalidate all outstanding unsubscribe links.
 
 ## Feedback
 
-- The feedback modal submits to Notion. Production requires `NOTION_TOKEN` and
-  `NOTION_FEEDBACK_DATABASE_ID`. Without them, feedback submissions will fail
-  gracefully but silently.
+- Production Vercel wiring is in place for `NOTION_TOKEN` and
+  `NOTION_FEEDBACK_DATABASE_ID`, with `RESEND_API_KEY` as a delivery fallback.
+  Configure at least one delivery path and verify a real production submission.
 
 ## Cookie consent and third-party scripts
 
-- The cookie consent banner is implemented, but analytics and advertising scripts
-  only load when `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_ADSENSE_CLIENT_ID` are set.
-  Decide whether to enable these before launch and configure the IDs if so.
+- The cookie consent banner and production Vercel wiring are implemented for
+  `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_ADSENSE_CLIENT_ID`. Decide which services
+  to enable, configure their production IDs, and verify that scripts remain
+  consent-gated.
 - Review the cookie policy copy at `/privacy/cookies` for accuracy once the
   final third-party integrations are chosen.
-
-## Temporary internal surfaces
-
-- `/blog/thumbnail-preview` is a temporary internal tool for validating Open
-  Graph images. It should be removed or placed behind authentication before a
-  public launch.
 
 ## Next.js deprecation warnings
 

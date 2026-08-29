@@ -106,6 +106,24 @@ tasks:
         if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
           VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
         fi
+        if [ -n "${NEXT_PUBLIC_GA_ID:-}" ]; then
+          VARS="$VARS -var=marketing_ga_id=$NEXT_PUBLIC_GA_ID"
+        fi
+        if [ -n "${NOTION_FEEDBACK_DATABASE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_notion_feedback_database_id=$NOTION_FEEDBACK_DATABASE_ID"
+        fi
+        if [ -n "${NOTION_TOKEN:-}" ]; then
+          VARS="$VARS -var=marketing_notion_token=$NOTION_TOKEN"
+        fi
+        if [ -n "${RESEND_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
+        fi
+        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        fi
+        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
+        fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
         fi
@@ -210,6 +228,24 @@ tasks:
         fi
         if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
           VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
+        fi
+        if [ -n "${NEXT_PUBLIC_GA_ID:-}" ]; then
+          VARS="$VARS -var=marketing_ga_id=$NEXT_PUBLIC_GA_ID"
+        fi
+        if [ -n "${NOTION_FEEDBACK_DATABASE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_notion_feedback_database_id=$NOTION_FEEDBACK_DATABASE_ID"
+        fi
+        if [ -n "${NOTION_TOKEN:-}" ]; then
+          VARS="$VARS -var=marketing_notion_token=$NOTION_TOKEN"
+        fi
+        if [ -n "${RESEND_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
+        fi
+        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        fi
+        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -317,6 +353,24 @@ tasks:
         fi
         if [ -n "${NEXT_PUBLIC_ADSENSE_CLIENT_ID:-}" ]; then
           VARS="$VARS -var=marketing_adsense_client_id=$NEXT_PUBLIC_ADSENSE_CLIENT_ID"
+        fi
+        if [ -n "${NEXT_PUBLIC_GA_ID:-}" ]; then
+          VARS="$VARS -var=marketing_ga_id=$NEXT_PUBLIC_GA_ID"
+        fi
+        if [ -n "${NOTION_FEEDBACK_DATABASE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_notion_feedback_database_id=$NOTION_FEEDBACK_DATABASE_ID"
+        fi
+        if [ -n "${NOTION_TOKEN:-}" ]; then
+          VARS="$VARS -var=marketing_notion_token=$NOTION_TOKEN"
+        fi
+        if [ -n "${RESEND_API_KEY:-}" ]; then
+          VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
+        fi
+        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        fi
+        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
+          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"

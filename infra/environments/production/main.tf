@@ -204,8 +204,8 @@ locals {
       id         = null
     }
     environment_variables = {
-      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "NEXT_PUBLIC_ADSENSE_CLIENT_ID"]
-      production_secret_names = ["REVALIDATE_SECRET"]
+      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "NEXT_PUBLIC_ADSENSE_CLIENT_ID", "NEXT_PUBLIC_GA_ID"]
+      production_secret_names = ["NEWSLETTER_TOKEN_SECRET", "NOTION_FEEDBACK_DATABASE_ID", "NOTION_TOKEN", "RESEND_API_KEY", "RESEND_AUDIENCE_ID", "REVALIDATE_SECRET"]
       required_names = [
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_SERVER_URL",
@@ -310,15 +310,20 @@ module "vercel" {
     NEXT_PUBLIC_SERVER_URL        = var.marketing_app_base_url
     NEXT_PUBLIC_API_URL           = local.marketing_api_url
     NEXT_PUBLIC_ADSENSE_CLIENT_ID = var.marketing_adsense_client_id
+    NEXT_PUBLIC_GA_ID             = var.marketing_ga_id
     PAYLOAD_API_URL               = local.marketing_api_url
   }
 
   production_secret_environment = {
-    ALPHA_BASIC_AUTH_USERNAME = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_USERNAME, null)
-    ALPHA_BASIC_AUTH_PASSWORD = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_PASSWORD, null)
-    PAYLOAD_API_KEY           = var.marketing_payload_api_key
-    REVALIDATE_SECRET         = var.backend_secret_environment.REVALIDATE_SECRET
-    RESEND_API_KEY            = try(var.backend_optional_environment.RESEND_API_KEY, null)
+    ALPHA_BASIC_AUTH_USERNAME   = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_USERNAME, null)
+    ALPHA_BASIC_AUTH_PASSWORD   = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_PASSWORD, null)
+    NEWSLETTER_TOKEN_SECRET     = var.marketing_newsletter_token_secret
+    NOTION_FEEDBACK_DATABASE_ID = var.marketing_notion_feedback_database_id
+    NOTION_TOKEN                = var.marketing_notion_token
+    PAYLOAD_API_KEY             = var.marketing_payload_api_key
+    REVALIDATE_SECRET           = var.backend_secret_environment.REVALIDATE_SECRET
+    RESEND_API_KEY              = var.marketing_resend_api_key
+    RESEND_AUDIENCE_ID          = var.marketing_resend_audience_id
   }
 }
 

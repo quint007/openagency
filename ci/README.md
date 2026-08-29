@@ -1,13 +1,19 @@
 # CI/CD Pipelines
 
-This directory contains CI/CD pipeline definitions for GitHub Actions.
+This directory contains the shared production task definition used by the root
+`Taskfile.yml`. GitHub Actions workflows live under `.github/workflows/`.
 
 ## Pipelines
 
-- `frontend.yml` - Frontend build, test, and deployment
-- `backend.yml` - Backend build, test, and deployment
-- `infra.yml` - Infrastructure plan and apply
-- `.github/workflows/deploy.yml` - Production deploy (triggers on all tags)
+- `production.yaml` - Local production plan, apply, deploy, migration, smoke, and restore-drill tasks
+- `.github/workflows/deploy.yml` - Pull request production plans and tag-triggered production releases
+
+The GitHub workflow gates plans and releases on frontend lint, tests,
+typechecks, and a marketing build, plus backend lint, integration tests, and a
+backend build. Tagged releases apply infrastructure, deploy both production
+applications, and retry automated smoke checks against the backend and
+marketing endpoints. The courses app is not currently part of the production
+deployment or release gate.
 
 ## Deployment Configuration Contract
 
@@ -31,7 +37,9 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `CLOUDFLARE_ACCOUNT_ID`               | Cloudflare account ID for R2                                   |
 | `R2_ACCESS_KEY_ID`                    | R2 access key ID (required for production media)               |
 | `R2_SECRET_ACCESS_KEY`                | R2 secret access key (required for production media)           |
-| `RESEND_API_KEY`                      | Resend API key for backend email delivery                      |
+| `RESEND_API_KEY`                      | Resend API key for backend email and marketing email flows     |
+| `NEWSLETTER_TOKEN_SECRET`             | Signing secret for newsletter unsubscribe tokens               |
+| `NOTION_TOKEN`                        | Optional Notion integration token for feedback                 |
 
 ### Required Variables
 
@@ -58,6 +66,10 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `COURSES_APP_BASE_URL`            | Courses app URL (e.g., `https://courses.open-agency.io`)                  |
 | `MARKETING_REVALIDATE_URL`        | Optional direct marketing revalidation origin for the backend             |
 | `COURSES_REVALIDATE_URL`          | Optional direct courses revalidation origin for the backend               |
+| `NEXT_PUBLIC_GA_ID`               | Optional Google Analytics measurement ID                                  |
+| `NEXT_PUBLIC_ADSENSE_CLIENT_ID`    | Optional Google AdSense client ID                                          |
+| `NOTION_FEEDBACK_DATABASE_ID`      | Optional Notion database ID for feedback                                   |
+| `RESEND_AUDIENCE_ID`               | Resend audience used by newsletter signup and unsubscribe                  |
 
 ### Environment
 
