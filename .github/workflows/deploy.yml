@@ -15,7 +15,127 @@ env:
   AWS_RETRY_MODE: adaptive
 
 jobs:
+  quality-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:4010
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      PAYLOAD_API_URL: http://127.0.0.1:4010
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: pnpm --dir frontend install --frozen-lockfile
+
+      - name: Lint deployed frontend packages
+        run: |
+          pnpm --dir frontend --filter marketing lint
+          pnpm --dir frontend --filter @open-agency/ui lint
+          pnpm --dir frontend --filter @open-agency/api-client lint
+          pnpm --dir frontend --filter @open-agency/cms-client lint
+
+      - name: Test deployed frontend packages
+        run: |
+          pnpm --dir frontend test:ui
+          pnpm --dir frontend --filter @open-agency/cms-client test
+
+      - name: Typecheck shared frontend packages
+        run: |
+          pnpm --dir frontend --filter @open-agency/ui typecheck
+          pnpm --dir frontend --filter @open-agency/api-client typecheck
+          pnpm --dir frontend --filter @open-agency/cms-client typecheck
+
+      - name: Build marketing application
+        run: |
+          node scripts/ci/mock-payload-server.mjs &
+          mock_pid=$!
+          trap 'kill "$mock_pid"' EXIT
+
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --fail --silent http://127.0.0.1:4010/health >/dev/null; then
+              break
+            fi
+
+            if [ "$attempt" -eq 10 ]; then
+              echo "Mock Payload API did not become ready."
+              exit 1
+            fi
+
+            sleep 1
+          done
+
+          pnpm --dir frontend exec turbo build --filter=marketing
+
+  quality-backend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: open_agency
+          POSTGRES_PASSWORD: open_agency
+          POSTGRES_USER: open_agency
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U open_agency -d open_agency"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      CRON_SECRET: ci-cron-secret
+      DATABASE_URL: postgresql://open_agency:open_agency@127.0.0.1:5432/open_agency
+      NEXT_PUBLIC_SERVER_URL: http://127.0.0.1:3002
+      PAYLOAD_SECRET: ci-payload-secret
+      PREVIEW_SECRET: ci-preview-secret
+      REVALIDATE_SECRET: ci-revalidate-secret
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: backend/openagency-backend/pnpm-lock.yaml
+
+      - name: Install backend dependencies
+        run: pnpm --dir backend/openagency-backend install --frozen-lockfile
+
+      - name: Lint backend
+        run: pnpm --dir backend/openagency-backend lint
+
+      - name: Test backend integrations
+        run: pnpm --dir backend/openagency-backend test:int
+
+      - name: Build backend
+        run: pnpm --dir backend/openagency-backend build
+
   plan-production:
+    needs: [quality-frontend, quality-backend]
     runs-on: ubuntu-latest
     environment: production
     permissions:
@@ -50,11 +170,16 @@ jobs:
       RAW_BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
       RAW_BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
       RAW_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
+      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RAW_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       RAW_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
       RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
+      RAW_NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID != '' && secrets.NEXT_PUBLIC_GA_ID || vars.NEXT_PUBLIC_GA_ID }}
+      RAW_NEWSLETTER_TOKEN_SECRET: ${{ secrets.NEWSLETTER_TOKEN_SECRET }}
+      RAW_NOTION_FEEDBACK_DATABASE_ID: ${{ secrets.NOTION_FEEDBACK_DATABASE_ID != '' && secrets.NOTION_FEEDBACK_DATABASE_ID || vars.NOTION_FEEDBACK_DATABASE_ID }}
+      RAW_NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      RAW_RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID != '' && secrets.RESEND_AUDIENCE_ID || vars.RESEND_AUDIENCE_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -98,6 +223,12 @@ jobs:
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
               'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
+              'marketing_ga_id': optional('RAW_NEXT_PUBLIC_GA_ID'),
+              'marketing_newsletter_token_secret': optional('RAW_NEWSLETTER_TOKEN_SECRET'),
+              'marketing_notion_feedback_database_id': optional('RAW_NOTION_FEEDBACK_DATABASE_ID'),
+              'marketing_notion_token': optional('RAW_NOTION_TOKEN'),
+              'marketing_resend_api_key': optional('RAW_RESEND_API_KEY'),
+              'marketing_resend_audience_id': optional('RAW_RESEND_AUDIENCE_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -212,7 +343,7 @@ jobs:
       RAW_BACKEND_PREVIEW_SECRET: ${{ secrets.BACKEND_PREVIEW_SECRET }}
       RAW_BACKEND_REVALIDATE_SECRET: ${{ secrets.BACKEND_REVALIDATE_SECRET }}
       RAW_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY != '' && secrets.RESEND_API_KEY || vars.RESEND_API_KEY }}
+      RAW_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RAW_RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       RAW_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       RAW_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -222,6 +353,11 @@ jobs:
       RAW_RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID != '' && secrets.RAILWAY_PROJECT_ID || vars.RAILWAY_PROJECT_ID }}
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
       RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
+      RAW_NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID != '' && secrets.NEXT_PUBLIC_GA_ID || vars.NEXT_PUBLIC_GA_ID }}
+      RAW_NEWSLETTER_TOKEN_SECRET: ${{ secrets.NEWSLETTER_TOKEN_SECRET }}
+      RAW_NOTION_FEEDBACK_DATABASE_ID: ${{ secrets.NOTION_FEEDBACK_DATABASE_ID != '' && secrets.NOTION_FEEDBACK_DATABASE_ID || vars.NOTION_FEEDBACK_DATABASE_ID }}
+      RAW_NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      RAW_RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID != '' && secrets.RESEND_AUDIENCE_ID || vars.RESEND_AUDIENCE_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -270,6 +406,12 @@ jobs:
               'postgres_user': get('RAW_POSTGRES_USER') or 'open_agency',
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
               'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
+              'marketing_ga_id': optional('RAW_NEXT_PUBLIC_GA_ID'),
+              'marketing_newsletter_token_secret': optional('RAW_NEWSLETTER_TOKEN_SECRET'),
+              'marketing_notion_feedback_database_id': optional('RAW_NOTION_FEEDBACK_DATABASE_ID'),
+              'marketing_notion_token': optional('RAW_NOTION_TOKEN'),
+              'marketing_resend_api_key': optional('RAW_RESEND_API_KEY'),
+              'marketing_resend_audience_id': optional('RAW_RESEND_AUDIENCE_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -300,11 +442,6 @@ jobs:
           tfvars_path = Path('infra/environments/production/github.auto.tfvars.json')
           tfvars_path.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
           PY
-
-      - name: Setup OpenTofu
-        uses: opentofu/setup-opentofu@v1
-        with:
-          tofu_version: "latest"
 
       - name: Init production environment
         run: tofu -chdir=infra/environments/production init
@@ -354,6 +491,8 @@ jobs:
     environment: production
     permissions:
       contents: read
+    outputs:
+      deployment_url: ${{ steps.deploy.outputs.deployment_url }}
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_API_TOKEN }}
       VERCEL_PROJECT_ID: ${{ secrets.MARKETING_VERCEL_PROJECT_ID != '' && secrets.MARKETING_VERCEL_PROJECT_ID || vars.MARKETING_VERCEL_PROJECT_ID }}
@@ -377,6 +516,7 @@ jobs:
           cache-dependency-path: frontend/pnpm-lock.yaml
 
       - name: Deploy marketing production build
+        id: deploy
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           : "${VERCEL_TOKEN:?Missing required Vercel token.}"
@@ -386,6 +526,7 @@ jobs:
           url=$(pnpm dlx vercel deploy --cwd frontend --prod --yes --token="$VERCEL_TOKEN")
           echo "Production deployment: $url"
           printf 'MARKETING_VERCEL_DEPLOY_URL=%s\n' "$url" >> "$GITHUB_ENV"
+          printf 'deployment_url=%s\n' "$url" >> "$GITHUB_OUTPUT"
 
       - name: Publish deployment summary
         run: |
@@ -433,3 +574,36 @@ jobs:
           sleep 45
           railway status open-agency-backend-production || true
           railway logs open-agency-backend-production --tail 100 || true
+
+  verify-production:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    needs: [deploy-marketing-frontend, deploy-backend]
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    env:
+      ALPHA_BASIC_AUTH_PASSWORD: ${{ secrets.ALPHA_BASIC_AUTH_PASSWORD != '' && secrets.ALPHA_BASIC_AUTH_PASSWORD || vars.ALPHA_BASIC_AUTH_PASSWORD }}
+      ALPHA_BASIC_AUTH_USERNAME: ${{ secrets.ALPHA_BASIC_AUTH_USERNAME != '' && secrets.ALPHA_BASIC_AUTH_USERNAME || vars.ALPHA_BASIC_AUTH_USERNAME }}
+      MARKETING_APP_BASE_URL: ${{ secrets.MARKETING_APP_BASE_URL != '' && secrets.MARKETING_APP_BASE_URL || vars.MARKETING_APP_BASE_URL }}
+      MARKETING_DEPLOY_URL: ${{ needs.deploy-marketing-frontend.outputs.deployment_url }}
+      NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL != '' && secrets.NEXT_PUBLIC_SERVER_URL || vars.NEXT_PUBLIC_SERVER_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify production endpoints
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if bash scripts/production/smoke-check.sh --skip-courses --marketing-deploy-url "$MARKETING_DEPLOY_URL"; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 6 ]; then
+              echo "Production smoke checks failed after $attempt attempts."
+              exit 1
+            fi
+
+            echo "Production endpoints are not ready yet; retrying in 20 seconds."
+            sleep 20
+          done

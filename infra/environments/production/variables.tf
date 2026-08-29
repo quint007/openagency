@@ -69,6 +69,47 @@ variable "marketing_adsense_client_id" {
   default     = null
 }
 
+variable "marketing_ga_id" {
+  description = "Optional Google Analytics measurement ID exposed to the production marketing Vercel project."
+  type        = string
+  default     = null
+}
+
+variable "marketing_notion_feedback_database_id" {
+  description = "Optional Notion database ID used by the production marketing feedback form."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "marketing_notion_token" {
+  description = "Optional Notion integration token used by the production marketing feedback form."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "marketing_resend_api_key" {
+  description = "Optional Resend API key used by production marketing feedback and newsletter flows."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "marketing_resend_audience_id" {
+  description = "Optional Resend audience ID used by the production marketing newsletter."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "marketing_newsletter_token_secret" {
+  description = "Optional signing secret used for production newsletter unsubscribe tokens."
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
 variable "cloudflare_dns_enabled" {
   description = "Whether production should manage Cloudflare DNS records directly. Defaults to fallback mode until provider credentials are available."
   type        = bool
