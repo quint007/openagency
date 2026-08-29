@@ -119,7 +119,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
             Back to all guides
           </Link>
 
-          <div className="flex max-w-[58rem] flex-col gap-5">
+          <div className="flex max-w-[46rem] flex-col gap-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className={`${styles.eyebrow} rounded-full px-3 py-2`}>{post.category}</span>
               {post.level ? (
@@ -138,11 +138,11 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
               ))}
             </div>
 
-            <h1 className={`${styles.pageTitle} max-w-[14ch] text-[var(--on-surface)]`}>{post.title}</h1>
-            <p className={`${styles.proseLead} max-w-[44rem]`}>{post.excerpt}</p>
+            <h1 className="max-w-[11ch] text-[clamp(2rem,4vw,3.25rem)] leading-[0.98] tracking-[-0.05em] text-[var(--on-surface)] text-balance">{post.title}</h1>
+            <p className="max-w-[38rem] text-[1rem] leading-8 text-[var(--on-surface-variant)] sm:text-[1.05rem] sm:leading-[1.8]">{post.excerpt}</p>
           </div>
 
-          <dl className="flex flex-wrap gap-x-8 gap-y-4 text-sm text-[var(--on-surface-variant)]">
+          <dl className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[var(--on-surface-variant)]">
             <div className="inline-flex items-center gap-2">
               <Calendar className="size-5 text-[var(--brand-primary-light)]" />
               <dt className="sr-only">Published</dt>
