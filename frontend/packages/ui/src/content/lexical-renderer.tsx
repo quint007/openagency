@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties, type ReactNode } from 'react';
+import { Fragment, isValidElement, type CSSProperties, type ReactNode } from 'react';
 import { createHighlighter } from 'shiki';
 
 import { cn } from '../lib/utils';
@@ -34,6 +34,7 @@ type RichTextMedia = {
 type LexicalRendererProps = {
   className?: string;
   content: unknown;
+  renderAfterNode?: (index: number, total: number) => ReactNode;
 };
 
 const TEXT_FORMAT_BOLD = 1;
@@ -507,7 +508,7 @@ export function calculateReadingTimeFromLexicalContent(content: unknown): string
   return `${Math.max(1, Math.ceil(wordCount / 200))} min read`;
 }
 
-export async function LexicalRenderer({ className, content }: LexicalRendererProps) {
+export async function LexicalRenderer({ className, content, renderAfterNode }: LexicalRendererProps) {
   const root = getRootNode(content);
 
   if (!root) {
@@ -520,5 +521,18 @@ export async function LexicalRenderer({ className, content }: LexicalRendererPro
     return null;
   }
 
-  return <div className={cn('flex min-w-0 flex-col gap-6 [overflow-wrap:anywhere] [&_*]:max-w-full [&_pre]:whitespace-pre-wrap [&_pre]:[overflow-wrap:anywhere] [&_code]:whitespace-pre-wrap [&_code]:[overflow-wrap:anywhere]', className)}>{nodes}</div>;
+  const contentWithInsertions = renderAfterNode
+    ? nodes.flatMap((node, index) => {
+        const insertion = renderAfterNode(index, nodes.length);
+        const insertionKey = isValidElement(node) && node.key != null ? `lexical-insert-after-${String(node.key)}` : null;
+
+        return insertion == null
+          ? [node]
+          : insertionKey
+            ? [node, <Fragment key={insertionKey}>{insertion}</Fragment>]
+            : [node, insertion];
+      })
+    : nodes;
+
+  return <div className={cn('flex min-w-0 flex-col gap-6 [overflow-wrap:anywhere] [&_*]:max-w-full [&_pre]:whitespace-pre-wrap [&_pre]:[overflow-wrap:anywhere] [&_code]:whitespace-pre-wrap [&_code]:[overflow-wrap:anywhere]', className)}>{contentWithInsertions}</div>;
 }
