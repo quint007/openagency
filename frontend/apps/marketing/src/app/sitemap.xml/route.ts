@@ -19,6 +19,8 @@ export async function GET() {
     '/blog',
     '/tools',
     '/tools/local-model-calculator',
+    '/about',
+    '/contact',
   ];
 
   return getServerSideSitemap([

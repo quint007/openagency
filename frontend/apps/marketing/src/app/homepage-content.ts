@@ -10,7 +10,9 @@ export type HomepageRouteHref =
   | "/tools/local-model-calculator"
   | "/newsletter"
   | "/about"
+  | "/contact"
   | "/privacy"
+  | "/privacy/cookies"
   | "/terms"
   | "https://github.com/Open-Agency-io"
   | "mailto:hello@open-agency.io";
@@ -35,7 +37,10 @@ export const allowedFooterLinkHrefs = [
   "/blog",
   "/tools",
   "https://github.com/Open-Agency-io",
+  "/about",
+  "/contact",
   "/privacy",
+  "/privacy/cookies",
   "/terms",
 ] as const;
 
@@ -237,6 +242,8 @@ export const homepageContent = {
         links: [
           { label: "Guides", href: "/blog" },
           { label: "Tools", href: "/tools" },
+          { label: "About", href: "/about" },
+          { label: "Contact", href: "/contact" },
         ],
       },
       {
@@ -248,6 +255,7 @@ export const homepageContent = {
         links: [
           { label: "Privacy", href: "/privacy" },
           { label: "Terms", href: "/terms" },
+          { label: "Cookies", href: "/privacy/cookies" },
         ],
       },
     ],

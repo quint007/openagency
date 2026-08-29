@@ -60,6 +60,7 @@ test("cookie integration configuration only exposes configured optional categori
 
   expect(config).toEqual({
     adsenseClientId: "ads-test-client",
+    adsensePublisherId: "ads-test-client",
     googleAnalyticsId: "G-TEST",
     hasAds: true,
     hasAnalytics: true,
@@ -73,11 +74,16 @@ test("cookie integration configuration only exposes configured optional categori
     }),
   ).toEqual({
     adsenseClientId: "",
+    adsensePublisherId: "",
     googleAnalyticsId: "",
     hasAds: false,
     hasAnalytics: false,
     hasOptionalIntegrations: false,
   });
+
+  expect(
+    getCookieIntegrationConfig({ NEXT_PUBLIC_ADSENSE_CLIENT_ID: "ca-pub-1234567890" }),
+  ).toMatchObject({ adsenseClientId: "ca-pub-1234567890", adsensePublisherId: "pub-1234567890" });
 
   expect(
     getCookieIntegrationConfig({ NEXT_PUBLIC_GA_ID: "G-ONLY" }),
