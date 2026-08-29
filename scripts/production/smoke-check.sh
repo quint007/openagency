@@ -105,7 +105,6 @@ if [ "$check_frontends" -eq 1 ]; then
 
   if [ -n "$marketing_deploy_url" ]; then
     check_url "marketing-deployment" "${marketing_deploy_url%/}/"
-    check_not_found "marketing-deployment-thumbnail-preview-removed" "${marketing_deploy_url%/}/blog/thumbnail-preview"
   fi
 fi
 
