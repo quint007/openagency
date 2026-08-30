@@ -35,7 +35,7 @@ Newsletter and feedback server actions run in the marketing deployment. Feedback
 
 ## Production Delivery
 
-Production uses Vercel for marketing, Railway for Payload and PostgreSQL, and Cloudflare for DNS and R2. OpenTofu defines the production resources and environment-variable contract. Tagged GitHub releases run frontend/backend quality gates, plan and apply infrastructure, deploy both applications, and execute post-deployment smoke checks.
+Production uses Vercel for marketing, Railway for Payload and PostgreSQL, and Cloudflare for DNS and R2. OpenTofu defines the production resources and environment-variable contract. Tagged GitHub releases run frontend/backend quality gates, plan and apply infrastructure, deploy both applications, and execute post-deployment smoke checks. The backend image applies pending Payload migrations before serving; production migrations follow an expand-and-contract policy so the previous application revision remains rollback-compatible.
 
 Operational details are intentionally kept in:
 

@@ -100,7 +100,8 @@ EXPOSE 8080
 ENV PORT=8080
 
 # server.js is created by next build from the standalone output.
-# Run migrations at container startup so they see the live Railway environment
-# before the app begins serving.
+# The release image is the only normal production migration runner. A failed
+# migration keeps the new revision from serving, so deployment verification
+# fails without requiring a second operator migration step.
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
 CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\"0.0.0.0\" exec node server.js"]

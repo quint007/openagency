@@ -218,7 +218,7 @@ tasks:
       - task production:cutover:plan
 
   deploy:migrate:
-    desc: Run production Payload migrations using the repo-root .env
+    desc: Run production Payload migrations manually for incident recovery only
     cmds:
       - task production:deploy:migrate
 

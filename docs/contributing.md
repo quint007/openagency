@@ -124,9 +124,6 @@ git push origin <release-tag>
 # Deploy the backend Payload instance to Railway manually
 task deploy:backend
 
-# Run the explicit post-deploy migration step
-task deploy:migrate
-
 # Run production smoke checks
 task deploy:verify
 
@@ -139,7 +136,6 @@ Alternatively, use the production namespace directly:
 task production:deploy:plan
 task production:deploy:apply
 task production:deploy:backend
-task production:deploy:migrate
 task production:deploy:verify
 task production:deploy:destroy
 ```
@@ -150,7 +146,9 @@ task production:deploy:destroy
 - Use the repo-root `.env.example` as the single deployment contract for local runs and CI variable setup.
 - Secrets are passed to OpenTofu via `-var` flags only when the corresponding environment variables are set in `.env`.
 - The deploy still supports provider defaults, but production media storage now requires the R2 env set to be present so the backend never falls back to local uploads.
-- Production cutover stays production-only and follows this exact order: **apply infra -> push release tag / deploy -> run migrations -> run smoke verification**.
+- Production cutover stays production-only and follows this exact order: **apply infra -> push release tag / deploy (the backend migrates before serving) -> run smoke verification**.
+- Production migrations must use the expand-and-contract policy in `infra/environments/production/README.md` so the previous application revision remains rollback-compatible.
+- `task deploy:migrate` is an incident-only command for running the affected release's migrations through an operator-supplied `BACKEND_DATABASE_URL`; it is not part of a normal release.
 - The backend runtime `DATABASE_URL` is generated inside Terraform from the managed Railway Postgres service credentials.
 - `BACKEND_DATABASE_URL` is now optional and only needed for operator workflows that connect directly from outside Railway.
 - `task restore:drill:plan` prints an isolated restore-drill path that restores into a disposable target database instead of staging, then follows with app smoke checks.

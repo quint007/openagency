@@ -77,6 +77,14 @@ locals {
         "Repeat the verification after major service setting changes because the provider does not enforce this toggle.",
       ]
     }
+    migration_runner = {
+      status = "manual_verification_required"
+      reason = "The Railway provider does not model a singleton pre-deploy command or backend replica count."
+      procedure = [
+        "Keep the production backend at one replica while the image applies pending migrations before serving.",
+        "Do not scale the backend until a singleton migration runner is managed by infrastructure.",
+      ]
+    }
   }
 }
 

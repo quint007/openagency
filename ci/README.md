@@ -7,6 +7,7 @@ This directory contains the shared production task definition used by the root
 
 - `production.yaml` - Local production plan, apply, deploy, migration, smoke, and restore-drill tasks
 - `.github/workflows/deploy.yml` - Pull request production plans and tag-triggered production releases
+- `.github/workflows/rollback-backend.yml` - Manual application-only backend rollback by immutable commit SHA
 
 The GitHub workflow gates plans and releases on frontend lint, tests,
 typechecks, and a marketing build, plus backend lint, integration tests, and a
@@ -14,6 +15,11 @@ backend build. Tagged releases apply infrastructure, deploy both production
 applications, and retry automated smoke checks against the backend and
 marketing endpoints. The courses app is not currently part of the production
 deployment or release gate.
+
+Backend rollback is intentionally separate from the tag release workflow. The
+manual rollback workflow deploys only the selected backend revision to Railway
+and verifies backend health; it never applies infrastructure from the old
+commit or deploys marketing.
 
 ## Deployment Configuration Contract
 
@@ -81,8 +87,8 @@ For `admin.open-agency.io`, keep the Cloudflare DNS record DNS-only. The backend
 
 The repo also exposes local production-only operator tasks through the repo-root `.env`:
 
-- `task cutover:plan` — prints the required `apply -> deploy -> migrate -> verify` production order.
-- `task deploy:migrate` — runs Payload migrations against an operator-supplied `BACKEND_DATABASE_URL` from the repo-root `.env` when you need an external direct connection.
+- `task cutover:plan` — prints the required `apply -> deploy with startup migrations -> verify` production order.
+- `task deploy:migrate` — incident-only escape hatch for running the affected release's migrations against an operator-supplied `BACKEND_DATABASE_URL`.
 - `task deploy:verify` — runs backend/frontend smoke checks.
 - `task restore:drill:plan` — prints the isolated restore-drill steps and follow-up smoke checks.
 

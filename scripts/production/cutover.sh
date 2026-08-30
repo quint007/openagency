@@ -31,16 +31,15 @@ Production cutover order (production-only)
 2. Deploy the tagged release through GitHub Actions
    git tag ${release_tag}
    git push origin ${release_tag}
+   The backend release applies pending migrations before it starts serving.
 
-3. Run the explicit production migration step
-   task deploy:migrate
-
-4. Verify backend + frontend smoke checks
+3. Verify backend + frontend smoke checks
    task deploy:verify
 
 Rollback handles to keep ready
 - Previous known-good release tag
-- Operator-accessible external database URL for emergency migration rollback
+- A confirmed pre-release database restore point
+- Operator-accessible external database URL for emergency migration diagnostics
 EOF
 
 if [ "$dry_run" -eq 1 ]; then
