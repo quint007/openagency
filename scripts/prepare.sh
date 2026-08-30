@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$REPO_ROOT"
 
-staged_files="$(git diff --cached --name-only --diff-filter=ACMRTUXB)"
+staged_files="$(git diff --cached --name-only --diff-filter=ACDMRTUXB)"
 
 if [ -z "$staged_files" ]; then
   echo "No staged files detected; skipping prepare checks."
@@ -27,7 +27,7 @@ while IFS= read -r file; do
   esac
 
   case "$file" in
-    backend/openagency-backend/src/middleware.ts|backend/openagency-backend/src/environment.d.ts|backend/openagency-backend/.env.example|frontend/apps/marketing/src/middleware.ts|frontend/apps/marketing/.env.local.example|frontend/apps/marketing/src/app/api/revalidate/route.ts|infra/environments/production/main.tf|infra/environments/production/variables.tf)
+    backend/openagency-backend/src/proxy.ts|backend/openagency-backend/src/environment.d.ts|backend/openagency-backend/.env.example|frontend/apps/marketing/src/proxy.ts|frontend/apps/marketing/.env.local.example|frontend/apps/marketing/src/app/api/revalidate/route.ts|infra/environments/production/main.tf|infra/environments/production/variables.tf)
       needs_auth_contract=true
       ;;
   esac

@@ -38,7 +38,7 @@ const unauthorizedResponse = (): NextResponse =>
     },
   });
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const username = process.env.ALPHA_BASIC_AUTH_USERNAME;
   const password = process.env.ALPHA_BASIC_AUTH_PASSWORD;
 

@@ -42,12 +42,6 @@ set of product-relevant changes.
 - Review the cookie policy copy at `/privacy/cookies` for accuracy once the
   final third-party integrations are chosen.
 
-## Next.js deprecation warnings
-
-- The marketing app uses the `middleware` file convention, which Next.js 16
-  reports as deprecated in favor of the `proxy` convention. This should be
-  migrated before it becomes a hard error in a future Next.js release.
-
 ## General
 
 - Homepage content in `homepage-content.ts` and `DESIGN.md` should be reviewed by

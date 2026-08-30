@@ -193,18 +193,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           </aside>
         </div>
 
-        <footer className="mx-auto mt-10 flex w-full max-w-[100rem] flex-col gap-3 border-t border-[color:color-mix(in_srgb,var(--outline-variant)_35%,transparent)] pt-8">
-          <p className={styles.metaText}>Published at</p>
-          <a
-            href={post.canonicalUrl}
-            className="break-all text-sm leading-7 text-[var(--brand-primary-light)] underline decoration-[color:color-mix(in_srgb,var(--brand-primary)_55%,transparent)] underline-offset-4"
-          >
-            {post.canonicalUrl}
-          </a>
-          <p className="text-sm leading-7 text-[var(--on-surface-variant)]">
-            This is the canonical URL. Publish here first, then cross-post externally.
-          </p>
-        </footer>
       </section>
     </MarketingPageFrame>
   );

@@ -27,8 +27,34 @@ const imageHostUrls = [
   'http://127.0.0.1:3002',
 ].filter((value): value is string => Boolean(value));
 
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline' https:",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https:",
+  "frame-src 'self' https:",
+  "worker-src 'self' blob:",
+].join("; ");
+
+export const securityHeaders = [
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
+  { key: "Permissions-Policy", value: "camera=(), geolocation=(), microphone=()" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+];
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
   async redirects() {
     return [
       { source: "/awesome", destination: "/", permanent: true },
