@@ -21,7 +21,7 @@ needs_courses_build=false
 
 while IFS= read -r file; do
   case "$file" in
-    frontend/vercel.json|infra/modules/vercel/main.tf|infra/environments/production/main.tf|frontend/apps/marketing/vercel.json)
+    .github/workflows/deploy.yml|.github/workflows/rollback-backend.yml|Taskfile.yml|backend/openagency-backend/Dockerfile|ci/production.yaml|frontend/vercel.json|infra/modules/vercel/main.tf|infra/environments/production/main.tf|frontend/apps/marketing/vercel.json|scripts/prepare-deploy-config.sh|scripts/production/cutover.sh)
       needs_deploy_config=true
       ;;
   esac

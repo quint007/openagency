@@ -4,7 +4,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 
 import { LegalDocuments } from '@/collections/LegalDocuments'
 import config from '@/payload.config'
-import type { LegalDocument, User } from '@/payload-types'
+import type { ApiClient, LegalDocument, User } from '@/payload-types'
 
 const testVersionLabel = 'legal-documents-integration-test'
 
@@ -73,6 +73,17 @@ async function createTestUser(role: UserRole): Promise<User> {
   })
 }
 
+async function createTestApiClient(): Promise<ApiClient> {
+  return payload.create({
+    collection: 'api-clients',
+    data: {
+      enableAPIKey: true,
+      name: `legal-documents-${crypto.randomUUID()}`,
+    },
+    overrideAccess: true,
+  })
+}
+
 async function removeTestRecords(): Promise<void> {
   await payload.delete({
     collection: 'legal-documents',
@@ -83,6 +94,16 @@ async function removeTestRecords(): Promise<void> {
     where: {
       versionLabel: {
         equals: testVersionLabel,
+      },
+    },
+  })
+
+  await payload.delete({
+    collection: 'api-clients',
+    overrideAccess: true,
+    where: {
+      name: {
+        like: 'legal-documents-%',
       },
     },
   })
@@ -144,8 +165,15 @@ describe('legal document Local API access', () => {
       overrideAccess: false,
     })
 
-    // Then: the draft is not visible
+    const editorResult = await payload.find({
+      collection: 'legal-documents',
+      overrideAccess: false,
+      user: editor,
+    })
+
+    // Then: the draft is private from the public but visible to a human editor
     expect(anonymousResult.docs.some((document) => document.id === draft.id)).toBe(false)
+    expect(editorResult.docs.some((document) => document.id === draft.id)).toBe(true)
   })
 
   it('rejects an editor publishing a legal document', async () => {
@@ -205,6 +233,92 @@ describe('legal document Local API access', () => {
 
     // Then: deletion is denied
     await expect(deleteAttempt).rejects.toBeInstanceOf(Forbidden)
+  })
+
+  it('rejects an API client creating a legal document draft', async () => {
+    // Given: an authenticated API client
+    const apiClient = await createTestApiClient()
+
+    // When: the client attempts to create an editorial draft
+    const createAttempt = payload.create({
+      collection: 'legal-documents',
+      context: {
+        disableRevalidate: true,
+      },
+      data: legalDocumentData('privacy', 'Privacy Policy'),
+      draft: true,
+      overrideAccess: false,
+      user: apiClient,
+    })
+
+    // Then: human-only editorial access rejects the operation
+    await expect(createAttempt).rejects.toBeInstanceOf(Forbidden)
+  })
+
+  it('limits an API client to published legal documents and rejects draft updates', async () => {
+    // Given: an editor draft, an approved published document, and an API client
+    const editor = await createTestUser('editor')
+    const admin = await createTestUser('admin')
+    const apiClient = await createTestApiClient()
+    const draft = await payload.create({
+      collection: 'legal-documents',
+      context: {
+        disableRevalidate: true,
+      },
+      data: legalDocumentData('privacy', 'Privacy Policy'),
+      draft: true,
+      overrideAccess: false,
+      user: editor,
+    })
+    const publishedDraft = await payload.create({
+      collection: 'legal-documents',
+      context: {
+        disableRevalidate: true,
+      },
+      data: legalDocumentData('terms', 'Terms of Service'),
+      draft: true,
+      overrideAccess: false,
+      user: admin,
+    })
+    const published = await payload.update({
+      collection: 'legal-documents',
+      context: {
+        disableRevalidate: true,
+      },
+      data: {
+        _status: 'published',
+      },
+      draft: false,
+      id: publishedDraft.id,
+      overrideAccess: false,
+      user: admin,
+    })
+
+    // When: the API client reads the collection with access enforcement
+    const result = await payload.find({
+      collection: 'legal-documents',
+      overrideAccess: false,
+      user: apiClient,
+    })
+
+    // Then: published content is readable, drafts stay private, and updates are rejected
+    expect(result.docs.some((document) => document.id === published.id)).toBe(true)
+    expect(result.docs.some((document) => document.id === draft.id)).toBe(false)
+
+    const updateAttempt = payload.update({
+      collection: 'legal-documents',
+      context: {
+        disableRevalidate: true,
+      },
+      data: {
+        title: 'API client revision',
+      },
+      id: draft.id,
+      overrideAccess: false,
+      user: apiClient,
+    })
+
+    await expect(updateAttempt).rejects.toBeInstanceOf(Forbidden)
   })
 
   it('rejects a duplicate legal document type', async () => {

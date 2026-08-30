@@ -1,0 +1,79 @@
+name: Rollback production backend
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend_ref:
+        description: Full commit SHA of the rollback-compatible backend revision
+        required: true
+        type: string
+
+concurrency:
+  group: production-opentofu-state
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    environment: production
+    env:
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Require an immutable commit SHA
+        env:
+          BACKEND_REF: ${{ inputs.backend_ref }}
+        run: |
+          if [ "${#BACKEND_REF}" -ne 40 ] || printf '%s' "$BACKEND_REF" | grep -q '[^0-9a-f]'; then
+            echo "backend_ref must be a full 40-character lowercase commit SHA." >&2
+            exit 1
+          fi
+
+      - name: Checkout rollback revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.backend_ref }}
+
+      - name: Deploy backend revision to Railway
+        run: |
+          set -eu
+
+          railway --version
+          echo "Deploying backend commit ${{ inputs.backend_ref }} without applying infrastructure or deploying marketing."
+          railway up ./backend/openagency-backend --path-as-root --project "$RAILWAY_PROJECT_ID" --service open-agency-backend-production --environment production --ci
+          sleep 45
+          railway status open-agency-backend-production || true
+          railway logs open-agency-backend-production --tail 100 || true
+
+  verify-backend:
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      ALPHA_BASIC_AUTH_PASSWORD: ${{ secrets.ALPHA_BASIC_AUTH_PASSWORD != '' && secrets.ALPHA_BASIC_AUTH_PASSWORD || vars.ALPHA_BASIC_AUTH_PASSWORD }}
+      ALPHA_BASIC_AUTH_USERNAME: ${{ secrets.ALPHA_BASIC_AUTH_USERNAME != '' && secrets.ALPHA_BASIC_AUTH_USERNAME || vars.ALPHA_BASIC_AUTH_USERNAME }}
+      NEXT_PUBLIC_SERVER_URL: ${{ secrets.NEXT_PUBLIC_SERVER_URL != '' && secrets.NEXT_PUBLIC_SERVER_URL || vars.NEXT_PUBLIC_SERVER_URL }}
+    steps:
+      - name: Checkout current operational scripts
+        uses: actions/checkout@v4
+
+      - name: Verify rolled-back backend
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if bash scripts/production/smoke-check.sh --backend-only; then
+              exit 0
+            fi
+
+            if [ "$attempt" -lt 6 ]; then
+              echo "Backend rollback verification attempt $attempt failed; retrying in 20 seconds."
+              sleep 20
+            fi
+          done
+
+          echo "Backend rollback verification failed after 6 attempts." >&2
+          exit 1

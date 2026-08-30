@@ -460,7 +460,7 @@ tasks:
         devbox run railway logs open-agency-backend-production --tail 100 || true
 
   deploy:migrate:
-    desc: Run production Payload migrations using root .env secrets
+    desc: Run production Payload migrations manually for incident recovery only
     dotenv: [.env]
     cmds:
       - |

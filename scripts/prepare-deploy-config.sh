@@ -51,4 +51,66 @@ if ! grep -Eq 'root_directory[[:space:]]*=[[:space:]]*var\.root_directory' infra
   fail "infra/modules/vercel/main.tf must pass root_directory through to the Vercel resource."
 fi
 
+node --input-type=module <<'NODE'
+import fs from 'node:fs'
+
+const dockerfile = fs.readFileSync('backend/openagency-backend/Dockerfile', 'utf8')
+const commands = dockerfile
+  .split('\n')
+  .map((line) => line.trim())
+  .filter((line) => line.startsWith('CMD '))
+const expected = 'CMD ["sh", "-c", "NODE_OPTIONS=--no-deprecation payload migrate --yes && HOSTNAME=\\"0.0.0.0\\" exec node server.js"]'
+
+if (commands.at(-1) !== expected) {
+  throw new Error('The final backend image command must apply Payload migrations before starting the production server.')
+}
+NODE
+
+if ! grep -Fq 'needs: [deploy-marketing-frontend, deploy-backend]' .github/workflows/deploy.yml; then
+  fail "Production verification must wait for both application deployments."
+fi
+
+if grep -Eq '(^|[^[:alnum:]_])(tofu|terraform)([^[:alnum:]_]|$)' .github/workflows/rollback-backend.yml; then
+  fail ".github/workflows/rollback-backend.yml must not apply historical infrastructure."
+fi
+
+if ! grep -Fq 'ref: ${{ inputs.backend_ref }}' .github/workflows/rollback-backend.yml; then
+  fail ".github/workflows/rollback-backend.yml must deploy the requested immutable backend revision."
+fi
+
+if ! grep -Fq 'bash scripts/production/smoke-check.sh --backend-only' .github/workflows/rollback-backend.yml; then
+  fail ".github/workflows/rollback-backend.yml must verify the backend after deployment."
+fi
+
+for normal_release_path in scripts/production/cutover.sh .github/workflows/deploy.yml .github/workflows/rollback-backend.yml; do
+  if grep -Eq '(^|[^[:alnum:]_])(deploy:migrate|production:deploy:migrate|payload[[:space:]]+migrate)([^[:alnum:]_]|$)' "$normal_release_path"; then
+    fail "$normal_release_path must not run a second migration outside the backend image."
+  fi
+done
+
+task_body() {
+  local file="$1"
+  local heading="$2"
+
+  awk -v heading="$heading" '
+    $0 == heading { capture = 1; next }
+    capture && $0 ~ /^  [^[:space:]].*:$/ { exit }
+    capture { print }
+  ' "$file"
+}
+
+for backend_task in 'Taskfile.yml|  deploy:backend:' 'ci/production.yaml|  deploy:backend:'; do
+  file="${backend_task%%|*}"
+  heading="${backend_task#*|}"
+  body="$(task_body "$file" "$heading")"
+
+  if [ -z "$body" ]; then
+    fail "$file is missing the deploy:backend task."
+  fi
+
+  if printf '%s' "$body" | grep -Eq '(^|[^[:alnum:]_])(deploy:migrate|production:deploy:migrate|payload[[:space:]]+migrate)([^[:alnum:]_]|$)'; then
+    fail "$file deploy:backend must not run a second migration outside the backend image."
+  fi
+done
+
 echo "prepare:deploy-config: passed"

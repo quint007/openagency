@@ -35,9 +35,8 @@ Optional values for verification and operator-only direct database access:
 Production-only rollout follows this exact order:
 
 1. **Apply** infrastructure.
-2. **Deploy** the tagged backend release through GitHub Actions.
-3. **Migrate** the production database explicitly.
-4. **Verify** production with smoke checks.
+2. **Deploy** the tagged release through GitHub Actions. The backend container applies pending Payload migrations before it starts serving.
+3. **Verify** production with smoke checks.
 
 The local command surface is:
 
@@ -47,15 +46,24 @@ task deploy:plan
 task deploy:apply
 git tag <release-tag>
 git push origin <release-tag>
-task deploy:migrate
 task deploy:verify
 ```
 
 `task cutover:plan` prints the same ordered flow without touching production.
 
-### Why migration is separate
+### Migration release contract
 
-`Taskfile.yml` already treats Payload migrations as an explicit operational step in development. Production keeps the same contract: after the release tag is deployed, run the matching tagged code's migrations against `BACKEND_DATABASE_URL` using `task deploy:migrate`.
+The backend image runs `payload migrate --yes` before starting the production server. This is the only migration step in a normal release: each container start checks for pending migrations, and a failed migration prevents that Railway revision from serving so the release smoke check fails. Do not run `task deploy:migrate` after a successful deployment.
+
+Every production migration must preserve compatibility with both the previous and new application revisions:
+
+- Use expand-and-contract changes. Add nullable columns, tables, or indexes first; backfill data separately; remove old fields only in a later release after rollback compatibility is no longer required.
+- Do not combine a destructive rename, drop, or new required field without a safe default/backfill with the application change that starts using the replacement.
+- Confirm a restorable database backup exists before tagging any release that mutates persisted data.
+- Prefer a forward-fix release. Redeploying the previous application tag is safe while the expanded schema remains compatible; do not automatically run down migrations during an application rollback.
+- Keep the production backend at one replica. The Railway provider does not model a singleton pre-deploy command or replica count, so do not scale the service until that migration runner is managed by infrastructure.
+
+`task deploy:migrate` remains available only for incident recovery or diagnostics using the exact code from the affected release and an operator-only `BACKEND_DATABASE_URL`.
 
 ## Smoke verification
 
@@ -104,29 +112,30 @@ Use the rollback path that matches the failure mode.
 
 ### Migration failure
 
-1. Stop the rollout and do **not** continue to smoke verification.
-2. Restore the most recent known-good logical backup artifact or execute the rollback SQL for the just-applied migration.
-3. Redeploy the previous known-good release tag.
-4. Re-run `task deploy:verify` after the database is back on the prior schema.
+1. The failed container must remain out of service; do not promote it or run the migration a second time from a different checkout.
+2. Inspect the failed release's Railway logs and the Payload migration table to determine whether the transaction rolled back cleanly.
+3. Prefer a corrected forward migration in a new release. If the migration left unsafe partial data changes, restore the confirmed pre-release backup before deploying another revision.
+4. Run the application-only backend rollback workflow for the previous known-good commit only when the migration contract confirms that revision remains compatible with the current schema. This workflow never applies historical infrastructure or deploys marketing.
+5. Re-run `task deploy:verify` after the backend and database are in a known-good state.
 
 Concrete commands:
 
 ```bash
 task restore:drill:plan
-git push origin <previous-known-good-tag>
+gh workflow run rollback-backend.yml --ref main -f backend_ref=<previous-known-good-commit-sha>
 task deploy:verify
 ```
 
 ### Bad deploy or runtime failure
 
-1. Re-point production to the previous known-good tag immediately.
+1. Run the application-only backend rollback workflow for the previous known-good commit. Do not tag the old commit: release tags also apply that commit's historical infrastructure and deploy marketing.
 2. Re-run smoke checks.
 3. If the bad release also changed data shape, follow the migration-failure rollback above.
 
 Concrete commands:
 
 ```bash
-git push origin <previous-known-good-tag>
+gh workflow run rollback-backend.yml --ref main -f backend_ref=<previous-known-good-commit-sha>
 task deploy:verify
 ```
 
@@ -149,13 +158,14 @@ If provider-managed DNS is disabled, use the `environment_contract.cloudflare` o
 ### Media cutover failure
 
 1. Stop new media migrations.
-2. Restore the previous media hostname / storage configuration.
+2. Restore the previous media hostname / storage configuration through the current OpenTofu configuration or provider console; never apply OpenTofu from an old application commit.
 3. Re-run the backend and frontend smoke checks, then verify representative media URLs manually.
 
 Concrete commands:
 
 ```bash
-git push origin <previous-known-good-tag>
+task deploy:plan
+task deploy:apply
 task deploy:verify
 ```
 

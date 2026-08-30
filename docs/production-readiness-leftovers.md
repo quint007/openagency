@@ -14,8 +14,10 @@ set of product-relevant changes.
 - The `legal-documents` collection, migration, and marketing pages are in place,
   but the actual privacy policy and terms of service documents still need to be
   authored and published in the CMS for production.
-- The `20260714_213520_legal_documents` migration must be run against the
-  production database before the backend is deployed.
+- The tagged backend image checks and applies pending migrations before the
+  server starts. New migrations must follow the documented expand-and-contract
+  policy, require a confirmed restore point, and keep the backend at one replica
+  until a singleton migration runner is managed by infrastructure.
 - The `20260603_190000_blog_post_level.json` migration metadata is now complete,
   but the migration should still be verified to have run in each environment.
 

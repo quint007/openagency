@@ -3,25 +3,26 @@ import type { Where } from 'payload'
 export type LegalDocumentRole = 'admin' | 'editor'
 
 export type LegalDocumentUser = {
+  readonly collection?: string
   readonly roles?: readonly LegalDocumentRole[]
 }
 
-const hasLegalDocumentRoles = (user: unknown): user is LegalDocumentUser => {
-  return typeof user === 'object' && user !== null && 'roles' in user && Array.isArray(user.roles)
+const isLegalDocumentUser = (user: unknown): user is LegalDocumentUser => {
+  return typeof user === 'object' && user !== null && 'collection' in user && user.collection === 'users'
 }
 
 export const canManageLegalDocuments = (user: unknown): boolean => {
-  return Boolean(user)
+  return isLegalDocumentUser(user)
 }
 
 export const canPublishLegalDocuments = (user: unknown): boolean => {
-  if (!hasLegalDocumentRoles(user)) return false
+  if (!isLegalDocumentUser(user) || !Array.isArray(user.roles)) return false
 
-  return user?.roles?.includes('admin') === true
+  return user.roles.includes('admin')
 }
 
 export const legalDocumentsRead = (user: unknown): Where | true => {
-  if (user) return true
+  if (isLegalDocumentUser(user)) return true
 
   return {
     _status: {

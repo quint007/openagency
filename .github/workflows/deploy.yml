@@ -570,7 +570,7 @@ jobs:
 
           # Debug: Print deployment status
           echo "=== Waiting for deployment ==="
-          # Give the deployed container time to start and run its startup migration.
+          # The release container applies pending migrations before serving.
           sleep 45
           railway status open-agency-backend-production || true
           railway logs open-agency-backend-production --tail 100 || true

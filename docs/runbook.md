@@ -33,11 +33,12 @@ Do not edit state files or production resources manually to bypass the documente
 
 ```bash
 devbox run task deploy:backend
-devbox run task deploy:migrate
 devbox run task deploy:verify
 ```
 
-Production releases are normally driven by a Git tag through `.github/workflows/deploy.yml`. The workflow gates the release with frontend/backend checks, applies infrastructure, deploys Vercel and Railway, and runs production smoke verification.
+Production releases are normally driven by a Git tag through `.github/workflows/deploy.yml`. The workflow gates the release with frontend/backend checks, applies infrastructure, deploys Vercel and Railway, and runs production smoke verification. The Railway image applies pending Payload migrations before serving; follow the expand-and-contract policy in the production infrastructure runbook and do not run a second post-deploy migration.
+
+`devbox run task deploy:migrate` is reserved for incident recovery and diagnostics using the exact affected release and an operator-only database connection.
 
 ## Recovery
 
@@ -48,6 +49,8 @@ devbox run task restore:drill:plan
 ```
 
 Use the rollback and restore sections in the [production infrastructure runbook](../infra/environments/production/README.md) during an incident. Record the affected release tag, migration state, provider status, and verification results before taking further action.
+
+Backend application rollback uses `.github/workflows/rollback-backend.yml` with an immutable commit SHA. It deploys only Railway and verifies backend health; it never applies historical OpenTofu or rolls back marketing.
 
 ## Sources Of Truth
 
