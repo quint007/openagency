@@ -1,68 +1,63 @@
 # Open Agency
 
-Monorepo for the Open Agency platform, containing frontend applications, backend services, and infrastructure.
+Open Agency is a monorepo for the public publication, its Payload CMS, shared frontend packages, and production infrastructure.
 
 ## Structure
 
-```
-open-agency/
-├── frontend/               # Turborepo — Next.js apps + shared packages
-│   ├── apps/
-│   │   ├── marketing/      # open-agency.io
-│   │   └── courses/        # courses.open-agency.io
-│   └── packages/
-│       ├── ui/             # Shared component library + design tokens
-│       └── api-client/     # TypeScript client for the API
-├── backend/                # Payload CMS backend
-├── infra/                  # OpenTofu infrastructure
-├── ci/                     # CI/CD pipeline definitions
-├── docs/                   # Documentation
-└── .opencode/              # AI agent & skill configuration
+```text
+openagency/
+├── frontend/                       # Turborepo workspace
+│   ├── apps/marketing/             # Active Next.js 16 publication
+│   ├── apps/courses/               # Separate scaffold-stage course app
+│   └── packages/                   # UI, API client, and CMS client
+├── backend/openagency-backend/     # Payload CMS 3 on PostgreSQL
+├── infra/                          # Production OpenTofu modules and composition
+├── ci/                             # Root production task definitions and contract
+├── docs/                           # Architecture, contributing, and operations
+└── scripts/                        # Setup, verification, and release helpers
 ```
 
-## Getting Started
+## Local Development
 
-Full local setup (Docker, env files, and `make setup`) is documented in `docs/contributing.md`.
-
-### Prerequisites
-
-- Node.js 20+
-- pnpm
-- Docker Desktop (for the PostgreSQL container defined in `docker-compose.yml`)
-
-### Installation
+The supported command surface is Devbox plus the root Taskfile. Docker provides the local PostgreSQL 16 service from the root `docker-compose.yml`.
 
 ```bash
-task install
+devbox run task setup
+devbox run task dev
 ```
 
-### Development
+Use the narrower tasks when only one side of the stack is needed:
 
 ```bash
-task dev
+devbox run task dev-frontend
+devbox run task dev-backend
 ```
 
-This starts the Payload backend and the frontend (Turborepo) with both Next.js apps.
+See [`docs/contributing.md`](docs/contributing.md) for prerequisites, environment files, migrations, and package-specific commands.
 
-### Build
+## Verification
+
+Frontend and backend are separate package roots:
 
 ```bash
-task build
+devbox run pnpm --dir frontend build
+devbox run pnpm --dir frontend lint
+devbox run pnpm --dir frontend test:ui
+devbox run pnpm --dir frontend --filter @open-agency/cms-client test
+devbox run pnpm --dir backend/openagency-backend lint
+devbox run pnpm --dir backend/openagency-backend test:int
 ```
 
-### Lint
+## Documentation
 
-```bash
-task lint
-```
+- [`docs/architecture.md`](docs/architecture.md): system boundaries and production topology
+- [`docs/runbook.md`](docs/runbook.md): operational command index
+- [`infra/environments/production/README.md`](infra/environments/production/README.md): canonical production cutover, rollback, and restore procedures
+- [`ci/README.md`](ci/README.md): GitHub Actions and production environment contract
 
-## Environment Variables
+## Stack
 
-All runtime settings live in the `.env*` files described in `docs/contributing.md` (backend, marketing, and courses).
-
-## Tech Stack
-
-- **Frontend**: Next.js 14+, React 19, Turborepo, pnpm
-- **Backend**: Payload CMS 3.x, MongoDB
-- **Infrastructure**: OpenTofu
-- **CI/CD**: GitHub Actions
+- Frontend: Next.js 16, React 19, Turborepo, pnpm
+- Backend: Payload CMS 3, PostgreSQL, Resend, Cloudflare R2
+- Production: Vercel, Railway, Cloudflare DNS/R2, OpenTofu
+- Delivery: GitHub Actions release workflows

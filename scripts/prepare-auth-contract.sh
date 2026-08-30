@@ -19,10 +19,10 @@ check_file_contains() {
   fi
 }
 
-check_file_contains backend/openagency-backend/src/middleware.ts 'ALPHA_BASIC_AUTH_USERNAME'
-check_file_contains backend/openagency-backend/src/middleware.ts 'ALPHA_BASIC_AUTH_PASSWORD'
-check_file_contains backend/openagency-backend/src/middleware.ts 'NextResponse.redirect'
-check_file_contains backend/openagency-backend/src/middleware.ts 'open-agency.io'
+check_file_contains backend/openagency-backend/src/proxy.ts 'ALPHA_BASIC_AUTH_USERNAME'
+check_file_contains backend/openagency-backend/src/proxy.ts 'ALPHA_BASIC_AUTH_PASSWORD'
+check_file_contains backend/openagency-backend/src/proxy.ts 'NextResponse.redirect'
+check_file_contains backend/openagency-backend/src/proxy.ts 'open-agency.io'
 
 if grep -q 'useAPIKey: true' backend/openagency-backend/src/collections/Users/index.ts; then
   fail 'backend/openagency-backend/src/collections/Users/index.ts must not enable API keys during alpha.'
@@ -35,9 +35,9 @@ check_file_contains backend/openagency-backend/src/environment.d.ts 'ALPHA_BASIC
 check_file_contains backend/openagency-backend/.env.example 'ALPHA_BASIC_AUTH_USERNAME='
 check_file_contains backend/openagency-backend/.env.example 'ALPHA_BASIC_AUTH_PASSWORD='
 
-check_file_contains frontend/apps/marketing/src/middleware.ts 'ALPHA_BASIC_AUTH_USERNAME'
-check_file_contains frontend/apps/marketing/src/middleware.ts 'ALPHA_BASIC_AUTH_PASSWORD'
-check_file_contains frontend/apps/marketing/src/middleware.ts 'api\\/revalidate'
+check_file_contains frontend/apps/marketing/src/proxy.ts 'ALPHA_BASIC_AUTH_USERNAME'
+check_file_contains frontend/apps/marketing/src/proxy.ts 'ALPHA_BASIC_AUTH_PASSWORD'
+check_file_contains frontend/apps/marketing/src/proxy.ts 'api\\/revalidate'
 check_file_contains frontend/apps/marketing/.env.local.example 'ALPHA_BASIC_AUTH_USERNAME='
 check_file_contains frontend/apps/marketing/.env.local.example 'ALPHA_BASIC_AUTH_PASSWORD='
 

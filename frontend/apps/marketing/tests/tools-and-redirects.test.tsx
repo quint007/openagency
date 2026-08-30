@@ -2,9 +2,9 @@ import { render, screen } from "@testing-library/react";
 import { NextRequest } from "next/server";
 import { afterEach, expect, test } from "vitest";
 
-import nextConfig from "../next.config";
+import nextConfig, { securityHeaders } from "../next.config";
 import ToolsPage from "../src/app/tools/page";
-import { middleware } from "../src/middleware";
+import { proxy } from "../src/proxy";
 
 const originalUsername = process.env.ALPHA_BASIC_AUTH_USERNAME;
 const originalPassword = process.env.ALPHA_BASIC_AUTH_PASSWORD;
@@ -38,6 +38,21 @@ test("retired resource routes have exact permanent redirects", async () => {
   ]);
 });
 
+test("all marketing routes receive the security header contract", async () => {
+  const headers = (await nextConfig.headers?.()) ?? [];
+  const headerValues = Object.fromEntries(
+    securityHeaders.map(({ key, value }) => [key, value]),
+  );
+
+  expect(headers).toEqual([{ source: "/:path*", headers: securityHeaders }]);
+  expect(headerValues["Content-Security-Policy"]).toContain("default-src 'self'");
+  expect(headerValues["Content-Security-Policy"]).toContain("frame-ancestors 'none'");
+  expect(headerValues["Permissions-Policy"]).toBe("camera=(), geolocation=(), microphone=()");
+  expect(headerValues["Referrer-Policy"]).toBe("strict-origin-when-cross-origin");
+  expect(headerValues["X-Content-Type-Options"]).toBe("nosniff");
+  expect(headerValues["X-Frame-Options"]).toBe("DENY");
+});
+
 test("tools index lists only the calculator without placeholder messaging", () => {
   render(<ToolsPage />);
 
@@ -48,14 +63,14 @@ test("tools index lists only the calculator without placeholder messaging", () =
   expect(screen.queryByText(/coming soon|in progress/i)).toBeNull();
 });
 
-test("middleware protects retired Awesome paths while preserving live public exclusions", () => {
+test("proxy protects retired Awesome paths while preserving live public exclusions", () => {
   process.env.ALPHA_BASIC_AUTH_USERNAME = "alpha-user";
   process.env.ALPHA_BASIC_AUTH_PASSWORD = "alpha-password";
 
-  expect(middleware(new NextRequest("http://localhost:3000/awesome")).status).toBe(401);
-  expect(middleware(new NextRequest("http://localhost:3000/about")).status).toBe(200);
-  expect(middleware(new NextRequest("http://localhost:3000/contact")).status).toBe(200);
-  expect(middleware(new NextRequest("http://localhost:3000/privacy/cookies")).status).toBe(200);
-  expect(middleware(new NextRequest("http://localhost:3000/tools")).status).toBe(200);
-  expect(middleware(new NextRequest("http://localhost:3000/newsletter/unsubscribe")).status).toBe(200);
+  expect(proxy(new NextRequest("http://localhost:3000/awesome")).status).toBe(401);
+  expect(proxy(new NextRequest("http://localhost:3000/about")).status).toBe(200);
+  expect(proxy(new NextRequest("http://localhost:3000/contact")).status).toBe(200);
+  expect(proxy(new NextRequest("http://localhost:3000/privacy/cookies")).status).toBe(200);
+  expect(proxy(new NextRequest("http://localhost:3000/tools")).status).toBe(200);
+  expect(proxy(new NextRequest("http://localhost:3000/newsletter/unsubscribe")).status).toBe(200);
 });

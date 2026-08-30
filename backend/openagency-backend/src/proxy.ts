@@ -52,7 +52,7 @@ const unauthorizedResponse = (): NextResponse =>
     },
   })
 
-export const middleware = (request: NextRequest): NextResponse => {
+export const proxy = (request: NextRequest): NextResponse => {
   const username = process.env.ALPHA_BASIC_AUTH_USERNAME
   const password = process.env.ALPHA_BASIC_AUTH_PASSWORD
   const adminHostname = getHostname(process.env.NEXT_PUBLIC_SERVER_URL)
