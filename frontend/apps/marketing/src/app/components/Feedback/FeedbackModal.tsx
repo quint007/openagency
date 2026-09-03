@@ -30,7 +30,7 @@ export function FeedbackModal({ open, onClose }: FeedbackModalProps) {
   const messageId = `${titleId}-message`;
   const emailId = `${titleId}-email`;
   const categoryId = `${titleId}-category`;
-  const pageUrl = typeof window === "undefined" ? "" : window.location.href;
+  const pageUrl = typeof window === "undefined" ? "" : `${window.location.origin}${window.location.pathname}`;
 
   useEffect(() => {
     if (!open) {

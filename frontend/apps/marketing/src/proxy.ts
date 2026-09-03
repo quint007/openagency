@@ -19,8 +19,11 @@ const EXCLUDED_PATH_PATTERNS = [
   /^\/privacy\/cookies$/i,
   /^\/terms$/i,
   /^\/newsletter(?:\/.*)?$/i,
+  /^\/api\/newsletter\/unsubscribe$/i,
   /^\/api\/revalidate(?:\/.*)?$/i,
 ];
+
+const CREDENTIAL_PATHS = new Set(["/newsletter/confirm", "/newsletter/unsubscribe"]);
 
 const isStaticAssetRequest = (pathname: string): boolean => {
   if (EXCLUDED_PATH_PATTERNS.some((pattern) => pattern.test(pathname))) {
@@ -43,7 +46,12 @@ export function proxy(request: NextRequest): NextResponse {
   const password = process.env.ALPHA_BASIC_AUTH_PASSWORD;
 
   if (!username || !password || isStaticAssetRequest(request.nextUrl.pathname)) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    if (CREDENTIAL_PATHS.has(request.nextUrl.pathname)) {
+      response.headers.set("Cache-Control", "no-store");
+      response.headers.set("Referrer-Policy", "no-referrer");
+    }
+    return response;
   }
 
   const authorizationHeader = request.headers.get("authorization");

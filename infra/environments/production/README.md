@@ -30,6 +30,22 @@ Optional values for verification and operator-only direct database access:
 - `ALPHA_BASIC_AUTH_USERNAME`
 - `ALPHA_BASIC_AUTH_PASSWORD`
 
+Newsletter collection is fail-closed through `NEWSLETTER_ENABLED=false`. Before
+changing it to `true`, configure `NEWSLETTER_SERVICE_SECRET`, a stable
+`NEWSLETTER_TOKEN_ENCRYPTION_KEY` containing 32 random base64url-encoded bytes,
+`NEWSLETTER_PRIVACY_VERSION` matching the exact approved and archived notice at
+`/privacy`, `RESEND_API_KEY`, `RESEND_AUDIENCE_ID`, and `BACKEND_CRON_SECRET`. Deploy the
+newsletter schema migration first and verify the scheduled
+`newsletter-maintenance.yml` workflow can reach the backend. Do not rotate or
+discard the token encryption key without a data migration, and do not import
+pre-existing Resend contacts as consented.
+
+The production backend always sets `NEWSLETTER_WITHDRAWAL_REQUIRED=true`. Keep
+the service secret and Resend audience credentials available while collection
+is paused so browser and one-click withdrawals, plus provider retries, remain
+operational. A failed maintenance workflow indicates unresolved delivery state
+or excess due backlog and is not a successful health check.
+
 ## Production cutover order
 
 Production-only rollout follows this exact order:

@@ -54,11 +54,13 @@ locals {
       variable_collection_id = null
     }
     public_environment = {
-      NEXT_PUBLIC_SERVER_URL = local.canonical_server_url
-      MARKETING_APP_BASE_URL = var.marketing_app_base_url
-      COURSES_APP_BASE_URL   = var.courses_app_base_url
+      NEXT_PUBLIC_SERVER_URL         = local.canonical_server_url
+      MARKETING_APP_BASE_URL         = var.marketing_app_base_url
+      COURSES_APP_BASE_URL           = var.courses_app_base_url
+      NEWSLETTER_ENABLED             = tostring(var.newsletter_enabled)
+      NEWSLETTER_WITHDRAWAL_REQUIRED = "true"
     }
-    required_public_environment_names = ["NEXT_PUBLIC_SERVER_URL", "MARKETING_APP_BASE_URL", "COURSES_APP_BASE_URL"]
+    required_public_environment_names = ["NEXT_PUBLIC_SERVER_URL", "MARKETING_APP_BASE_URL", "COURSES_APP_BASE_URL", "NEWSLETTER_ENABLED", "NEWSLETTER_WITHDRAWAL_REQUIRED"]
     required_secret_environment_names = ["PAYLOAD_SECRET", "CRON_SECRET", "PREVIEW_SECRET", "REVALIDATE_SECRET"]
     optional_environment_names = [
       "ALPHA_BASIC_AUTH_PASSWORD",
@@ -167,11 +169,14 @@ locals {
 
   backend_optional_environment = merge(
     {
-      R2_BUCKET          = local.r2_contract.bucket_name
-      R2_ENDPOINT        = local.r2_contract.s3_compatible_endpoint
-      R2_PUBLIC_BASE_URL = local.r2_contract.public_custom_domain == null ? null : "https://${local.r2_contract.public_custom_domain}"
-      R2_REGION          = local.r2_contract.aws_region
-      RESEND_API_KEY     = try(var.backend_optional_environment.RESEND_API_KEY, null)
+      NEWSLETTER_SERVICE_SECRET       = var.newsletter_service_secret
+      NEWSLETTER_TOKEN_ENCRYPTION_KEY = var.newsletter_token_encryption_key
+      NEWSLETTER_PRIVACY_VERSION      = var.newsletter_privacy_version
+      R2_BUCKET                       = local.r2_contract.bucket_name
+      R2_ENDPOINT                     = local.r2_contract.s3_compatible_endpoint
+      R2_PUBLIC_BASE_URL              = local.r2_contract.public_custom_domain == null ? null : "https://${local.r2_contract.public_custom_domain}"
+      R2_REGION                       = local.r2_contract.aws_region
+      RESEND_API_KEY                  = try(var.backend_optional_environment.RESEND_API_KEY, null)
     },
     {
       for key, value in var.backend_optional_environment : key => value
@@ -180,6 +185,9 @@ locals {
         "R2_ENDPOINT",
         "R2_PUBLIC_BASE_URL",
         "R2_REGION",
+        "NEWSLETTER_SERVICE_SECRET",
+        "NEWSLETTER_TOKEN_ENCRYPTION_KEY",
+        "NEWSLETTER_PRIVACY_VERSION",
       ], key)
     },
   )
@@ -204,8 +212,8 @@ locals {
       id         = null
     }
     environment_variables = {
-      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "NEXT_PUBLIC_ADSENSE_CLIENT_ID", "NEXT_PUBLIC_GA_ID"]
-      production_secret_names = ["NEWSLETTER_TOKEN_SECRET", "NOTION_FEEDBACK_DATABASE_ID", "NOTION_TOKEN", "RESEND_API_KEY", "RESEND_AUDIENCE_ID", "REVALIDATE_SECRET"]
+      production_public_names = ["NEXT_PUBLIC_API_URL", "NEXT_PUBLIC_SERVER_URL", "PAYLOAD_API_URL", "NEXT_PUBLIC_ADSENSE_CLIENT_ID", "NEXT_PUBLIC_GA_ID", "NEXT_PUBLIC_NEWSLETTER_ENABLED"]
+      production_secret_names = ["NEWSLETTER_SERVICE_SECRET", "NOTION_FEEDBACK_DATABASE_ID", "NOTION_TOKEN", "RESEND_API_KEY", "REVALIDATE_SECRET"]
       required_names = [
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_SERVER_URL",
@@ -243,9 +251,11 @@ module "railway" {
   api_hostname                 = local.api_hostname
   backend_optional_environment = local.backend_optional_environment
   backend_public_environment = {
-    NEXT_PUBLIC_SERVER_URL = local.canonical_server_url
-    MARKETING_APP_BASE_URL = var.marketing_app_base_url
-    COURSES_APP_BASE_URL   = var.courses_app_base_url
+    NEXT_PUBLIC_SERVER_URL         = local.canonical_server_url
+    MARKETING_APP_BASE_URL         = var.marketing_app_base_url
+    COURSES_APP_BASE_URL           = var.courses_app_base_url
+    NEWSLETTER_ENABLED             = tostring(var.newsletter_enabled)
+    NEWSLETTER_WITHDRAWAL_REQUIRED = "true"
   }
   backend_secret_environment       = var.backend_secret_environment
   backend_service_domain_subdomain = local.backend_service_domain_subdomain
@@ -307,23 +317,23 @@ module "vercel" {
   domain            = var.marketing_vercel_domain
 
   production_environment = {
-    NEXT_PUBLIC_SERVER_URL        = var.marketing_app_base_url
-    NEXT_PUBLIC_API_URL           = local.marketing_api_url
-    NEXT_PUBLIC_ADSENSE_CLIENT_ID = var.marketing_adsense_client_id
-    NEXT_PUBLIC_GA_ID             = var.marketing_ga_id
-    PAYLOAD_API_URL               = local.marketing_api_url
+    NEXT_PUBLIC_SERVER_URL         = var.marketing_app_base_url
+    NEXT_PUBLIC_API_URL            = local.marketing_api_url
+    NEXT_PUBLIC_ADSENSE_CLIENT_ID  = var.marketing_adsense_client_id
+    NEXT_PUBLIC_GA_ID              = var.marketing_ga_id
+    NEXT_PUBLIC_NEWSLETTER_ENABLED = tostring(var.newsletter_enabled)
+    PAYLOAD_API_URL                = local.marketing_api_url
   }
 
   production_secret_environment = {
     ALPHA_BASIC_AUTH_USERNAME   = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_USERNAME, null)
     ALPHA_BASIC_AUTH_PASSWORD   = try(var.backend_optional_environment.ALPHA_BASIC_AUTH_PASSWORD, null)
-    NEWSLETTER_TOKEN_SECRET     = var.marketing_newsletter_token_secret
+    NEWSLETTER_SERVICE_SECRET   = var.newsletter_service_secret
     NOTION_FEEDBACK_DATABASE_ID = var.marketing_notion_feedback_database_id
     NOTION_TOKEN                = var.marketing_notion_token
     PAYLOAD_API_KEY             = var.marketing_payload_api_key
     REVALIDATE_SECRET           = var.backend_secret_environment.REVALIDATE_SECRET
     RESEND_API_KEY              = var.marketing_resend_api_key
-    RESEND_AUDIENCE_ID          = var.marketing_resend_audience_id
   }
 }
 

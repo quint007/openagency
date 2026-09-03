@@ -11,14 +11,14 @@
         "NEXT_PUBLIC_API_URL",
         "NEXT_PUBLIC_ADSENSE_CLIENT_ID",
         "NEXT_PUBLIC_GA_ID",
+        "NEXT_PUBLIC_NEWSLETTER_ENABLED",
         "NEXT_PUBLIC_SERVER_URL",
         "NOTION_FEEDBACK_DATABASE_ID",
         "NOTION_TOKEN",
         "PAYLOAD_API_URL",
         "REVALIDATE_SECRET",
         "RESEND_API_KEY",
-        "RESEND_AUDIENCE_ID",
-        "NEWSLETTER_TOKEN_SECRET"
+        "NEWSLETTER_SERVICE_SECRET"
       ],
       "cache": true,
       "inputs": ["**/*.ts", "**/*.tsx", "**/*.css", "package.json"]

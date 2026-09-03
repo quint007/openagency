@@ -23,11 +23,37 @@ set of product-relevant changes.
 
 ## Newsletter
 
-- Production Vercel wiring is in place for `RESEND_AUDIENCE_ID`,
-  `NEWSLETTER_TOKEN_SECRET`, and `RESEND_API_KEY`. Configure the production
-  values and verify that the Resend audience exists and matches the configured ID.
-- The unsubscribe flow uses signed tokens; rotating `NEWSLETTER_TOKEN_SECRET`
-  will invalidate all outstanding unsubscribe links.
+- The newsletter now uses inbox confirmation, a private first-party consent
+  ledger, lifecycle generations, and durable opaque unsubscribe credentials.
+  Keep `NEWSLETTER_ENABLED=false` until the legal and operational prerequisites
+  below are complete. Configure `NEWSLETTER_SERVICE_SECRET`,
+  `NEWSLETTER_TOKEN_ENCRYPTION_KEY`, `NEWSLETTER_PRIVACY_VERSION`, `RESEND_API_KEY`,
+  `RESEND_AUDIENCE_ID`, and `BACKEND_CRON_SECRET`; archive the approved notice
+  identified by that version, deploy the schema migration, and verify the 15-minute
+  `newsletter-maintenance.yml` workflow; then enable collection and test an
+  end-to-end production confirmation, resubscription, browser unsubscribe, and
+  RFC 8058 one-click unsubscribe flow.
+- Production keeps `NEWSLETTER_WITHDRAWAL_REQUIRED=true` even while collection
+  is paused. This makes startup fail if the service secret or Resend withdrawal
+  configuration is removed after subscription state exists. Treat a failed
+  maintenance workflow as an outstanding delivery or synchronization backlog.
+- Generate `NEWSLETTER_TOKEN_ENCRYPTION_KEY` as 32 random base64url-encoded bytes
+  and retain it in the production secret store. Changing or losing it invalidates
+  the encrypted unsubscribe credentials retained for active subscribers; key
+  rotation requires a separate migration plan.
+- Confirm with Resend that `List-Unsubscribe` and `List-Unsubscribe-Post` are
+  covered by DKIM, and do not send a broadcast while provider synchronization
+  failures are outstanding.
+- Do not import existing Resend contacts as consented. Only subscriptions with a
+  matching first-party confirmation event may be projected into the broadcast
+  audience; legacy contacts need a separately approved re-permission process.
+- Public requests are throttled using short-lived HMAC-pseudonymized requester
+  buckets. Verify the deployment proxy preserves one of the supported client-IP
+  headers without allowing clients to spoof the trusted value.
+- Approve and operate the retention schedule for pending requests, consent
+  evidence, and suppression records. The privacy notice still requires final
+  review of the controller identity/contact details, transfer assessment, and
+  supervisory-authority wording before collection is enabled for EU users.
 
 ## Feedback
 

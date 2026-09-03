@@ -114,9 +114,11 @@ variable "admin_hostname" {
 variable "backend_public_environment" {
   description = "Non-secret backend runtime environment values."
   type = object({
-    NEXT_PUBLIC_SERVER_URL = string
-    MARKETING_APP_BASE_URL = string
-    COURSES_APP_BASE_URL   = string
+    NEXT_PUBLIC_SERVER_URL         = string
+    MARKETING_APP_BASE_URL         = string
+    COURSES_APP_BASE_URL           = string
+    NEWSLETTER_ENABLED             = string
+    NEWSLETTER_WITHDRAWAL_REQUIRED = string
   })
   nullable = false
 
@@ -226,16 +228,20 @@ variable "postgres_data_directory" {
 variable "backend_optional_environment" {
   description = "Optional backend runtime environment values."
   type = object({
-    ALPHA_BASIC_AUTH_PASSWORD = optional(string)
-    ALPHA_BASIC_AUTH_USERNAME = optional(string)
-    R2_ACCESS_KEY_ID          = optional(string)
-    R2_BUCKET                 = optional(string)
-    R2_ENDPOINT               = optional(string)
-    R2_PUBLIC_BASE_URL        = optional(string)
-    R2_REGION                 = optional(string)
-    R2_SECRET_ACCESS_KEY      = optional(string)
-    RESEND_API_KEY            = optional(string)
-    REVALIDATE_TIMEOUT_MS     = optional(string)
+    ALPHA_BASIC_AUTH_PASSWORD       = optional(string)
+    ALPHA_BASIC_AUTH_USERNAME       = optional(string)
+    R2_ACCESS_KEY_ID                = optional(string)
+    R2_BUCKET                       = optional(string)
+    R2_ENDPOINT                     = optional(string)
+    R2_PUBLIC_BASE_URL              = optional(string)
+    R2_REGION                       = optional(string)
+    R2_SECRET_ACCESS_KEY            = optional(string)
+    RESEND_API_KEY                  = optional(string)
+    RESEND_AUDIENCE_ID              = optional(string)
+    NEWSLETTER_PRIVACY_VERSION      = optional(string)
+    NEWSLETTER_SERVICE_SECRET       = optional(string)
+    NEWSLETTER_TOKEN_ENCRYPTION_KEY = optional(string)
+    REVALIDATE_TIMEOUT_MS           = optional(string)
   })
   default = {}
 

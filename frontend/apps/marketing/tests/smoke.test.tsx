@@ -263,9 +263,9 @@ test("homepage content contract keeps the calculator teaser and footer href cont
     "/tools/local-model-calculator",
   );
   expect(homepageContent.newsletter.fieldLabel).toBe("Your email address");
-  expect(homepageContent.newsletter.submitLabel).toBe("Subscribe — it's free");
+  expect(homepageContent.newsletter.submitLabel).toBe("Send confirmation email");
   expect(homepageContent.newsletter.privacyNote).toBe(
-    "No spam. No selling your email. Unsubscribe any time.",
+    "By selecting Send confirmation email, you consent to Open Agency using your email to send the weekly Open Agency newsletter about practical AI workflows, guides, and tools. You can withdraw at any time.",
   );
   expect(homepageContent.footer.description).toBe(
     "open-agency — practical AI for people who build things.",

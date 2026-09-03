@@ -176,7 +176,10 @@ jobs:
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
       RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
       RAW_NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID != '' && secrets.NEXT_PUBLIC_GA_ID || vars.NEXT_PUBLIC_GA_ID }}
-      RAW_NEWSLETTER_TOKEN_SECRET: ${{ secrets.NEWSLETTER_TOKEN_SECRET }}
+      RAW_NEWSLETTER_SERVICE_SECRET: ${{ secrets.NEWSLETTER_SERVICE_SECRET }}
+      RAW_NEWSLETTER_TOKEN_ENCRYPTION_KEY: ${{ secrets.NEWSLETTER_TOKEN_ENCRYPTION_KEY }}
+      RAW_NEWSLETTER_PRIVACY_VERSION: ${{ secrets.NEWSLETTER_PRIVACY_VERSION != '' && secrets.NEWSLETTER_PRIVACY_VERSION || vars.NEWSLETTER_PRIVACY_VERSION }}
+      RAW_NEWSLETTER_ENABLED: ${{ secrets.NEWSLETTER_ENABLED != '' && secrets.NEWSLETTER_ENABLED || vars.NEWSLETTER_ENABLED }}
       RAW_NOTION_FEEDBACK_DATABASE_ID: ${{ secrets.NOTION_FEEDBACK_DATABASE_ID != '' && secrets.NOTION_FEEDBACK_DATABASE_ID || vars.NOTION_FEEDBACK_DATABASE_ID }}
       RAW_NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       RAW_RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID != '' && secrets.RESEND_AUDIENCE_ID || vars.RESEND_AUDIENCE_ID }}
@@ -224,11 +227,13 @@ jobs:
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
               'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
               'marketing_ga_id': optional('RAW_NEXT_PUBLIC_GA_ID'),
-              'marketing_newsletter_token_secret': optional('RAW_NEWSLETTER_TOKEN_SECRET'),
+              'newsletter_service_secret': optional('RAW_NEWSLETTER_SERVICE_SECRET'),
+              'newsletter_token_encryption_key': optional('RAW_NEWSLETTER_TOKEN_ENCRYPTION_KEY'),
+              'newsletter_privacy_version': optional('RAW_NEWSLETTER_PRIVACY_VERSION'),
+              'newsletter_enabled': get_bool('RAW_NEWSLETTER_ENABLED', False),
               'marketing_notion_feedback_database_id': optional('RAW_NOTION_FEEDBACK_DATABASE_ID'),
               'marketing_notion_token': optional('RAW_NOTION_TOKEN'),
               'marketing_resend_api_key': optional('RAW_RESEND_API_KEY'),
-              'marketing_resend_audience_id': optional('RAW_RESEND_AUDIENCE_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -248,6 +253,7 @@ jobs:
                   'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
                   'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
+                  'RESEND_AUDIENCE_ID': optional('RAW_RESEND_AUDIENCE_ID'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
               }.items()
               if value is not None
@@ -354,7 +360,10 @@ jobs:
       RAW_R2_PUBLIC_BASE_URL: ${{ secrets.R2_PUBLIC_BASE_URL != '' && secrets.R2_PUBLIC_BASE_URL || vars.R2_PUBLIC_BASE_URL }}
       RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID != '' && secrets.NEXT_PUBLIC_ADSENSE_CLIENT_ID || vars.NEXT_PUBLIC_ADSENSE_CLIENT_ID }}
       RAW_NEXT_PUBLIC_GA_ID: ${{ secrets.NEXT_PUBLIC_GA_ID != '' && secrets.NEXT_PUBLIC_GA_ID || vars.NEXT_PUBLIC_GA_ID }}
-      RAW_NEWSLETTER_TOKEN_SECRET: ${{ secrets.NEWSLETTER_TOKEN_SECRET }}
+      RAW_NEWSLETTER_SERVICE_SECRET: ${{ secrets.NEWSLETTER_SERVICE_SECRET }}
+      RAW_NEWSLETTER_TOKEN_ENCRYPTION_KEY: ${{ secrets.NEWSLETTER_TOKEN_ENCRYPTION_KEY }}
+      RAW_NEWSLETTER_PRIVACY_VERSION: ${{ secrets.NEWSLETTER_PRIVACY_VERSION != '' && secrets.NEWSLETTER_PRIVACY_VERSION || vars.NEWSLETTER_PRIVACY_VERSION }}
+      RAW_NEWSLETTER_ENABLED: ${{ secrets.NEWSLETTER_ENABLED != '' && secrets.NEWSLETTER_ENABLED || vars.NEWSLETTER_ENABLED }}
       RAW_NOTION_FEEDBACK_DATABASE_ID: ${{ secrets.NOTION_FEEDBACK_DATABASE_ID != '' && secrets.NOTION_FEEDBACK_DATABASE_ID || vars.NOTION_FEEDBACK_DATABASE_ID }}
       RAW_NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
       RAW_RESEND_AUDIENCE_ID: ${{ secrets.RESEND_AUDIENCE_ID != '' && secrets.RESEND_AUDIENCE_ID || vars.RESEND_AUDIENCE_ID }}
@@ -407,11 +416,13 @@ jobs:
               'postgres_password': get('RAW_POSTGRES_PASSWORD') or 'replace-with-production-postgres-password',
               'marketing_adsense_client_id': optional('RAW_NEXT_PUBLIC_ADSENSE_CLIENT_ID'),
               'marketing_ga_id': optional('RAW_NEXT_PUBLIC_GA_ID'),
-              'marketing_newsletter_token_secret': optional('RAW_NEWSLETTER_TOKEN_SECRET'),
+              'newsletter_service_secret': optional('RAW_NEWSLETTER_SERVICE_SECRET'),
+              'newsletter_token_encryption_key': optional('RAW_NEWSLETTER_TOKEN_ENCRYPTION_KEY'),
+              'newsletter_privacy_version': optional('RAW_NEWSLETTER_PRIVACY_VERSION'),
+              'newsletter_enabled': get_bool('RAW_NEWSLETTER_ENABLED', False),
               'marketing_notion_feedback_database_id': optional('RAW_NOTION_FEEDBACK_DATABASE_ID'),
               'marketing_notion_token': optional('RAW_NOTION_TOKEN'),
               'marketing_resend_api_key': optional('RAW_RESEND_API_KEY'),
-              'marketing_resend_audience_id': optional('RAW_RESEND_AUDIENCE_ID'),
               'backend_secret_environment': {
                   'PAYLOAD_SECRET': get('RAW_BACKEND_PAYLOAD_SECRET') or 'replace-with-production-payload-secret',
                   'CRON_SECRET': get('RAW_BACKEND_CRON_SECRET') or 'replace-with-production-cron-secret',
@@ -431,6 +442,7 @@ jobs:
                   'MARKETING_REVALIDATE_URL': optional('RAW_MARKETING_REVALIDATE_URL'),
                   'COURSES_REVALIDATE_URL': optional('RAW_COURSES_REVALIDATE_URL'),
                   'RESEND_API_KEY': optional('RAW_RESEND_API_KEY'),
+                  'RESEND_AUDIENCE_ID': optional('RAW_RESEND_AUDIENCE_ID'),
                   'REVALIDATE_TIMEOUT_MS': optional('RAW_REVALIDATE_TIMEOUT_MS'),
               }.items()
               if value is not None

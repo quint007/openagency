@@ -118,11 +118,17 @@ tasks:
         if [ -n "${RESEND_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
         fi
-        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
-          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        if [ -n "${NEWSLETTER_SERVICE_SECRET:-}" ]; then
+          VARS="$VARS -var=newsletter_service_secret=$NEWSLETTER_SERVICE_SECRET"
         fi
-        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
-          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
+        if [ -n "${NEWSLETTER_TOKEN_ENCRYPTION_KEY:-}" ]; then
+          VARS="$VARS -var=newsletter_token_encryption_key=$NEWSLETTER_TOKEN_ENCRYPTION_KEY"
+        fi
+        if [ -n "${NEWSLETTER_PRIVACY_VERSION:-}" ]; then
+          VARS="$VARS -var=newsletter_privacy_version=$NEWSLETTER_PRIVACY_VERSION"
+        fi
+        if [ -n "${NEWSLETTER_ENABLED:-}" ]; then
+          VARS="$VARS -var=newsletter_enabled=$NEWSLETTER_ENABLED"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -158,6 +164,9 @@ tasks:
           fi
           if [ -n "${RESEND_API_KEY:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_AUDIENCE_ID=\"$RESEND_AUDIENCE_ID\""
           fi
           if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
@@ -241,11 +250,17 @@ tasks:
         if [ -n "${RESEND_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
         fi
-        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
-          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        if [ -n "${NEWSLETTER_SERVICE_SECRET:-}" ]; then
+          VARS="$VARS -var=newsletter_service_secret=$NEWSLETTER_SERVICE_SECRET"
         fi
-        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
-          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
+        if [ -n "${NEWSLETTER_TOKEN_ENCRYPTION_KEY:-}" ]; then
+          VARS="$VARS -var=newsletter_token_encryption_key=$NEWSLETTER_TOKEN_ENCRYPTION_KEY"
+        fi
+        if [ -n "${NEWSLETTER_PRIVACY_VERSION:-}" ]; then
+          VARS="$VARS -var=newsletter_privacy_version=$NEWSLETTER_PRIVACY_VERSION"
+        fi
+        if [ -n "${NEWSLETTER_ENABLED:-}" ]; then
+          VARS="$VARS -var=newsletter_enabled=$NEWSLETTER_ENABLED"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -281,6 +296,9 @@ tasks:
           fi
           if [ -n "${RESEND_API_KEY:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_AUDIENCE_ID=\"$RESEND_AUDIENCE_ID\""
           fi
            if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
              OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""
@@ -366,11 +384,17 @@ tasks:
         if [ -n "${RESEND_API_KEY:-}" ]; then
           VARS="$VARS -var=marketing_resend_api_key=$RESEND_API_KEY"
         fi
-        if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
-          VARS="$VARS -var=marketing_resend_audience_id=$RESEND_AUDIENCE_ID"
+        if [ -n "${NEWSLETTER_SERVICE_SECRET:-}" ]; then
+          VARS="$VARS -var=newsletter_service_secret=$NEWSLETTER_SERVICE_SECRET"
         fi
-        if [ -n "${NEWSLETTER_TOKEN_SECRET:-}" ]; then
-          VARS="$VARS -var=marketing_newsletter_token_secret=$NEWSLETTER_TOKEN_SECRET"
+        if [ -n "${NEWSLETTER_TOKEN_ENCRYPTION_KEY:-}" ]; then
+          VARS="$VARS -var=newsletter_token_encryption_key=$NEWSLETTER_TOKEN_ENCRYPTION_KEY"
+        fi
+        if [ -n "${NEWSLETTER_PRIVACY_VERSION:-}" ]; then
+          VARS="$VARS -var=newsletter_privacy_version=$NEWSLETTER_PRIVACY_VERSION"
+        fi
+        if [ -n "${NEWSLETTER_ENABLED:-}" ]; then
+          VARS="$VARS -var=newsletter_enabled=$NEWSLETTER_ENABLED"
         fi
         if [ -n "${CLOUDFLARE_DNS_ENABLED:-}" ]; then
           VARS="$VARS -var=cloudflare_dns_enabled=$CLOUDFLARE_DNS_ENABLED"
@@ -408,6 +432,9 @@ tasks:
           fi
           if [ -n "${RESEND_API_KEY:-}" ]; then
             OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_API_KEY=\"$RESEND_API_KEY\""
+          fi
+          if [ -n "${RESEND_AUDIENCE_ID:-}" ]; then
+            OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,RESEND_AUDIENCE_ID=\"$RESEND_AUDIENCE_ID\""
           fi
            if [ -n "${REVALIDATE_TIMEOUT_MS:-}" ]; then
              OPTIONAL_BACKEND_ENV="$OPTIONAL_BACKEND_ENV,REVALIDATE_TIMEOUT_MS=\"$REVALIDATE_TIMEOUT_MS\""

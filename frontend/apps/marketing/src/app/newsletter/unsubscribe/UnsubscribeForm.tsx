@@ -6,13 +6,12 @@ import { useActionState, useEffect, useRef } from "react";
 import { type NewsletterSignupResult, unsubscribeNewsletterForm } from "../actions";
 
 type UnsubscribeFormProps = {
-  readonly email: string;
   readonly token: string;
 };
 
 const initialState: NewsletterSignupResult = { status: "idle" };
 
-export function UnsubscribeForm({ email, token }: UnsubscribeFormProps) {
+export function UnsubscribeForm({ token }: UnsubscribeFormProps) {
   const [state, formAction, pending] = useActionState(unsubscribeNewsletterForm, initialState);
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +26,9 @@ export function UnsubscribeForm({ email, token }: UnsubscribeFormProps) {
       <div ref={resultRef} tabIndex={-1} aria-live="polite">
         <Alert>
           <AlertTitle>You are unsubscribed.</AlertTitle>
-          <AlertDescription>You will no longer receive emails at {email}.</AlertDescription>
+          <AlertDescription>
+            Your withdrawal is recorded. You will no longer receive the Open Agency newsletter.
+          </AlertDescription>
         </Alert>
       </div>
     );

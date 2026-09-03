@@ -11,6 +11,8 @@ type NewsletterSectionProps = {
   content: HomepageContent["newsletter"];
 };
 
+const newsletterEnabled = process.env.NEXT_PUBLIC_NEWSLETTER_ENABLED === "true" || process.env.NODE_ENV !== "production";
+
 export function NewsletterSection({ content }: NewsletterSectionProps) {
   const [email, setEmail] = useState("");
   const [dismissedError, setDismissedError] = useState<string | null>(null);
@@ -93,7 +95,12 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
           </div>
 
           <div className="flex w-full max-w-[34rem] flex-1 flex-col gap-5">
-            {state.status === "success" ? (
+            {!newsletterEnabled ? (
+              <Alert className={styles.newsletterMessage}>
+                <AlertTitle>Newsletter signup is not open yet</AlertTitle>
+                <AlertDescription>Check back after our privacy and delivery configuration review is complete.</AlertDescription>
+              </Alert>
+            ) : state.status === "success" ? (
               <div className={styles.newsletterMessage} ref={successRef} tabIndex={-1}>
                 <Alert className={styles.newsletterSuccessAlert}>
                   <AlertTitle>{content.success.title}</AlertTitle>
@@ -125,7 +132,7 @@ export function NewsletterSection({ content }: NewsletterSectionProps) {
                   </div>
 
                   <Button className="min-h-11 px-6 sm:self-end" type="submit" disabled={pending}>
-                    {pending ? "Subscribing..." : content.submitLabel}
+                    {pending ? "Sending..." : content.submitLabel}
                   </Button>
                 </div>
 

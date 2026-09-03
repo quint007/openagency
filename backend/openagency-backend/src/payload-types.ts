@@ -82,6 +82,9 @@ export interface Config {
     users: User;
     'api-clients': ApiClient;
     'tool-submissions': ToolSubmission;
+    'newsletter-subscriptions': NewsletterSubscription;
+    'newsletter-consent-events': NewsletterConsentEvent;
+    'newsletter-request-limits': NewsletterRequestLimit;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -113,6 +116,9 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
     'tool-submissions': ToolSubmissionsSelect<false> | ToolSubmissionsSelect<true>;
+    'newsletter-subscriptions': NewsletterSubscriptionsSelect<false> | NewsletterSubscriptionsSelect<true>;
+    'newsletter-consent-events': NewsletterConsentEventsSelect<false> | NewsletterConsentEventsSelect<true>;
+    'newsletter-request-limits': NewsletterRequestLimitsSelect<false> | NewsletterRequestLimitsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1120,6 +1126,85 @@ export interface ToolSubmission {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscriptions".
+ */
+export interface NewsletterSubscription {
+  id: number;
+  email: string;
+  status: 'pending' | 'active' | 'unsubscribed' | 'suppressed' | 'expired';
+  generation: number;
+  purpose: string;
+  consentVersion: string;
+  privacyVersion: string;
+  source: string;
+  requestedAt: string;
+  confirmationTokenHash?: string | null;
+  confirmationExpiresAt?: string | null;
+  confirmationSentAt?: string | null;
+  confirmationDeliveryStatus: 'pending' | 'sending' | 'sent' | 'failed';
+  confirmationDeliveryAttempts: number;
+  confirmationNextAttemptAt?: string | null;
+  confirmedAt?: string | null;
+  unsubscribedAt?: string | null;
+  unsubscribeTokenHash?: string | null;
+  unsubscribeTokenCiphertext?: string | null;
+  suppressionReason?: ('user_unsubscribe' | 'complaint' | 'hard_bounce' | 'administrative') | null;
+  providerSyncStatus: 'pending' | 'syncing' | 'synced' | 'failed';
+  providerOperationId?: string | null;
+  providerContactId?: string | null;
+  providerSyncAttempts: number;
+  providerNextAttemptAt?: string | null;
+  providerError?: string | null;
+  welcomeSentAt?: string | null;
+  welcomeDeliveryStatus: 'pending' | 'sending' | 'sent' | 'failed';
+  welcomeDeliveryAttempts: number;
+  welcomeNextAttemptAt?: string | null;
+  welcomeOperationId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-consent-events".
+ */
+export interface NewsletterConsentEvent {
+  id: number;
+  subscription: number | NewsletterSubscription;
+  generation: number;
+  eventType:
+    | 'signup_requested'
+    | 'confirmation_sent'
+    | 'confirmation_delivery_failed'
+    | 'pending_expired'
+    | 'consent_confirmed'
+    | 'unsubscribed'
+    | 'provider_synced'
+    | 'provider_sync_failed'
+    | 'welcome_sent'
+    | 'welcome_delivery_failed';
+  eventKey: string;
+  occurredAt: string;
+  purpose: string;
+  consentVersion: string;
+  privacyVersion: string;
+  source: string;
+  providerMessageId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-request-limits".
+ */
+export interface NewsletterRequestLimit {
+  id: number;
+  key: string;
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1404,6 +1489,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'tool-submissions';
         value: number | ToolSubmission;
+      } | null)
+    | ({
+        relationTo: 'newsletter-subscriptions';
+        value: number | NewsletterSubscription;
+      } | null)
+    | ({
+        relationTo: 'newsletter-consent-events';
+        value: number | NewsletterConsentEvent;
+      } | null)
+    | ({
+        relationTo: 'newsletter-request-limits';
+        value: number | NewsletterRequestLimit;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1971,6 +2068,72 @@ export interface ToolSubmissionsSelect<T extends boolean = true> {
   email?: T;
   inputs?: T;
   result?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-subscriptions_select".
+ */
+export interface NewsletterSubscriptionsSelect<T extends boolean = true> {
+  email?: T;
+  status?: T;
+  generation?: T;
+  purpose?: T;
+  consentVersion?: T;
+  privacyVersion?: T;
+  source?: T;
+  requestedAt?: T;
+  confirmationTokenHash?: T;
+  confirmationExpiresAt?: T;
+  confirmationSentAt?: T;
+  confirmationDeliveryStatus?: T;
+  confirmationDeliveryAttempts?: T;
+  confirmationNextAttemptAt?: T;
+  confirmedAt?: T;
+  unsubscribedAt?: T;
+  unsubscribeTokenHash?: T;
+  unsubscribeTokenCiphertext?: T;
+  suppressionReason?: T;
+  providerSyncStatus?: T;
+  providerOperationId?: T;
+  providerContactId?: T;
+  providerSyncAttempts?: T;
+  providerNextAttemptAt?: T;
+  providerError?: T;
+  welcomeSentAt?: T;
+  welcomeDeliveryStatus?: T;
+  welcomeDeliveryAttempts?: T;
+  welcomeNextAttemptAt?: T;
+  welcomeOperationId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-consent-events_select".
+ */
+export interface NewsletterConsentEventsSelect<T extends boolean = true> {
+  subscription?: T;
+  generation?: T;
+  eventType?: T;
+  eventKey?: T;
+  occurredAt?: T;
+  purpose?: T;
+  consentVersion?: T;
+  privacyVersion?: T;
+  source?: T;
+  providerMessageId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletter-request-limits_select".
+ */
+export interface NewsletterRequestLimitsSelect<T extends boolean = true> {
+  key?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

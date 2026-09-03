@@ -40,6 +40,9 @@ describe('marketing app source boundary', () => {
       const contents = await readFile(filePath, 'utf8');
       const relativePath = path.relative(appRoot, filePath);
 
+      // This private, service-authenticated command client is the newsletter boundary.
+      if (relativePath === 'newsletter/service-client.ts') continue;
+
       for (const pattern of forbiddenPatterns) {
         if (relativePath === 'feedback/actions.ts' && pattern === forbiddenPatterns[0]) {
           continue;

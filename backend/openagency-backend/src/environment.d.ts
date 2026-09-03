@@ -9,9 +9,15 @@ declare global {
       DATABASE_URL: string
       MARKETING_APP_BASE_URL: string
       MARKETING_REVALIDATE_URL?: string
+      NEWSLETTER_ENABLED?: string
+      NEWSLETTER_PRIVACY_VERSION?: string
+      NEWSLETTER_SERVICE_SECRET?: string
+      NEWSLETTER_TOKEN_ENCRYPTION_KEY?: string
+      NEWSLETTER_WITHDRAWAL_REQUIRED?: string
       NEXT_PUBLIC_SERVER_URL: string
       PAYLOAD_SECRET: string
       RESEND_API_KEY?: string
+      RESEND_AUDIENCE_ID?: string
       PREVIEW_SECRET: string
       REVALIDATE_SECRET: string
       REVALIDATE_TIMEOUT_MS?: string
