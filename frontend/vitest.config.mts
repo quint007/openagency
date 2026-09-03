@@ -46,6 +46,10 @@ export default defineConfig({
         find: /^@open-agency\/cms-client\/(.*)$/,
         replacement: path.join(frontendRoot, 'packages/cms-client/src/$1'),
       },
+      {
+        find: /^server-only$/,
+        replacement: path.join(frontendRoot, 'test/server-only.ts'),
+      },
     ],
   },
   test: {

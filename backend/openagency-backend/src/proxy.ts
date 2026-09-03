@@ -44,6 +44,8 @@ const isAllowedAdminRoute = (pathname: string): boolean => {
   )
 }
 
+const isSelfAuthenticatedApiRoute = (pathname: string): boolean => pathname.startsWith('/api/newsletter/')
+
 const unauthorizedResponse = (): NextResponse =>
   new NextResponse('Authentication required', {
     status: 401,
@@ -82,6 +84,7 @@ export const proxy = (request: NextRequest): NextResponse => {
     !username ||
     !password ||
     isStaticAssetRequest(request.nextUrl.pathname) ||
+    isSelfAuthenticatedApiRoute(request.nextUrl.pathname) ||
     !isAllowedAdminRoute(request.nextUrl.pathname)
   ) {
     return NextResponse.next()

@@ -203,12 +203,12 @@ export const homepageContent = {
     ],
   },
   newsletter: {
-    title: "Get the good stuff in your inbox",
+    title: "Practical AI notes, once a week",
     description: "A focused newsletter on open-source workflow patterns, guides, and tools for AI users.",
     fieldLabel: "Your email address",
     placeholder: "name@example.com",
-    submitLabel: "Subscribe — it's free",
-    privacyNote: "No spam. No selling your email. Unsubscribe any time.",
+    submitLabel: "Send confirmation email",
+    privacyNote: "By selecting Send confirmation email, you consent to Open Agency using your email to send the weekly Open Agency newsletter about practical AI workflows, guides, and tools. You can withdraw at any time.",
     privacyLinkLabel: "Read our Privacy policy.",
     retryLabel: "Try again",
     errors: {
@@ -221,7 +221,7 @@ export const homepageContent = {
         description: "Check the format and try again.",
       },
       generic: {
-        title: "We could not subscribe you",
+        title: "We could not process your request",
         description: "Please try again in a moment.",
       },
       configuration: {
@@ -230,8 +230,8 @@ export const homepageContent = {
       },
     },
     success: {
-      title: "You’re on the list.",
-      description: "We’ll confirm your spot when the waitlist opens and send the first issue when launch day arrives.",
+      title: "Check your inbox.",
+      description: "If this address is eligible, look for a confirmation link in the next few minutes. You are not subscribed until you confirm.",
     },
   },
   footer: {

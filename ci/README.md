@@ -43,8 +43,9 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `CLOUDFLARE_ACCOUNT_ID`               | Cloudflare account ID for R2                                   |
 | `R2_ACCESS_KEY_ID`                    | R2 access key ID (required for production media)               |
 | `R2_SECRET_ACCESS_KEY`                | R2 secret access key (required for production media)           |
-| `RESEND_API_KEY`                      | Resend API key for backend email and marketing email flows     |
-| `NEWSLETTER_TOKEN_SECRET`             | Signing secret for newsletter unsubscribe tokens               |
+| `RESEND_API_KEY`                      | Resend API key for backend email and marketing feedback fallback |
+| `NEWSLETTER_SERVICE_SECRET`           | Shared secret for private marketing-to-backend newsletter calls |
+| `NEWSLETTER_TOKEN_ENCRYPTION_KEY`      | Stable 32-byte base64url key for durable unsubscribe credentials |
 | `NOTION_TOKEN`                        | Optional Notion integration token for feedback                 |
 
 ### Required Variables
@@ -75,11 +76,16 @@ The current GitHub Actions deploy workflow requires the following secrets and va
 | `NEXT_PUBLIC_GA_ID`               | Optional Google Analytics measurement ID                                  |
 | `NEXT_PUBLIC_ADSENSE_CLIENT_ID`    | Optional Google AdSense client ID                                          |
 | `NOTION_FEEDBACK_DATABASE_ID`      | Optional Notion database ID for feedback                                   |
-| `RESEND_AUDIENCE_ID`               | Resend audience used by newsletter signup and unsubscribe                  |
+| `RESEND_AUDIENCE_ID`               | Resend audience used by the backend after confirmed newsletter consent     |
+| `NEWSLETTER_ENABLED`                | Production collection switch; keep `false` until launch approval           |
+| `NEWSLETTER_PRIVACY_VERSION`        | Identifier of the exact approved and archived privacy notice                |
+| `NEWSLETTER_MAINTENANCE_URL`        | Optional maintenance endpoint override; defaults to the production backend |
 
 ### Environment
 
 Create a `production` environment in GitHub and assign the secrets/variables to it.
+
+Newsletter addresses become broadcastable only after inbox confirmation. Payload/PostgreSQL is the consent authority; Resend mirrors confirmed active or withdrawn state. Public requests are limited per HMAC-pseudonymized requester, without storing raw requester addresses. The scheduled `newsletter-maintenance.yml` workflow sends queued confirmations and retries provider synchronization every 15 minutes using `BACKEND_CRON_SECRET`; it must remain operational even when `NEWSLETTER_ENABLED=false` so withdrawals, request-limit cleanup, and pending-record expiry continue. Production hard-codes `NEWSLETTER_WITHDRAWAL_REQUIRED=true`, so a paused deployment fails closed if the service secret or Resend withdrawal configuration is removed. Before enabling collection, deploy the database migration, configure and preserve `NEWSLETTER_TOKEN_ENCRYPTION_KEY`, publish the privacy legal document whose version exactly matches `NEWSLETTER_PRIVACY_VERSION`, verify the Resend audience and sender domain, approve the legal copy and retention policy, and exercise confirmation plus both unsubscribe paths in production. A non-2xx maintenance result means failed delivery state or excess due backlog remains and must be investigated. Before sending a campaign, confirm there are no newsletter records with `providerSyncStatus=failed`, verify one-click unsubscribe headers are DKIM-covered by Resend, and retain the reviewed consent/privacy text versions referenced by the consent ledger. Never import existing Resend contacts as consented; legacy contacts require a separately approved re-permission process.
 
 For `admin.open-agency.io`, keep the Cloudflare DNS record DNS-only. The backend/admin origin is expected to terminate TLS at Railway rather than through Cloudflare proxying.
 

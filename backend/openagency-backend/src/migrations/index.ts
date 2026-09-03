@@ -4,6 +4,7 @@ import * as migration_20260602_072007_blog_post_thumbnail_columns from './202606
 import * as migration_20260603_190000_blog_post_level from './20260603_190000_blog_post_level';
 import * as migration_20260714_213520_legal_documents from './20260714_213520_legal_documents';
 import * as migration_20260825_185225_tool_submissions from './20260825_185225_tool_submissions';
+import * as migration_20260903_074205_newsletter_consent from './20260903_074205_newsletter_consent';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20260825_185225_tool_submissions.up,
     down: migration_20260825_185225_tool_submissions.down,
-    name: '20260825_185225_tool_submissions'
+    name: '20260825_185225_tool_submissions',
+  },
+  {
+    up: migration_20260903_074205_newsletter_consent.up,
+    down: migration_20260903_074205_newsletter_consent.down,
+    name: '20260903_074205_newsletter_consent',
   },
 ];

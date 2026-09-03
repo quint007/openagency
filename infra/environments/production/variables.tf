@@ -90,23 +90,35 @@ variable "marketing_notion_token" {
 }
 
 variable "marketing_resend_api_key" {
-  description = "Optional Resend API key used by production marketing feedback and newsletter flows."
+  description = "Optional Resend API key used by the production marketing feedback fallback."
   type        = string
   sensitive   = true
   default     = null
 }
 
-variable "marketing_resend_audience_id" {
-  description = "Optional Resend audience ID used by the production marketing newsletter."
+variable "newsletter_service_secret" {
+  description = "Shared secret used by the marketing app to call the private backend newsletter API."
   type        = string
   sensitive   = true
   default     = null
 }
 
-variable "marketing_newsletter_token_secret" {
-  description = "Optional signing secret used for production newsletter unsubscribe tokens."
+variable "newsletter_token_encryption_key" {
+  description = "Backend-only 32-byte base64url key used to encrypt durable newsletter unsubscribe credentials."
   type        = string
   sensitive   = true
+  default     = null
+}
+
+variable "newsletter_enabled" {
+  description = "Fail-closed switch for production newsletter collection and confirmation delivery."
+  type        = bool
+  default     = false
+}
+
+variable "newsletter_privacy_version" {
+  description = "Identifier of the approved and archived privacy notice presented when newsletter consent is requested."
+  type        = string
   default     = null
 }
 
@@ -204,16 +216,18 @@ variable "postgres_password" {
 variable "backend_optional_environment" {
   description = "Optional backend runtime environment values for production."
   type = object({
-    ALPHA_BASIC_AUTH_PASSWORD = optional(string)
-    ALPHA_BASIC_AUTH_USERNAME = optional(string)
-    R2_ACCESS_KEY_ID          = optional(string)
-    R2_BUCKET                 = optional(string)
-    R2_ENDPOINT               = optional(string)
-    R2_PUBLIC_BASE_URL        = optional(string)
-    R2_REGION                 = optional(string)
-    R2_SECRET_ACCESS_KEY      = optional(string)
-    RESEND_API_KEY            = optional(string)
-    REVALIDATE_TIMEOUT_MS     = optional(string)
+    ALPHA_BASIC_AUTH_PASSWORD  = optional(string)
+    ALPHA_BASIC_AUTH_USERNAME  = optional(string)
+    R2_ACCESS_KEY_ID           = optional(string)
+    R2_BUCKET                  = optional(string)
+    R2_ENDPOINT                = optional(string)
+    R2_PUBLIC_BASE_URL         = optional(string)
+    R2_REGION                  = optional(string)
+    R2_SECRET_ACCESS_KEY       = optional(string)
+    RESEND_API_KEY             = optional(string)
+    RESEND_AUDIENCE_ID         = optional(string)
+    NEWSLETTER_PRIVACY_VERSION = optional(string)
+    REVALIDATE_TIMEOUT_MS      = optional(string)
   })
   default = {}
 }

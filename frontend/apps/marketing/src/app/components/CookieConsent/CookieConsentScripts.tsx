@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { cookieIntegrationConfig } from "./cookie-config";
@@ -36,8 +37,10 @@ function AdSenseScript({ clientId }: { readonly clientId: string }) {
 export function CookieConsentScripts() {
   const { consent, isHydrated } = useCookieConsent();
   const { adsenseClientId, googleAnalyticsId } = cookieIntegrationConfig;
+  const pathname = usePathname();
+  const isCredentialRoute = pathname === "/newsletter/confirm" || pathname === "/newsletter/unsubscribe";
 
-  if (!isHydrated) {
+  if (!isHydrated || isCredentialRoute) {
     return null;
   }
 

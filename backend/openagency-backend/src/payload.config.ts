@@ -18,12 +18,16 @@ import { LegalDocuments } from './collections/LegalDocuments'
 import { Lessons } from './collections/Lessons'
 import { Media } from './collections/Media'
 import { Modules } from './collections/Modules'
+import { NewsletterConsentEvents } from './collections/NewsletterConsentEvents'
+import { NewsletterRequestLimits } from './collections/NewsletterRequestLimits'
+import { NewsletterSubscriptions } from './collections/NewsletterSubscriptions'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { ToolSubmissions } from './collections/ToolSubmissions'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { getNewsletterConfigurationError } from './newsletter/constants'
 import { plugins } from './plugins'
 import { getAdminURL, getPublicSiteURL } from './utilities/getURL'
 import { getR2StorageDiagnostics, getR2StorageEndpoint, isR2StorageConfigured } from './utilities/mediaStorage'
@@ -33,11 +37,16 @@ const dirname = path.dirname(filename)
 const r2StorageEnabled = isR2StorageConfigured()
 const r2StorageEndpoint = getR2StorageEndpoint()
 const r2StorageDiagnostics = getR2StorageDiagnostics()
+const newsletterConfigurationError = getNewsletterConfigurationError()
 
 if (process.env.OPENAGENCY_REQUIRE_R2_STORAGE === 'true' && !r2StorageEnabled) {
   throw new Error(
     `R2 storage is required in production but is misconfigured: ${r2StorageDiagnostics.error}`,
   )
+}
+
+if (newsletterConfigurationError) {
+  throw new Error(newsletterConfigurationError)
 }
 
 if (r2StorageEnabled && r2StorageDiagnostics.bucket && r2StorageDiagnostics.endpointHost) {
@@ -109,6 +118,9 @@ export default buildConfig({
     Users,
     ApiClients,
     ToolSubmissions,
+    NewsletterSubscriptions,
+    NewsletterConsentEvents,
+    NewsletterRequestLimits,
   ],
   cors: [getAdminURL(), getPublicSiteURL()].filter(Boolean),
   globals: [Header, Footer],
